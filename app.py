@@ -29,5 +29,5 @@ def send_message():
     return jsonify({'message': 'Message sent!'})
 
 if __name__ == '__main__':
-    port = int(os.environ.get("PORT", 5000))
-    app.run(host='0.0.0.0', port=port)
+    port = int(os.environ.get("PORT", 5000))  # Fetch the port from environment variables or set to 5000
+    app.run(host="0.0.0.0", port=port)  # Run the app
