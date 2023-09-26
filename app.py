@@ -18,19 +18,27 @@ client = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
 gpt4_api_key = os.environ.get('GPT4_API_KEY')
 openai.api_key = gpt4_api_key
 
-def generate_greeting():
+conversations = {}  # This will hold the conversation history
+
+def generate_response(user_input, phone_number):
+    global conversations
+    if phone_number not in conversations:
+        conversations[phone_number] = [
+            {"role": "system", "content": "You are a chatbot."},
+        ]
+    conversations[phone_number].append({"role": "user", "content": user_input})
+    
     try:
         response = openai.ChatCompletion.create(
-            model="gpt-4",  # Replace with the actual GPT-4 model ID
-            messages=[
-                {"role": "system", "content": "You are a friendly greeter named Pal. aks if there something they want to talk it through"},
-                {"role": "user", "content": "Generate a greeting for me."}
-            ]
+            model="gpt-4",
+            messages=conversations[phone_number]
         )
-        return response['choices'][0]['message']['content'].strip()
+        gpt4_reply = response['choices'][0]['message']['content'].strip()
+        conversations[phone_number].append({"role": "assistant", "content": gpt4_reply})
+        return gpt4_reply
     except Exception as e:
         logging.error(f"Failed to generate message with GPT-4: {e}")
-        return "Hey there, nice to meet you!"
+        return "Sorry, I couldn't understand that."
 
 @app.route('/')
 def index():
@@ -57,12 +65,11 @@ def send_message():
 
 @app.route("/sms", methods=['POST'])
 def sms_reply():
-    """Respond to incoming messages with a text from GPT-4."""
     user_input = request.values.get('Body', None)
     phone_number = request.values.get('From', None)
 
     # Generate response using GPT-4
-    gpt4_response = generate_response(user_input)
+    gpt4_response = generate_response(user_input, phone_number)
     
     message = client.messages.create(
         to=phone_number,
@@ -71,6 +78,7 @@ def sms_reply():
     )
 
     return jsonify({'message': 'Reply sent!'})
+
 
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 5001))  # Fetch the port from environment variables or set to 5000
