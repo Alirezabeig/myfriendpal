@@ -3,6 +3,8 @@ from twilio.rest import Client
 import os
 from dotenv import load_dotenv
 import logging
+import openai
+
 
 app = Flask(__name__)
 
