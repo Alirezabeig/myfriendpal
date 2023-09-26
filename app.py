@@ -4,8 +4,8 @@ import os
 from dotenv import load_dotenv
 import logging
 import openai
-load_dotenv()
 
+load_dotenv()
 
 app = Flask(__name__)
 
@@ -16,7 +16,6 @@ TWILIO_PHONE_NUMBER = '+18666421882'
 client = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
 
 gpt4_api_key = os.environ.get('GPT4_API_KEY')
-
 openai.api_key = gpt4_api_key
 
 def generate_greeting():
@@ -24,7 +23,7 @@ def generate_greeting():
         response = openai.ChatCompletion.create(
             model="gpt-4",  # Replace with the actual GPT-4 model ID
             messages=[
-                {"role": "system", "content": "You are a friendly greeter named Pal."},
+                {"role": "system", "content": "You are a friendly greeter named Pal. aks if there something they want to talk it through"},
                 {"role": "user", "content": "Generate a greeting for me."}
             ]
         )
@@ -56,6 +55,22 @@ def send_message():
         logging.error(f"Failed to send message: {e}")
         return jsonify({'message': 'Failed to send message', 'error': str(e)})
 
+@app.route("/sms", methods=['POST'])
+def sms_reply():
+    """Respond to incoming messages with a text from GPT-4."""
+    user_input = request.values.get('Body', None)
+    phone_number = request.values.get('From', None)
+
+    # Generate response using GPT-4
+    gpt4_response = generate_response(user_input)
+    
+    message = client.messages.create(
+        to=phone_number,
+        from_=TWILIO_PHONE_NUMBER,
+        body=gpt4_response
+    )
+
+    return jsonify({'message': 'Reply sent!'})
 
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 5001))  # Fetch the port from environment variables or set to 5000
