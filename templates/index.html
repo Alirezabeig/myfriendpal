@@ -3,24 +3,17 @@
 
 <head>
   <title>MyFriendPal</title>
-  <link rel="stylesheet" type="text/css" href="styles.css">  
 </head>
 
 <body>
-  <div class="container">
-    <div class="content-left">
-      <h1>Your personal AI Therapist!</h1>
-      <form id="phoneNumberForm">
-        <input type="text" id="phoneNumber" name="phone_number" placeholder="Enter your phone number">
-        <input type="submit" value="Send Message">
-      </form>
-    </div>
-    <div class="content-right">
-      <img src="phone-image.png" alt="How it works">  <!-- Update src to your image path -->
-    </div>
-  </div>
-
+  <form id="phoneNumberForm">
+    pal is activated: <input type="text" id="phoneNumber" name="phone_number">
+    <input type="submit" value="Send Message">
+  </form>
+  
   <script src="{{ url_for('static', filename='script.js') }}"></script>
+
+
 </body>
 
 </html>
