@@ -4,6 +4,7 @@ import os
 from dotenv import load_dotenv
 import logging
 import openai
+load_dotenv()
 
 
 app = Flask(__name__)
@@ -12,9 +13,7 @@ TWILIO_ACCOUNT_SID = os.environ.get('TWILIO_ACCOUNT_SID')
 TWILIO_AUTH_TOKEN = os.environ.get('TWILIO_AUTH_TOKEN')
 TWILIO_PHONE_NUMBER = '+18666421882'
 
-twilio_account = TWILIO_ACCOUNT_SID
-twilio_auth = TWILIO_AUTH_TOKEN
-client = Client(twilio_account, twilio_auth)
+client = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
 
 gpt4_api_key = os.environ.get('GPT4_API_KEY')
 
@@ -25,7 +24,7 @@ def generate_greeting():
         response = openai.ChatCompletion.create(
             model="gpt-4",  # Replace with the actual GPT-4 model ID
             messages=[
-                {"role": "system", "content": "You are a friendly greeter."},
+                {"role": "system", "content": "You are a friendly greeter named Pal."},
                 {"role": "user", "content": "Generate a greeting for me."}
             ]
         )
