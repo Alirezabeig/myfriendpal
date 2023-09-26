@@ -11,23 +11,11 @@ app = Flask(__name__)
 TWILIO_ACCOUNT_SID = 'AC4f83e220b05a9e196c601e69705b44ab'
 TWILIO_AUTH_TOKEN = 'fae80af5822f21e3e00544462caabe3d'
 TWILIO_PHONE_NUMBER = '+18666421882'
-GPT4_API_KEY = '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'
+## GPT4_API_KEY = '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'
 
 client = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
 
-openai.api_key = GPT4_API_KEY
-
-def generate_greeting():
-    try:
-        response = openai.Completion.create(
-          engine="text-davinci-002",
-          prompt="Create a friendly greeting message.",
-          max_tokens=50
-        )
-        return response.choices[0].text.strip()
-    except Exception as e:
-        logging.error(f"Failed to generate message with GPT-4: {e}")
-        return "Hey there, nice to meet you!"
+##openai.api_key = GPT4_API_KEY
 
 @app.route('/')
 def index():
