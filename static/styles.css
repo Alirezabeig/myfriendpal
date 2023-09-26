@@ -33,21 +33,49 @@ h1 {
   text-shadow: 2px 2px 4px #000000;  /* New: add text shadow */
 }
 
-#phoneNumberForm input[type="text"] {
-  padding: 10px;
+#phoneNumberForm .phone-input-container {
+  position: relative;
   width: 80%;
   margin-bottom: 20px;
-  border: 2px solid #ccc;  /* New: add border */
-  border-radius: 4px;  /* New: add rounded corners */
+}
+
+#phoneNumberForm .phone-input-container i {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 16px;
+  color: #aaa;
+}
+
+#phoneNumberForm input[type="tel"] {
+  padding: 10px;
+  padding-left: 30px;  /* Space for phone icon */
+  width: 100%;
+  border: 1px solid #aaa;
+  border-radius: 4px;
+  box-shadow: 0px 0px 5px #ccc;
+  transition: all 0.3s ease;
+  placeholder: "Enter phone number";
+}
+
+#phoneNumberForm input[type="tel"]:focus {
+  border-color: #007bff;
+  box-shadow: 0px 0px 5px #007bff;
 }
 
 #phoneNumberForm input[type="submit"] {
   padding: 10px 20px;
   cursor: pointer;
-  background-color: #4CAF50;  /* New: add background color */
-  color: white;  /* New: change text color */
-  border: none;  /* New: remove border */
-  border-radius: 4px;  /* New: add rounded corners */
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  transition: background-color 0.3s ease;
+}
+
+#phoneNumberForm input[type="submit"]:hover {
+  background-color: #45a049;
 }
 
 

@@ -24,7 +24,7 @@ def generate_response(user_input, phone_number):
     global conversations
     if phone_number not in conversations:
         conversations[phone_number] = [
-            {"role": "system", "content": "You are like a friend. your name is pal. Your language is like a friend"},
+            {"role": "system", "content": "You are like a friend. Your name is Pal. you have no other name. Your language is like a friend"},
         ]
     conversations[phone_number].append({"role": "user", "content": user_input})
     
