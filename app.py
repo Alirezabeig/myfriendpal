@@ -9,11 +9,9 @@ app = Flask(__name__)
 TWILIO_ACCOUNT_SID = 'AC4f83e220b05a9e196c601e69705b44ab'
 TWILIO_AUTH_TOKEN = 'fae80af5822f21e3e00544462caabe3d'
 TWILIO_PHONE_NUMBER = '+18666421882'
-GPT4_API_KEY = 'your_openai_api_key_here'  # Step 3
 
 
 client = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
-openai.api_key = GPT4_API_KEY  # Step 3
 
 
 @app.route('/')
