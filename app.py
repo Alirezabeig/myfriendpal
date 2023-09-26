@@ -3,7 +3,7 @@ from twilio.rest import Client
 import os
 from dotenv import load_dotenv
 
-load_dotenv()
+
 
 app = Flask(__name__)
 
@@ -19,15 +19,21 @@ def index():
 
 @app.route('/send_message', methods=['POST'])
 def send_message():
-    data = request.json
-    phone_number = data.get('phone_number')
-    message = client.messages.create(
-        to=phone_number,
-        from_=TWILIO_PHONE_NUMBER,
-        body="hey, very nice meeting you!"
-    )
-    return jsonify({'message': 'Message sent!'})
+    try:
+        data = request.json
+        phone_number = data.get('phone_number')
+        message = client.messages.create(
+            to=phone_number,
+            from_=TWILIO_PHONE_NUMBER,
+            body="hey, very nice meeting you!"
+        )
+        logging.info(f"Message sent with ID: {message.sid}")
+        return jsonify({'message': 'Message sent!'})
+    except Exception as e:
+        logging.error(f"Failed to send message: {e}")
+        return jsonify({'message': 'Failed to send message', 'error': str(e)})
 
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 5001))  # Fetch the port from environment variables or set to 5000
     app.run(host="0.0.0.0", port=port)  # Run the app
+

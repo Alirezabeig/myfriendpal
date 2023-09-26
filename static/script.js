@@ -1,5 +1,6 @@
 document.addEventListener('DOMContentLoaded', function () {
   document.getElementById('phoneNumberForm').addEventListener('submit', function (e) {
+      console.log("form submitted")
     e.preventDefault();
 
     let phoneNumber = document.getElementById('phoneNumber').value;
