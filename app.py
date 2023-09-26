@@ -14,9 +14,11 @@ TWILIO_PHONE_NUMBER = '+18666421882'
 
 
 client = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
-GPT4_API_KEY = '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'
 
-openai.api_key = GPT4_API_KEY
+gpt4_api_key = os.environ.get('GPT4_API_KEY')
+##GPT4_API_KEY = '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'
+
+openai.api_key = gpt4_api_key
 
 def generate_greeting():
     try:
