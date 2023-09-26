@@ -1,22 +1,26 @@
 <!DOCTYPE html>
 <html>
+
 <head>
   <title>MyFriendPal</title>
-  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}">
+  <link rel="stylesheet" type="text/css" href="your_css_file.css">  <!-- Add this line to link your CSS -->
 </head>
+
 <body>
   <div class="container">
-    <div class="content content-left">
+    <div class="content-left">
       <h1>Your personal AI Therapist!</h1>
       <form id="phoneNumberForm">
         <input type="text" id="phoneNumber" name="phone_number" placeholder="Enter your phone number">
         <input type="submit" value="Send Message">
       </form>
     </div>
-    <div class="content content-right">
-      <img src="{{ url_for('static', filename='phone-image.png') }}" alt="Phone showing how the app works">
+    <div class="content-right">
+      <img src="phone-image.png" alt="How it works">  <!-- Update src to your image path -->
     </div>
   </div>
+
   <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
+
 </html>

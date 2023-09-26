@@ -2,6 +2,10 @@ body {
   font-family: Arial, sans-serif;
   margin: 0;
   padding: 0;
+  background-image: url('/static/background.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
 }
 
 .container {
@@ -25,30 +29,44 @@ body {
 h1 {
   font-size: 2.5em;
   margin-bottom: 20px;
+  color: white;  /* New: change text color */
+  text-shadow: 2px 2px 4px #000000;  /* New: add text shadow */
 }
 
 #phoneNumberForm input[type="text"] {
   padding: 10px;
   width: 80%;
   margin-bottom: 20px;
+  border: 2px solid #ccc;  /* New: add border */
+  border-radius: 4px;  /* New: add rounded corners */
 }
 
 #phoneNumberForm input[type="submit"] {
   padding: 10px 20px;
   cursor: pointer;
+  background-color: #4CAF50;  /* New: add background color */
+  color: white;  /* New: change text color */
+  border: none;  /* New: remove border */
+  border-radius: 4px;  /* New: add rounded corners */
 }
+
 
 img {
   max-width: 100%;
   height: auto;
 }
+/* New Media Query */
+@media (max-width: 768px) {
+  .container {
+    flex-direction: column;
+  }
 
-body {
-  font-family: Arial, sans-serif;
-  margin: 0;
-  padding: 0;
-  background-image: url('/static/background.jpg');
-  background-size: cover;  /* Cover the entire page */
-  background-position: center;
-  background-repeat: no-repeat; /* Don't repeat the image */
+  .content-left, .content-right {
+    margin-bottom: 20px;
+  }
+
+  img {
+    order: 1;  /* New: push image below the "Send Message" box */
+  }
 }
+
