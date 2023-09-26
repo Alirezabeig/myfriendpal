@@ -22,12 +22,14 @@ openai.api_key = gpt4_api_key
 
 def generate_greeting():
     try:
-        response = openai.Completion.create(
-          engine="text-davinci-002",
-          prompt="Create a friendly greeting message.",
-          max_tokens=50
+        response = openai.ChatCompletion.create(
+            model="gpt-4",  # Replace with the actual GPT-4 model ID
+            messages=[
+                {"role": "system", "content": "You are a friendly greeter."},
+                {"role": "user", "content": "Generate a greeting for me."}
+            ]
         )
-        return response.choices[0].text.strip()
+        return response['choices'][0]['message']['content'].strip()
     except Exception as e:
         logging.error(f"Failed to generate message with GPT-4: {e}")
         return "Hey there, nice to meet you!"
