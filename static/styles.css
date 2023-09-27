@@ -7,21 +7,22 @@ body {
     margin: 100px;
     justify-content: center;
     align-items: center;
-    font-size: 100px;
+    font-size: 50px;
 }
 
 #phoneInput, #activatePal button {
-    width: 200px;
+    width: 250px;  /* Updated width */
     height: 40px;
     box-sizing: border-box;
     border-radius: 10px;
     margin-bottom: 8px;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);  /* Add shadow */
-    border: 1px solid rgba(0,0,0,0.2);  /* Lighter border */
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    border: 1px solid rgba(0,0,0,0.2);
 }
 
 #phoneInput {
     font-size: 14px;
+    margin-right: 16px;  /* Add space on the right */
 }
 
 #activatePal button {
@@ -31,14 +32,13 @@ body {
 
 .container {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;  /* Align items horizontally */
     align-items: center;
     justify-content: center;
 }
 
 @media (max-width: 600px) {
     #phoneInput, #activatePal button {
-        width: 150px;
+        width: 200px;  /* Updated width for smaller screens */
     }
 }
-
