@@ -11,6 +11,8 @@
     font-size: 72px;
     text-align: center;
     margin-top: 50px;
+    margin-left: 10%; /* Add margin to left */
+    margin-right: 10%; /* Add margin to right */
     font-weight: 300;
 }
 
@@ -23,20 +25,22 @@
 /* Updated single text box for phone number */
 #phoneInput {
     width: 100%;
-    max-width: 200px;
+    max-width: 200px; /* Set max-width */
     padding: 10px;
     border: 1px solid black;
-    border-radius: 10px; /* Add rounded corners */
+    border-radius: 10px;
     background-color: lightgray;
     text-align: center;
 }
 
 input[type="submit"] {
+    width: 100%; /* Set width to 100% */
+    max-width: 200px; /* Set max-width to match #phoneInput */
     background: linear-gradient(to bottom, #ffffff, #ff6666);
     color: black;
     padding: 10px 20px;
     border: none;
-    border-radius: 10px; /* Add rounded corners */
+    border-radius: 10px;
     cursor: pointer;
 }
 
@@ -59,6 +63,8 @@ body {
 #yourImage {
     display: block;
     margin: auto;
+    margin-left: -20px; /* Move slightly to the left */
     width: 600px;
     height: auto;
 }
+
