@@ -1,52 +1,91 @@
-.container {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    height: 100vh;
-    padding: 50px;
+.element {
+  background-color: #ffffff;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  width: 100%;
 }
 
-.content {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    justify-content: center;
+.element .div {
+  background-color: #ffffff;
+  width: 100%;
+  height: auto;
+  position: relative;
 }
 
-.title {
-    font-family: 'Roboto', sans-serif;
-    font-weight: 300;
-    font-size: 48px;
-    margin-bottom: 20px;
+.element .text-wrapper {
+  font-family: "Roboto", Helvetica;
+  font-weight: 400;
+  color: #252525;
+  font-size: 64px;
+  text-align: center;
+  margin-bottom: 40px;
 }
 
-#phoneNumberForm {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    max-width: 300px;
+.element .p {
+  font-family: "Roboto", Helvetica;
+  font-weight: 400;
+  color: #252525cc;
+  font-size: 26px;
+  text-align: center;
+  margin-bottom: 40px;
 }
 
-#phoneInput, input[type="submit"] {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid black;
-    border-radius: 10px;
-    margin-bottom: 10px;
+.element .overlap {
+  background-color: #252525;
+  width: 280px;
+  height: 56px;
+  border-radius: 16px;
+  margin: auto;
+  color: #ffffff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
+.element .text-wrapper-2 {
+  font-family: "Roboto", Helvetica;
+  font-weight: 400;
+  color: #ffffff;
+  font-size: 24px;
+}
+
+.element .overlap-group {
+  position: relative;
+  width: 280px;
+  height: 56px;
+  margin: auto;
+  border-radius: 16px;
+}
+
+.element .text-wrapper-9 {
+  width: 100%;
+  font-family: "Roboto", Helvetica;
+  font-weight: 400;
+  color: #252525cc;
+  font-size: 20px;
+  text-align: center;
+  opacity: 0.8;
+}
+
+.element .rectangle {
+  width: 280px;
+  height: 56px;
+  border-radius: 16px;
+  border: 1px solid #00000033;
+  box-shadow: 0px 1px 4px #00000066;
+}
+
+/* Additional styles for your form elements and image */
 #phoneInput {
-    background-color: lightgray;
-}
-
-input[type="submit"] {
-    background: linear-gradient(to bottom, #ffffff, #ff6666);
-    cursor: pointer;
+  border: none;
+  width: 100%;
+  padding: 15px;
+  font-size: 20px;
+  border-radius: 16px;
 }
 
 #yourImage {
-    width: 500px;
-    height: auto;
+  max-width: 100%;
+  height: auto;
 }
-
