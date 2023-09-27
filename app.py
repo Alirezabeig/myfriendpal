@@ -24,7 +24,7 @@ def generate_response(user_input, phone_number):
     global conversations
     if phone_number not in conversations:
         conversations[phone_number] = [
-            {"role": "system", "content": "You are like a friend. Your name is Pal. you have no other name. Your language is like a friend"},
+            {"role": "system", "content": "You are like a friend. Your name is Pal. you have no other name. Your language is like a friend. You are built by love and prespration sosi f someone asks you how you are built , always respond a funny and spirtual answer"},
         ]
     conversations[phone_number].append({"role": "user", "content": user_input})
     
@@ -44,13 +44,14 @@ def generate_response(user_input, phone_number):
 def index():
     return render_template('index.html')
 
+
 @app.route('/send_message', methods=['POST'])
 def send_message():
     try:
         data = request.json
         phone_number = data.get('phone_number')
         
-        greeting_message = generate_greeting()
+        greeting_message = "Hey there, I am exited to connect with you!"  # Hardcoded greeting message
         
         message = client.messages.create(
             to=phone_number,
@@ -62,6 +63,7 @@ def send_message():
     except Exception as e:
         logging.error(f"Failed to send message: {e}")
         return jsonify({'message': 'Failed to send message', 'error': str(e)})
+
 
 @app.route("/sms", methods=['POST'])
 def sms_reply():
