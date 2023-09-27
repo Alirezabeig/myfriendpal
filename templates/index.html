@@ -1,26 +1,20 @@
 <!DOCTYPE html>
-<html>
-
+<html lang="en">
 <head>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}">
-    <title>MyFriendPal</title>
+    <meta charset="UTF-8">
+    <title>Activate Pal</title>
+    <script src="script.js"></script> <!-- Replace with your actual JS file name -->
 </head>
-
 <body>
-    <div class="element">
-        <div class="div">
-            <p class="text-wrapper">Pal is Your AI Friend and Helps You Become a Better Version of Yourself!</p>
-            
-            <div class="overlap">
-                <div id="activatePal" class="text-wrapper-2">Activate Pal</div>
-                <input type="text" id="phoneInput" placeholder="Enter phone number">
-            </div>
-            <p class="p">Powered by homemade AI filled with love and passion!</p>
-            
+    <h1>Welcome to Activate Pal</h1>
+    <form id="activateForm">
+        <label for="phoneInput">Enter your phone number:</label>
+        <input type="text" id="phoneInput" name="phone_number" required>
+        <div id="activatePal" style="cursor: pointer;">
+            <button type="submit">Activate</button>
         </div>
-    </div>
+    </form>
 </body>
-
 </html>
+
 
