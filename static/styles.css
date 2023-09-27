@@ -1,5 +1,4 @@
 .element {
-  background-color: #ffffff;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -8,14 +7,12 @@
 }
 
 .div {
-  background-color: #ffffff;
   width: 100%;
   max-width: 1440px;
   position: relative;
 }
 
 .text-wrapper, .text-wrapper-3, .text-wrapper-4, .text-wrapper-5, .text-wrapper-6, .text-wrapper-7, .text-wrapper-8 {
-  font-family: "Avenir-Heavy", Helvetica;
   font-weight: 400;
   color: #252525;
   font-size: 64px;
@@ -41,14 +38,12 @@
 }
 
 .text-wrapper-2 {
-  font-family: "Inter-Regular", Helvetica;
   font-weight: 400;
   color: #ffffff;
   font-size: 24px;
 }
 
 .p {
-  font-family: "Poppins-Regular", Helvetica;
   font-weight: 400;
   color: #252525cc;
   font-size: 26px;
@@ -57,15 +52,4 @@
 
 @media only screen and (max-width: 768px) {
   .text-wrapper, .text-wrapper-3, .text-wrapper-4, .text-wrapper-5, .text-wrapper-6, .text-wrapper-7, .text-wrapper-8 {
-    font-size: 32px;
-  }
-  .p {
-    font-size: 18px;
-  }
-  .overlap {
-    width: 200px;
-  }
-  .text-wrapper-2 {
-    font-size: 18px;
-  }
-}
+    font-size: 32
