@@ -118,6 +118,6 @@ def load_conversation(phone_number):
         return None
 
 if __name__ == '__main__':
-    initialize_database()
+    initialize_db()
     port = int(os.environ.get("PORT", 5001))  # Fetch the port from environment variables or set to 5000
     app.run(host="0.0.0.0", port=port)
