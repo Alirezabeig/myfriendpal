@@ -3,21 +3,29 @@
 
 <head>
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}">
-
-  <title>MyFriendPal</title>
+    <title>MyFriendPal</title>
 </head>
 
-<body>
-  <h1 class = "title">Your personal AI Therapist!</h1>
-  
-  <form id="phoneNumberForm">
-    <input type="text" id="phoneInput" name="phone_number" placeholder="Enter your phone number" maxlength="14">
-    <input type="submit" value="Send Message">
-  </form>
+<body onload="document.getElementById('input1').focus();">
+    <h1 class="title">Your personal AI Therapist!</h1>
 
-  <!-- Keeping the JavaScript link -->
-  <script src="{{ url_for('static', filename='script.js') }}"></script>
+    <form id="phoneNumberForm">
+        <div id="phoneBoxContainer">
+            <input type="text" id="input1" maxlength="1">
+            <input type="text" id="input2" maxlength="1">
+            <input type="text" id="input3" maxlength="1">
+            <input type="text" id="input4" maxlength="1">
+            <input type="text" id="input5" maxlength="1">
+            <input type="text" id="input6" maxlength="1">
+            <input type="text" id="input7" maxlength="1">
+            <input type="text" id="input8" maxlength="1">
+            <input type="text" id="input9" maxlength="1">
+            <input type="text" id="input10" maxlength="1">
+        </div>
+        <input type="submit" value="Send Message">
+    </form>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 
 </html>
-

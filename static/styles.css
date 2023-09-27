@@ -1,7 +1,7 @@
 .title {
     color: black;  /* Replace with your color */
     font-family: 'Avenir', sans-serif;  /* Replace with your font */
-    font-size: 16px;  /* Replace with your font size */
+    font-size: 36px;  /* Replace with your font size */
     font-weight: 400;
     height: auto;  /* Height will be determined by content */
     letter-spacing: 0;
@@ -12,3 +12,34 @@
     width: auto;  /* Width will be determined by content */
 }
 
+/* Style the form container for responsiveness */
+#phoneNumberForm {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 20px;
+}
+
+/* Style the input field */
+#phoneInput {
+    width: 100%;
+    max-width: 400px;
+    margin-bottom: 10px;
+    padding: 10px;
+}
+
+/* Style the submit button */
+input[type="submit"] {
+    padding: 10px 20px;
+    cursor: pointer;
+}
+
+/* Media query for screens smaller than 600px */
+@media (max-width: 600px) {
+    .title {
+        font-size: 24px;
+    }
+    #phoneInput {
+        width: 90%;
+    }
+}
