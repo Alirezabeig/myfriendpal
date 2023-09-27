@@ -4,10 +4,11 @@ body {
 
 .title {
     display: flex;
-    margin: 100px;
+    margin: 400px;
     justify-content: center;
     align-items: center;
-    font-size: 50px;
+    font-size: 75px;
+    text-align: center;  /* Add this line */
 }
 
 #phoneInput, #activatePal button {
