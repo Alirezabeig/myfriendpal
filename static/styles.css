@@ -2,7 +2,6 @@ body, html {
     height: 100%;
     margin: 0;
     display: flex;
-    flex-direction: column;
     justify-content: center;
     align-items: center;
     background-color: #f2f2f2;
@@ -12,14 +11,15 @@ body, html {
     text-align: center;
     display: flex;
     flex-direction: column;
+    justify-content: center;
     align-items: center;
+    height: 100%;
 }
 
 .title {
-    font-family: 'Arial', sans-serif; /* Changed to a different font; you can choose any modern font */
+    font-family: 'Roboto', sans-serif;  /* Changed to Roboto for modern look */
     font-size: 2em;
     margin-bottom: 20px;
-    text-align: center;
 }
 
 #phoneInput {
@@ -31,4 +31,6 @@ button {
     padding: 10px 20px;
     background-color: #007bff;
     color: white;
+    cursor: pointer;
 }
+

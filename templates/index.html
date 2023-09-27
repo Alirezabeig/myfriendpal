@@ -3,20 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <title>Pal</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <script src="{{ url_for('static', filename='script.js') }}"></script>
 </head>
 <body>
-    <div class="container">
-        <h1 class="title">Pal is Your AI friend. It helps you become a better version of yourself!</h1>
-        <form id="activateForm">
-            <input type="text" id="phoneInput" placeholder="Enter your phone number" required>
-            <div id="activatePal">
-                <button type="submit">Activate</button>
-            </div>
-        </form>
+    <div class="wrapper">
+        <div class="container">
+            <h1 class="title">Pal is Your AI friend. It helps you become a better version of yourself!</h1>
+            <form id="activateForm">
+                <input type="text" id="phoneInput" placeholder="Enter your phone number" required>
+                <div id="activatePal">
+                    <button type="submit">Activate</button>
+                </div>
+            </form>
+        </div>
     </div>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 </html>
-
