@@ -9,6 +9,15 @@ document.addEventListener('DOMContentLoaded', function () {
     "phrase4": "I'd love to help you with any challenge you have anytime.",
     "phrase5": "I will amaze you if you get easily amazed :)",
     "phrase6": "We will build real connection as I everyday learn about you"
+      // Add hover event listeners for all phrases
+      for (let i = 1; i <= 6; i++) {
+          const phrase = document.getElementById(`phrase${i}`);
+          if (phrase) {
+              const tooltip = phrase.querySelector('.tooltip');
+           tooltip.innerText = hoverMessages[`phrase${i}`];
+         }
+       }
+
   };
 
   // Add hover event listeners for all phrases
