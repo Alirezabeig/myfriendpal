@@ -42,6 +42,7 @@ document.addEventListener('DOMContentLoaded', function () {
       const modal = document.getElementById("myModal");
       const span = document.getElementsByClassName("close")[0];
       const modalText = document.getElementById("modalText");
+      const modalBulletPoints = document.getElementById("modalBulletPoints");
 
       // Validate phone number
       if (!phoneNumber) {
@@ -71,7 +72,13 @@ document.addEventListener('DOMContentLoaded', function () {
       })
       .then(response => response.json())
       .then(data => {
-        modalText.innerText = "Message Sent";  // Update modal text
+        modalText.innerText = "Congrats! Pal is now going to message you on your phone";  // Update modal text
+        modalBulletPoints.innerHTML = `
+          <li>Your first random point</li>
+          <li>Your second random point</li>
+          <li>Your third random point</li>
+        `;
+
         modal.style.display = "block";  // Show modal
 
         span.onclick = function() {

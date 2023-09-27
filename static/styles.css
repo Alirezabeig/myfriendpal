@@ -175,3 +175,21 @@ body {
   text-decoration: none;
   cursor: pointer;
 }
+/* Modal Header */
+.modal-header {
+  display: flex;
+  align-items: center;
+}
+
+/* Modal Image */
+.modal-image {
+  width: 40px;
+  height: 40px;
+  margin-right: 15px;
+}
+
+/* Modal Bullet Points */
+#modalBulletPoints {
+  margin-top: 20px;
+  list-style-type: disc;
+}
