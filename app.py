@@ -5,6 +5,8 @@ from dotenv import load_dotenv
 import logging
 import openai
 
+logging.basicConfig(level=logging.INFO)
+
 load_dotenv()
 
 app = Flask(__name__)

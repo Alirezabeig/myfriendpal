@@ -3,26 +3,17 @@
 
 <head>
   <title>MyFriendPal</title>
-  <!-- Use Flask's url_for function to link the CSS -->
-  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 
 <body>
-  <div class="container">
-    <div class="content-left">
-      <h1 clas= "title">Your personal AI Therapist!</h1>
-      <form id="phoneNumberForm">
-        <input type="text" id="phoneInput" name="phone_number" placeholder="(- - -) - - - - - - - -" maxlength="14">
-        <input type="submit" value="Send Message">
-      </form>
-    </div>
-    <div class="content-right">
-      <!-- Use Flask's url_for function for the image as well -->
-      <img src="{{ url_for('static', filename='phone-image.png') }}" alt="How it works">
-    </div>
-  </div>
+  <h1>Your personal AI Therapist!</h1>
+  
+  <form id="phoneNumberForm">
+    <input type="text" id="phoneInput" name="phone_number" placeholder="(- - -) - - - - - - - -" maxlength="14">
+    <input type="submit" value="Send Message">
+  </form>
 
-  <!-- Your JavaScript link appears to be correct -->
+  <!-- Keeping the JavaScript link -->
   <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 

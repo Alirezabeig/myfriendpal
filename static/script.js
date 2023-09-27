@@ -2,7 +2,8 @@ document.addEventListener('DOMContentLoaded', function () {
   document.getElementById('phoneNumberForm').addEventListener('submit', function (e) {
     e.preventDefault();
 
-    let phoneNumber = document.getElementById('phoneNumber').value;
+      let phoneNumber = document.getElementById('phoneInput').value;
+
 
     fetch('/send_message', {
       method: 'POST',
