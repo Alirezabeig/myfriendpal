@@ -28,12 +28,14 @@ body {
 
 
 #phoneInput {
+    font-family: 'Avenir-Heavy', Helvetica, sans-serif;
     font-size: 16px;
     margin-right: 16px;
     padding-left: 15px;
 }
 
 #activatePal button {
+    font-family: 'Avenir-Heavy', Helvetica, sans-serif;
     background-color: black;
     color: white;
 }
@@ -79,7 +81,7 @@ body {
 }
 
 .phrase img {
-    width: 50px; /* Or any other size you want */
-    height: 50px; /* Or any other size you want */
-    margin-top: 20px;
+    width: 200px; /* Or any other size you want */
+    height: 200px; /* Or any other size you want */
+    margin-top: 40px;
 }
