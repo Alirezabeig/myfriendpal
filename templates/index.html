@@ -5,8 +5,6 @@
   <title>MyFriendPal</title>
   <!-- Use Flask's url_for function to link the CSS -->
   <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}">
-  <!-- Adding Font Awesome for the phone icon -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 
 <body>
@@ -14,10 +12,7 @@
     <div class="content-left">
       <h1>Your personal AI Therapist!</h1>
       <form id="phoneNumberForm">
-        <div class="phone-input-container">
-          <i class="fa fa-phone"></i>
-          <input type="tel" id="phoneNumber" name="phone_number" placeholder="Enter your phone number">
-        </div>
+        <input type="text" id="phoneInput" name="phone_number" placeholder="(- - -) - - - - - - - -" maxlength="14">
         <input type="submit" value="Send Message">
       </form>
     </div>

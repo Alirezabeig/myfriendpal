@@ -39,31 +39,24 @@ h1 {
   margin-bottom: 20px;
 }
 
-#phoneNumberForm .phone-input-container i {
-  position: absolute;
-  left: 10px;
-  top: 50%;
-  transform: translateY(-50%);
-  font-size: 16px;
-  color: #aaa;
-}
-
-#phoneNumberForm input[type="tel"] {
+/* CHANGED: updated the selector to match the new ID */
+#phoneNumberForm input[type="text"], #phoneNumberForm input#phoneInput {
   padding: 10px;
-  padding-left: 30px;  /* Space for phone icon */
-  width: 100%;
-  border: 1px solid #aaa;
+  /* REMOVED: padding-left for phone icon */
+  width: 250px;  /* CHANGED: fixed width for better layout */
+  margin-bottom: 20px;
+  border: 2px solid #ccc;  /* CHANGED: updated border */
   border-radius: 4px;
-  box-shadow: 0px 0px 5px #ccc;
-  transition: all 0.3s ease;
-  placeholder: "Enter phone number";
+  font-size: 18px;  /* NEW: larger font size */
 }
 
-#phoneNumberForm input[type="tel"]:focus {
+/* NEW: Added focus styling for the new input ID */
+#phoneNumberForm input#phoneInput:focus {
   border-color: #007bff;
   box-shadow: 0px 0px 5px #007bff;
 }
 
+/* No changes for the submit button, kept as is */
 #phoneNumberForm input[type="submit"] {
   padding: 10px 20px;
   cursor: pointer;
