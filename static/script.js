@@ -38,13 +38,13 @@ document.addEventListener('DOMContentLoaded', function () {
 
       const phoneNumber = document.getElementById('phoneInput').value;
 
+      // Initialize modal components
+      const modal = document.getElementById("myModal");
+      const span = document.getElementsByClassName("close")[0];
+      const modalText = document.getElementById("modalText");
+
       // Validate phone number
       if (!phoneNumber) {
-        // Display custom modal
-        const modal = document.getElementById("myModal");
-        const span = document.getElementsByClassName("close")[0];
-        const modalText = document.getElementById("modalText");
-
         modalText.innerText = "Please enter your phone number";
         modal.style.display = "block";
 
@@ -61,6 +61,7 @@ document.addEventListener('DOMContentLoaded', function () {
         return;
       }
 
+      // Sending message
       fetch('/send_message', {
         method: 'POST',
         headers: {
@@ -69,8 +70,23 @@ document.addEventListener('DOMContentLoaded', function () {
         body: JSON.stringify({ phone_number: phoneNumber })
       })
       .then(response => response.json())
-      .then(data => alert(data.message))
-      .catch(error => alert('Failed to send SMS. Please try again.'));
+      .then(data => {
+        modalText.innerText = "Message Sent";  // Update modal text
+        modal.style.display = "block";  // Show modal
+
+        span.onclick = function() {
+          modal.style.display = "none";
+        };
+
+        window.onclick = function(event) {
+          if (event.target === modal) {
+            modal.style.display = "none";
+          }
+        };
+      })
+      .catch(error => {
+        alert('Failed to send SMS. Please try again.');
+      });
     });
   } else {
     console.log("Could not find Activate Pal div");  // Debug line
