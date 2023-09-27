@@ -6,13 +6,19 @@
   justify-content: center;
   min-height: 100vh;
 }
-
+@font-face {
+    font-family: "Avenir-Heavy";
+    font-style: normal;
+    font-weight: 400;
+    src: url("https://fonts.animaapp.com/Avenir-Heavy")
+    format("opentype")
+}
 .title {
-    font-size: 72px;
+    font-size: 50px;
     text-align: center;
     margin-top: 50px;
-    margin-left: 10%; /* Add margin to left */
-    margin-right: 10%; /* Add margin to right */
+    margin-left: 20%; /* Add margin to left */
+    margin-right: 20%; /* Add margin to right */
     font-weight: 300;
 }
 
@@ -53,17 +59,11 @@ input[type="submit"] {
     }
 }
 
-/* Background and image styles */
-body {
-    background: linear-gradient(to bottom, white, lightgray);
-    margin: 0;
-    padding: 0;
-}
 
 #yourImage {
     display: block;
     margin: auto;
-    margin-left: -20px; /* Move slightly to the left */
+    margin-left: 10px; /* Move slightly to the left */
     width: 600px;
     height: auto;
 }
