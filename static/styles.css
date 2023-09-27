@@ -80,6 +80,7 @@ body {
     margin-right: 15px;
     margin-left: 15px;
     margin-right: 20px;
+    margin-top: 20px;
 }
 
 .phrases span {
@@ -91,5 +92,5 @@ body {
 .phrase img {
     width: 200px; /* Or any other size you want */
     height: 200px; /* Or any other size you want */
-    margin-top: 40px;
+    margin-top: 20px;
 }
