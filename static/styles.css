@@ -17,13 +17,15 @@ body {
 
 #phoneInput, #activatePal button {
     width: 250px;
-    height: 40px;
+    height: 50px;  /* Increase the height */
     box-sizing: border-box;
     border-radius: 10px;
     margin-bottom: 8px;
     box-shadow: 0 4px 8px rgba(0,0,0,0.1);
     border: 1px solid rgba(0,0,0,0.2);
+    font-size: 18px;  /* Increase the font size */
 }
+
 
 #phoneInput {
     font-size: 14px;
@@ -52,17 +54,18 @@ body {
         width: 200px;
     }
 }
+/* Updated styles for phrases */
 .phrases {
     display: flex;
-    justify-content: space-between;
+    justify-content: center;  /* Align items to be close to each other */
     width: 100%;
     margin-top: 50px;
 }
 
 .phrases span {
-    flex-grow: 1;
+    margin-right: 15px;  /* Add some space between each phrase */
+    margin-left: 15px;   /* Add some space between each phrase */
     text-align: center;
     font-size: 18px;
+    color: gray;  /* Make text color gray */
 }
-
-/* ... (Your existing CSS) ... */
