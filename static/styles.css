@@ -58,7 +58,8 @@ body {
 /* Updated styles for phrases */
 .phrases {
     display: flex;
-    justify-content: center;  /* Align items to be close to each other */
+    flex-wrap: wrap;  /* Add this line */
+    justify-content: center;  
     width: 100%;
     margin-top: 50px;
 }
