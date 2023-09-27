@@ -43,3 +43,15 @@ input[type="submit"] {
         width: 90%;
     }
 }
+#phoneBoxContainer {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+#phoneBoxContainer input {
+    width: 20px;
+    height: 20px;
+    text-align: center;
+    margin: 0 2px;
+}
