@@ -111,7 +111,7 @@ body {
   min-width: 150px;  /* Set a minimum width for the tooltip */
   width: auto; /* Allow the width to expand based on content */
     
-  height: 90px;  /* Set the height to a fixed value */
+  height: 100px;  /* Set the height to a fixed value */
   top: 50%;  /* Position at the center vertically */
   left: 50%;  /* Position at the center horizontally */
   transform: translate(-50%, -50%);  /* Adjust for exact centering */
@@ -124,4 +124,15 @@ body {
 .phrase:hover .tooltip {
   visibility: visible;
   opacity: 1;
+}
+.footer {
+    text-align: center;
+    font-family: 'Avenir-Heavy', Helvetica, sans-serif;
+    font-size: 24px; /* Adjust the font size as needed */
+    color: gray;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    padding: 20px 0; /* Adjust the padding as needed */
 }
