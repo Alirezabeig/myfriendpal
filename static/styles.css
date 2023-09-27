@@ -7,6 +7,7 @@ body {
     margin-top: 100px;
     margin-bottom: 50px;
     margin-left: 100px;
+    margin-right: 100px;
     
     justify-content: center;
     align-items: center;
@@ -55,13 +56,13 @@ body {
     display: flex;
     justify-content: space-between;
     width: 100%;
-    margin-top: 20px;
+    margin-top: 50px;
 }
 
 .phrases span {
     flex-grow: 1;
     text-align: center;
-    font-size: 14px;
+    font-size: 18px;
 }
 
 /* ... (Your existing CSS) ... */
