@@ -2,19 +2,19 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Activate Pal</title>
+    <title>Pal</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <script src="{{ url_for('static', filename='script.js') }}"></script>
 </head>
 <body>
-    <h1>Welcome to Activate Pal</h1>
-    <form id="activateForm">
-        <label for="phoneInput">Enter your phone number:</label>
-        <input type="text" id="phoneInput" name="phone_number" required>
-        <div id="activatePal" style="cursor: pointer;">
-            <button type="submit">Activate</button>
-        </div>
-    </form>
+    <div class="container">
+        <h1 class="title">Pal is Your AI friend. It helps you become a better version of yourself!</h1>
+        <form id="activateForm">
+            <input type="text" id="phoneInput" name="phone_number" placeholder="Enter your phone number" required>
+            <div id="activatePal">
+                <button type="submit">Activate</button>
+            </div>
+        </form>
+    </div>
 </body>
 </html>
-
-

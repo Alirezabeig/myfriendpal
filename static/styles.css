@@ -1,55 +1,36 @@
-.element {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  width: 100%;
+body {
+    font-family: 'Poppins', sans-serif;
+    text-align: center;
 }
 
-.div {
-  width: 100%;
-  max-width: 1440px;
-  position: relative;
+.container {
+    margin: 0 auto;
+    width: 100%;
 }
 
-.text-wrapper, .text-wrapper-3, .text-wrapper-4, .text-wrapper-5, .text-wrapper-6, .text-wrapper-7, .text-wrapper-8 {
-  font-weight: 400;
-  color: #252525;
-  font-size: 64px;
-  text-align: center;
-  margin-bottom: 20px;
+.title {
+    font-size: 2em;
+    margin: 20px 10px;
 }
 
-.text-row {
-  display: flex;
-  justify-content: space-around;
-  flex-wrap: wrap;
+#activatePal {
+    cursor: pointer;
 }
 
-.overlap {
-  background-color: #252525;
-  width: 280px;
-  height: 56px;
-  border-radius: 16px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-bottom: 20px;
+#phoneInput {
+    margin: 20px 0;
+    text-align: center;
 }
 
-.text-wrapper-2 {
-  font-weight: 400;
-  color: #ffffff;
-  font-size: 24px;
+button {
+    background-color: #007bff;
+    border: none;
+    color: white;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
 }
-
-.p {
-  font-weight: 400;
-  color: #252525cc;
-  font-size: 26px;
-  text-align: center;
-}
-
-@media only screen and (max-width: 768px) {
-  .text-wrapper, .text-wrapper-3, .text-wrapper-4, .text-wrapper-5, .text-wrapper-6, .text-wrapper-7, .text-wrapper-8 {
-    font-size: 32
