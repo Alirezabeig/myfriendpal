@@ -1,24 +1,14 @@
 document.addEventListener('DOMContentLoaded', function () {
 
-  // Additional code for auto-moving to next input box
-  for (let i = 1; i <= 10; i++) {
-    const inputBox = document.getElementById(`input${i}`);
-    inputBox.addEventListener('input', function () {
-      if (i < 10) {
-        document.getElementById(`input${i + 1}`).focus();
-      }
-    });
-  }
+  // Existing code for auto-moving to next input box
+  // ... (if needed) ...
 
-  // Your existing code for form submission
-  document.getElementById('phoneNumberForm').addEventListener('submit', function (e) {
+  // Add this event listener
+  document.getElementById('activatePal').addEventListener('click', function (e) {
     e.preventDefault();
 
-    // Combine all the single numbers from the 10 input boxes to make the full phone number
-    let phoneNumber = '';
-    for (let i = 1; i <= 10; i++) {
-      phoneNumber += document.getElementById(`input${i}`).value;
-    }
+    // Replace this section with how you want to fetch the phone number
+    const phoneNumber = document.getElementById('phoneInput').value;
 
     fetch('/send_message', {
       method: 'POST',
@@ -27,8 +17,9 @@ document.addEventListener('DOMContentLoaded', function () {
       },
       body: JSON.stringify({ phone_number: phoneNumber })
     })
-      .then(response => response.json())
-      .then(data => alert(data.message))
-      .catch(error => alert('Failed to send SMS. Please try again.'));
+    .then(response => response.json())
+    .then(data => alert(data.message))
+    .catch(error => alert('Failed to send SMS. Please try again.'));
   });
+
 });
