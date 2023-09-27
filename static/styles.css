@@ -11,7 +11,7 @@ body {
 }
 
 #phoneInput, #activatePal button {
-    width: 250px;  /* Updated width */
+    width: 250px;
     height: 40px;
     box-sizing: border-box;
     border-radius: 10px;
@@ -22,7 +22,7 @@ body {
 
 #phoneInput {
     font-size: 14px;
-    margin-right: 16px;  /* Add space on the right */
+    margin-right: 16px;
 }
 
 #activatePal button {
@@ -30,15 +30,20 @@ body {
     color: white;
 }
 
+#inputContainer {
+    display: flex;
+    align-items: center;
+}
+
 .container {
     display: flex;
-    flex-direction: row;  /* Align items horizontally */
+    flex-direction: column;
     align-items: center;
     justify-content: center;
 }
 
 @media (max-width: 600px) {
     #phoneInput, #activatePal button {
-        width: 200px;  /* Updated width for smaller screens */
+        width: 200px;
     }
 }

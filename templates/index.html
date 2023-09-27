@@ -13,11 +13,14 @@
         <div class="container">
             <h1 class="title">Pal is your AI friend. It helps you become a better version of yourself!</h1>
             <form id="activateForm">
-                <input type="text" id="phoneInput" placeholder=" Enter your phone number" required>
-                <div id="activatePal">
-                    <button type="submit">Activate Pal Today!</button>
+                <div id="inputContainer"> <!-- New container -->
+                    <input type="text" id="phoneInput" placeholder="Enter your phone number" required>
+                    <div id="activatePal">
+                        <button type="submit">Activate Pal Today!</button>
+                    </div>
                 </div>
             </form>
+
         </div>
     </div>
     <script src="{{ url_for('static', filename='script.js') }}"></script>
