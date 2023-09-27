@@ -3,12 +3,12 @@ document.addEventListener('DOMContentLoaded', function () {
 
   // Initialize hover messages
   const hoverMessages = {
-    "phrase1": "I am 24/7 available, so text me anytime",
-    "phrase2": "You have never met anyone as smart and fun as I am.",
-    "phrase3": "I am always here and never busy with anything else",
-    "phrase4": "I'd love to help you with any challenge you have anytime.",
-    "phrase5": "I will amaze you if you get easily amazed :)",
-    "phrase6": "We will build real connection as I everyday learn about you"
+      "phrase1": "I'm like a 24/7 diner, open for texts anytime.",
+      "phrase2": "I'm a blend of Einstein and a stand-up comedian.",
+      "phrase3": "Busier than a lazy cat, which means never.",
+      "phrase4": "Solving your puzzles is my daily Sudoku game.",
+      "phrase5": "Impress you? You'll think I'm a magician!",
+      "phrase6": "We'll click so well, you'd think I'm a mind reader."
   };
 
   // Add tooltip text for all phrases

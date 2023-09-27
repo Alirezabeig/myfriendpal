@@ -103,7 +103,7 @@ body {
 .tooltip {
   visibility: hidden;
   position: absolute;
-  background-color: rgba(85, 85, 85, 0.8); /* Semi-transparent gray background */
+  background-color: rgba(85, 85, 85, 1); /* Semi-transparent gray background */
   color: white;  /* Text color set to white */
   text-align: center;
   padding: 8px 16px;
