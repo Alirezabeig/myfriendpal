@@ -6,19 +6,21 @@
     <title>MyFriendPal</title>
 </head>
 
-<body onload="document.getElementById('phoneInput').focus();">
-    <h1 class="title">Your personal AI Therapist!</h1>
+<body>
+    <div class="container">
+        <h1 class="title">Become friend with AI. A friend is always there for you!</h1>
 
-    <form id="phoneNumberForm">
-        <div id="phoneBoxContainer">
-            <!-- New single text box for phone number -->
-            <input type="text" id="phoneInput" placeholder="Enter phone number">
-        </div>
-        <input type="submit" value="Send Message">
-    </form>
+        <form id="phoneNumberForm">
+            <div id="phoneBoxContainer">
+                <!-- Updated single text box for phone number -->
+                <input type="text" id="phoneInput" placeholder="Enter phone number">
+            </div>
+            <input type="submit" value="Send Message">
+        </form>
 
-    <!-- Centered background image -->
-    <img id="yourImage" src="{{ url_for('static', filename='phone-image.png') }}" alt="Your Image Description">
+        <!-- Centered background image -->
+        <img id="yourImage" src="{{ url_for('static', filename='phone-image.png') }}" alt="Your Image Description">
+    </div>
 
     <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>

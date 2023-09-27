@@ -1,7 +1,17 @@
+/* Container for centering elements */
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+}
+
 .title {
     font-size: 72px;
     text-align: center;
     margin-top: 50px;
+    font-weight: 300;
 }
 
 #phoneNumberForm {
@@ -10,12 +20,13 @@
     align-items: center;
 }
 
-/* New single text box for phone number */
+/* Updated single text box for phone number */
 #phoneInput {
     width: 100%;
     max-width: 200px;
     padding: 10px;
     border: 1px solid black;
+    border-radius: 10px; /* Add rounded corners */
     background-color: lightgray;
     text-align: center;
 }
@@ -25,6 +36,7 @@ input[type="submit"] {
     color: black;
     padding: 10px 20px;
     border: none;
+    border-radius: 10px; /* Add rounded corners */
     cursor: pointer;
 }
 
@@ -40,12 +52,13 @@ input[type="submit"] {
 /* Background and image styles */
 body {
     background: linear-gradient(to bottom, white, lightgray);
+    margin: 0;
+    padding: 0;
 }
 
 #yourImage {
     display: block;
     margin: auto;
-    width: 600px;  /* Make the image larger */
+    width: 600px;
     height: auto;
 }
-
