@@ -1,91 +1,71 @@
 .element {
   background-color: #ffffff;
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   justify-content: center;
+  align-items: center;
   width: 100%;
 }
 
-.element .div {
+.div {
   background-color: #ffffff;
   width: 100%;
-  height: auto;
+  max-width: 1440px;
   position: relative;
 }
 
-.element .text-wrapper {
-  font-family: "Roboto", Helvetica;
+.text-wrapper, .text-wrapper-3, .text-wrapper-4, .text-wrapper-5, .text-wrapper-6, .text-wrapper-7, .text-wrapper-8 {
+  font-family: "Avenir-Heavy", Helvetica;
   font-weight: 400;
   color: #252525;
   font-size: 64px;
   text-align: center;
-  margin-bottom: 40px;
+  margin-bottom: 20px;
 }
 
-.element .p {
-  font-family: "Roboto", Helvetica;
-  font-weight: 400;
-  color: #252525cc;
-  font-size: 26px;
-  text-align: center;
-  margin-bottom: 40px;
+.text-row {
+  display: flex;
+  justify-content: space-around;
+  flex-wrap: wrap;
 }
 
-.element .overlap {
+.overlap {
   background-color: #252525;
   width: 280px;
   height: 56px;
   border-radius: 16px;
-  margin: auto;
-  color: #ffffff;
   display: flex;
   justify-content: center;
   align-items: center;
+  margin-bottom: 20px;
 }
 
-.element .text-wrapper-2 {
-  font-family: "Roboto", Helvetica;
+.text-wrapper-2 {
+  font-family: "Inter-Regular", Helvetica;
   font-weight: 400;
   color: #ffffff;
   font-size: 24px;
 }
 
-.element .overlap-group {
-  position: relative;
-  width: 280px;
-  height: 56px;
-  margin: auto;
-  border-radius: 16px;
-}
-
-.element .text-wrapper-9 {
-  width: 100%;
-  font-family: "Roboto", Helvetica;
+.p {
+  font-family: "Poppins-Regular", Helvetica;
   font-weight: 400;
   color: #252525cc;
-  font-size: 20px;
+  font-size: 26px;
   text-align: center;
-  opacity: 0.8;
 }
 
-.element .rectangle {
-  width: 280px;
-  height: 56px;
-  border-radius: 16px;
-  border: 1px solid #00000033;
-  box-shadow: 0px 1px 4px #00000066;
-}
-
-/* Additional styles for your form elements and image */
-#phoneInput {
-  border: none;
-  width: 100%;
-  padding: 15px;
-  font-size: 20px;
-  border-radius: 16px;
-}
-
-#yourImage {
-  max-width: 100%;
-  height: auto;
+@media only screen and (max-width: 768px) {
+  .text-wrapper, .text-wrapper-3, .text-wrapper-4, .text-wrapper-5, .text-wrapper-6, .text-wrapper-7, .text-wrapper-8 {
+    font-size: 32px;
+  }
+  .p {
+    font-size: 18px;
+  }
+  .overlap {
+    width: 200px;
+  }
+  .text-wrapper-2 {
+    font-size: 18px;
+  }
 }
