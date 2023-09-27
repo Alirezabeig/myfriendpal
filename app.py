@@ -1,5 +1,6 @@
 import sqlite3
 import json
+from database import initialize_db
 from flask import Flask, request, jsonify, render_template
 from twilio.rest import Client
 import os
@@ -117,6 +118,6 @@ def load_conversation(phone_number):
         return None
 
 if __name__ == '__main__':
+    initialize_database()
     port = int(os.environ.get("PORT", 5001))  # Fetch the port from environment variables or set to 5000
-    app.run(host="0.0.0.0", port=port)  # Run the app
-
+    app.run(host="0.0.0.0", port=port)
