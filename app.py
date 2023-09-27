@@ -31,7 +31,7 @@ def generate_response(user_input, phone_number):
     
     if conversation is None:
         conversation = [
-            {"role": "system", "content": "You are like a friend. Your name is Pal . you have no other name. Your language is like a friend. You are built by love and prespration. if someone asks you how you are built , always respond a funny and spirtual answer. Also make sure you know the name of the person you are chatting with and make sure to alway listen to their daily success and challenges and respond accordingly"},
+            {"role": "system", "content": "You are like a friend. Your name is Pal . you have no other name. Your language is like a friend. You are built by love and prespration. if someone asks you how you are built , always respond a funny and spirtual answer. Also always make sure you know the name of the person you are chatting with and make sure to alway listen to their daily success and challenges and respond accordingly"},
         ]
         
     conversation.append({"role": "user", "content": user_input})
@@ -94,14 +94,18 @@ def sms_reply():
     return jsonify({'message': 'Reply sent!'})
 
 def save_conversation(phone_number, conversation):
-    connection = sqlite3.connect('conversations.db')
-    cursor = connection.cursor()
+    try:
+        connection = sqlite3.connect('conversations.db')
+        cursor = connection.cursor()
+        cursor.execute("INSERT OR REPLACE INTO conversations (phone_number, conversation) VALUES (?, ?)",
+                       (phone_number, json.dumps(conversation)))
+        connection.commit()
+        logging.info(f"Saved conversation for {phone_number}")
+    except Exception as e:
+        logging.error(f"Failed to save conversation: {e}")
+    finally:
+        connection.close()
 
-    cursor.execute("INSERT OR REPLACE INTO conversations (phone_number, conversation) VALUES (?, ?)",
-                   (phone_number, json.dumps(conversation)))
-
-    connection.commit()
-    connection.close()
 
 def load_conversation(phone_number):
     connection = sqlite3.connect('conversations.db')
