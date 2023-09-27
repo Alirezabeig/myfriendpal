@@ -24,7 +24,8 @@ gpt4_api_key = os.environ.get('GPT4_API_KEY')
 openai.api_key = gpt4_api_key
 
 conversations = {}  # This will hold the conversation history
-
+initialize_db()
+    
 def generate_response(user_input, phone_number):
     # Load existing conversation from database
     conversation = load_conversation(phone_number)
