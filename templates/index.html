@@ -17,18 +17,17 @@
       </div>
     </div>
     
-    <div id="myModal" class="modal">
-      <div class="modal-content">
-        <span class="close">&times;</span>
+    <div id="messageSentModal" class="message-sent-modal">
+      <div class="message-sent-modal-content">
+        <span class="message-sent-close">&times;</span>
         <div class="modal-header">
-          <img "{{ url_for('static', filename='cong.jpg') }}" class="modal-image">
-          <span id="modalText">Modal text</span>
+          <img src="{{ url_for('static', filename='cong.jpg') }}" class="modal-image">
+          <span id="messageSentModalText">Modal text</span>
         </div>
-        <ul id="modalBulletPoints">
+        <ul id="messageSentModalBulletPoints">
           <li>Pal is still training and becoming better.</li>
           <li>Pal will learn from you & about you.</li>
           <li>Pal hopes to become your bff.</li>
-          
         </ul>
       </div>
     </div>
