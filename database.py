@@ -1,6 +1,7 @@
 import sqlite3
 
 def initialize_db():
+    print("Database has been initialized")
     connection = sqlite3.connect('conversations.db')
     cursor = connection.cursor()
     

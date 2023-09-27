@@ -95,13 +95,10 @@ def sms_reply():
     return jsonify({'message': 'Reply sent!'})
     
 def save_conversation(phone_number, conversation):
+    print("save_conversation called")
     try:
-        connection = sqlite3.connect('conversations.db')
-        cursor = connection.cursor()
-        cursor.execute("INSERT OR REPLACE INTO conversations (phone_number, conversation) VALUES (?, ?)", (phone_number, json.dumps(conversation)))
-        connection.commit()
-        connection.close()
-        logging.info(f"Conversation saved for phone number: {phone_number}")
+        # your existing code
+        logging.info(f"Attempting to save conversation for {phone_number}: {json.dumps(conversation)}")
     except Exception as e:
         logging.error(f"Could not save conversation: {e}")
 
