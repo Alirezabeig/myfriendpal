@@ -1,18 +1,15 @@
 .title {
-    color: black;  /* Replace with your color */
-    font-family: 'Avenir', sans-serif;  /* Replace with your font */
-    font-size: 36px;  /* Replace with your font size */
+    color: black;
+    font-family: 'Avenir', sans-serif;
+    font-size: 72px;
     font-weight: 400;
-    height: auto;  /* Height will be determined by content */
     letter-spacing: 0;
     line-height: 80px;
-    margin-top: -1px;
     position: relative;
     text-align: center;
-    width: auto;  /* Width will be determined by content */
+    margin-top: 50px;  /* Adjust as needed */
 }
 
-/* Style the form container for responsiveness */
 #phoneNumberForm {
     display: flex;
     flex-direction: column;
@@ -20,29 +17,24 @@
     margin-top: 20px;
 }
 
-/* Style the input field */
-#phoneInput {
-    width: 100%;
-    max-width: 400px;
-    margin-bottom: 10px;
-    padding: 10px;
+input[type="text"] {
+  width: 30px;
 }
 
-/* Style the submit button */
 input[type="submit"] {
-    padding: 10px 20px;
-    cursor: pointer;
+  background: linear-gradient(to bottom, #ffffff, #ff6666);
+  color: black;
+  border: none;
+  padding: 10px 20px;
+  cursor: pointer;
 }
 
-/* Media query for screens smaller than 600px */
 @media (max-width: 600px) {
     .title {
         font-size: 24px;
     }
-    #phoneInput {
-        width: 90%;
-    }
 }
+
 #phoneBoxContainer {
     display: flex;
     justify-content: center;
@@ -54,4 +46,14 @@ input[type="submit"] {
     height: 20px;
     text-align: center;
     margin: 0 2px;
+}
+
+body {
+  background: linear-gradient(to bottom, white, lightgray);
+}
+
+#yourImage {
+  width: 300px;
+  height: auto;
+  margin-top: 20px;
 }
