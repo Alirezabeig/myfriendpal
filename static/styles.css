@@ -110,6 +110,8 @@ body {
   border-radius: 6px;
   min-width: 150px;  /* Set a minimum width for the tooltip */
   width: auto; /* Allow the width to expand based on content */
+  min-height: 60px;  /* Set a minimum height for the tooltip */
+  height: 60px;  /* Set the height to a fixed value */
   top: 50%;  /* Position at the center vertically */
   left: 50%;  /* Position at the center horizontally */
   transform: translate(-50%, -50%);  /* Adjust for exact centering */
