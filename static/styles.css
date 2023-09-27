@@ -100,31 +100,22 @@ body {
 .hover-img {
   cursor: pointer;
 }
-.img-wrap {
-  position: relative; /* Make it relative so child tooltip is positioned relative to it */
-}
-
 .tooltip {
   visibility: hidden;
   position: absolute;
-  background-color: rgba(85, 85, 85, 0.8); /* Gray background */
-  color: white;  /* White text */
-  top: 0;  /* Position to the top edge of img-wrap */
-  left: 0;  /* Position to the left edge of img-wrap */
-  width: 100%;  /* Same width as image */
-  height: 100%;  /* Same height as image */
+  background-color: rgba(85, 85, 85, 0.8);  /* Semi-transparent gray background */
+  color: white;  /* Text color set to white */
   text-align: center;
-  line-height: 200px;  /* Center text vertically */
-  font-size: 18px;
+  padding: 8px 16px;
+  border-radius: 6px;
+  bottom: 50%;  /* Position at the center vertically */
+  left: 50%;  /* Position at the center horizontally */
+  transform: translate(-50%, 50%);  /* Adjust for exact centering */
   opacity: 0;
   transition: opacity 0.3s;
-  z-index: 2;  /* Higher than image */
+  z-index: 2;  /* To make sure the tooltip is above the image */
 }
 
-.img-wrap:hover .tooltip {
-  visibility: visible;
-  opacity: 1;
-}
 .phrase:hover .tooltip {
   visibility: visible;
   opacity: 1;
