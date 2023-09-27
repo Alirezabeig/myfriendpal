@@ -1,70 +1,52 @@
-/* Container for centering elements */
 .container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-height: 100vh;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 100vh;
+    padding: 50px;
 }
-@font-face {
-    font-family: "Avenir-Heavy";
-    font-style: normal;
-    font-weight: 400;
-    src: url("https://fonts.animaapp.com/Avenir-Heavy")
-    format("opentype")
+
+.content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
 }
+
 .title {
-    font-size: 50px;
-    text-align: center;
-    margin-top: 50px;
-    margin-left: 20%; /* Add margin to left */
-    margin-right: 20%; /* Add margin to right */
+    font-family: 'Roboto', sans-serif;
     font-weight: 300;
+    font-size: 48px;
+    margin-bottom: 20px;
 }
 
 #phoneNumberForm {
     display: flex;
     flex-direction: column;
-    align-items: center;
+    width: 100%;
+    max-width: 300px;
 }
 
-/* Updated single text box for phone number */
-#phoneInput {
+#phoneInput, input[type="submit"] {
     width: 100%;
-    max-width: 200px; /* Set max-width */
     padding: 10px;
     border: 1px solid black;
     border-radius: 10px;
+    margin-bottom: 10px;
+}
+
+#phoneInput {
     background-color: lightgray;
-    text-align: center;
 }
 
 input[type="submit"] {
-    width: 100%; /* Set width to 100% */
-    max-width: 200px; /* Set max-width to match #phoneInput */
     background: linear-gradient(to bottom, #ffffff, #ff6666);
-    color: black;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 10px;
     cursor: pointer;
 }
 
-@media (max-width: 600px) {
-    .title {
-        font-size: 24px;
-    }
-    #phoneInput {
-        width: 90%;
-    }
-}
-
-
 #yourImage {
-    display: block;
-    margin: auto;
-    margin-left: 10px; /* Move slightly to the left */
-    width: 600px;
+    width: 500px;
     height: auto;
 }
 

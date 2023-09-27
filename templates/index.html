@@ -1,29 +1,22 @@
 <!DOCTYPE html>
 <html>
-
 <head>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}">
     <title>MyFriendPal</title>
 </head>
-
 <body>
     <div class="container">
-        <h1 class="title">Pal is your AI friend and helps you become a better version of yourself!</h1>
-
-        <form id="phoneNumberForm">
-            <div id="phoneBoxContainer">
-                <!-- Updated single text box for phone number -->
+        <div class="content">
+            <h1 class="title">
+                Pal is your AI friend and helps you become a better version of yourself!</h1>
+            <form id="phoneNumberForm">
                 <input type="text" id="phoneInput" placeholder="Enter phone number">
-            </div>
-            <input type="submit" value="Activate Pal">
-        </form>
-
-        <!-- Centered background image -->
+                <input type="submit" value="Send Message">
+            </form>
+        </div>
         <img id="yourImage" src="{{ url_for('static', filename='phone-image.png') }}" alt="Your Image Description">
     </div>
-
-    <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
-
 </html>
 
