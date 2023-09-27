@@ -103,17 +103,17 @@ body {
 .tooltip {
   visibility: hidden;
   position: absolute;
-  background-color: #555;
-  color: #fff;
+  background-color: rgba(85, 85, 85, 0.8);  /* Semi-transparent gray background */
+  color: white;  /* Text color set to white */
   text-align: center;
   padding: 8px 16px;
   border-radius: 6px;
-  bottom: 0;  /* Changed from 100% to 0 */
-  left: 50%;
-  margin-left: -60px;
+  bottom: 50%;  /* Position at the center vertically */
+  left: 50%;  /* Position at the center horizontally */
+  transform: translate(-50%, 50%);  /* Adjust for exact centering */
   opacity: 0;
   transition: opacity 0.3s;
-  z-index: 1;  /* To make sure the tooltip is above the image */
+  z-index: 2;  /* To make sure the tooltip is above the image */
 }
 
 .phrase:hover .tooltip {
