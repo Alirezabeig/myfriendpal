@@ -12,21 +12,21 @@ document.addEventListener('DOMContentLoaded', function () {
   };
 
   // Add tooltip text for all phrases
-    for (let i = 1; i <= 6; i++) {
-      const phrase = document.getElementById(`phrase${i}`);
-      if (phrase) {
-        const tooltip = phrase.querySelector('.tooltip');
-        tooltip.innerText = hoverMessages[`phrase${i}`];
-        phrase.addEventListener("mouseover", function() {
-          tooltip.style.visibility = "visible";
-          tooltip.style.opacity = "1";
-        });
-        phrase.addEventListener("mouseout", function() {
-          tooltip.style.visibility = "hidden";
-          tooltip.style.opacity = "0";
-        });
-      }
+  for (let i = 1; i <= 6; i++) {
+    const phrase = document.getElementById(`phrase${i}`);
+    if (phrase) {
+      const tooltip = phrase.querySelector('.tooltip');
+      tooltip.innerText = hoverMessages[`phrase${i}`];
+      phrase.addEventListener("mouseover", function() {
+        tooltip.style.visibility = "visible";
+        tooltip.style.opacity = "1";
+      });
+      phrase.addEventListener("mouseout", function() {
+        tooltip.style.visibility = "hidden";
+        tooltip.style.opacity = "0";
+      });
     }
+  }
 
   const activatePalDiv = document.getElementById('activatePal');
 
@@ -40,7 +40,24 @@ document.addEventListener('DOMContentLoaded', function () {
 
       // Validate phone number
       if (!phoneNumber) {
-        alert("Please enter your phone number");
+        // Display custom modal
+        const modal = document.getElementById("myModal");
+        const span = document.getElementsByClassName("close")[0];
+        const modalText = document.getElementById("modalText");
+
+        modalText.innerText = "Please enter your phone number";
+        modal.style.display = "block";
+
+        span.onclick = function() {
+          modal.style.display = "none";
+        };
+
+        window.onclick = function(event) {
+          if (event.target === modal) {
+            modal.style.display = "none";
+          }
+        };
+
         return;
       }
 
