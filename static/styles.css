@@ -1,7 +1,22 @@
-.title {
-    display: flex;
-
-    justify-content: center; /* align horizontal */
-    align-items: center; /* align vertical */
+body {
+    font-family: 'Poppins', sans-serif;
 }
 
+.title {
+    display: flex;
+    margin : 10px;
+    justify-content: center;
+    align-items: center;
+}
+
+#phoneInput, #activatePal button {
+    width: 200px;
+    height: 40px;
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
