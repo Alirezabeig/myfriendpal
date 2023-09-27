@@ -1,59 +1,51 @@
 .title {
-    color: black;
-    font-family: 'Avenir', sans-serif;
     font-size: 72px;
-    font-weight: 400;
-    letter-spacing: 0;
-    line-height: 80px;
-    position: relative;
     text-align: center;
-    margin-top: 50px;  /* Adjust as needed */
+    margin-top: 50px;
 }
 
 #phoneNumberForm {
     display: flex;
     flex-direction: column;
     align-items: center;
-    margin-top: 20px;
 }
 
-input[type="text"] {
-  width: 30px;
+/* New single text box for phone number */
+#phoneInput {
+    width: 100%;
+    max-width: 200px;
+    padding: 10px;
+    border: 1px solid black;
+    background-color: lightgray;
+    text-align: center;
 }
 
 input[type="submit"] {
-  background: linear-gradient(to bottom, #ffffff, #ff6666);
-  color: black;
-  border: none;
-  padding: 10px 20px;
-  cursor: pointer;
+    background: linear-gradient(to bottom, #ffffff, #ff6666);
+    color: black;
+    padding: 10px 20px;
+    border: none;
+    cursor: pointer;
 }
 
 @media (max-width: 600px) {
     .title {
         font-size: 24px;
     }
+    #phoneInput {
+        width: 90%;
+    }
 }
 
-#phoneBoxContainer {
-    display: flex;
-    justify-content: center;
-    margin-bottom: 20px;
-}
-
-#phoneBoxContainer input {
-    width: 20px;
-    height: 20px;
-    text-align: center;
-    margin: 0 2px;
-}
-
+/* Background and image styles */
 body {
-  background: linear-gradient(to bottom, white, lightgray);
+    background: linear-gradient(to bottom, white, lightgray);
 }
 
 #yourImage {
-  width: 300px;
-  height: auto;
-  margin-top: 20px;
+    display: block;
+    margin: auto;
+    width: 600px;  /* Make the image larger */
+    height: auto;
 }
+
