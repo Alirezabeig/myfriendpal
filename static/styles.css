@@ -4,7 +4,7 @@ body {
 
 .title {
     display: flex;
-    margin-top: 75px;
+    margin-top: 60px;
     margin-bottom: 50px;
     margin-left: 150px;
     margin-right: 150px;
@@ -108,7 +108,7 @@ body {
   text-align: center;
   padding: 8px 16px;
   border-radius: 6px;
-  width: 200px;  /* Same width as the image */
+  width: 150px;  /* Same width as the image */
   top: 50%;  /* Position at the center vertically */
   left: 50%;  /* Position at the center horizontally */
   transform: translate(-50%, -50%);  /* Adjust for exact centering */
