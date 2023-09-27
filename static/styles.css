@@ -1,1 +1,14 @@
- 
+.title {
+    color :var(--shark);
+    font-family : var(--font-family-avenir-heavy);
+    font-size : var(--font-size-l);
+    font-weight :400;
+    height : 145px;
+    letter-spacing: 0;
+    line-height : 80px;
+    margin-top : -1px:
+    position: relative;
+    text-align : center;
+    width : 610px;
+    
+}
