@@ -28,6 +28,7 @@ initialize_db()
     
 def generate_response(user_input, phone_number):
     # Load existing conversation from database
+    print("generate_response called")
     conversation = load_conversation(phone_number)
     
     if conversation is None:
@@ -95,9 +96,9 @@ def sms_reply():
     return jsonify({'message': 'Reply sent!'})
     
 def save_conversation(phone_number, conversation):
-    print("save_conversation called")
+    
     try:
-        # your existing code
+        print("save_conversation called")
         logging.info(f"Attempting to save conversation for {phone_number}: {json.dumps(conversation)}")
     except Exception as e:
         logging.error(f"Could not save conversation: {e}")
