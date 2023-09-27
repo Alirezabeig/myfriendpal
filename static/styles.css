@@ -1,6 +1,5 @@
 body {
     font-family: 'Avenir-Heavy', Helvetica, sans-serif;
-    
 }
 
 .title {
@@ -8,19 +7,21 @@ body {
     margin: 100px;
     justify-content: center;
     align-items: center;
-    font-size: 400px;
+    font-size: 100px;
 }
 
 #phoneInput, #activatePal button {
     width: 200px;
     height: 40px;
-    box-sizing: border-box;  /* include padding and border in total width */
-    border-radius: 10px;  /* Rounded corners */
-    margin-bottom: 8px;  /* Add some space at the bottom */
+    box-sizing: border-box;
+    border-radius: 10px;
+    margin-bottom: 8px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);  /* Add shadow */
+    border: 1px solid rgba(0,0,0,0.2);  /* Lighter border */
 }
 
 #phoneInput {
-    font-size: 14px;  /* set the font size */
+    font-size: 14px;
 }
 
 #activatePal button {
@@ -35,9 +36,9 @@ body {
     justify-content: center;
 }
 
-/* Media query for responsiveness */
 @media (max-width: 600px) {
     #phoneInput, #activatePal button {
         width: 150px;
     }
 }
+
