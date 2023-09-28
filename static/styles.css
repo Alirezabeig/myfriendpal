@@ -4,7 +4,7 @@ body {
 
 .title {
     display: flex;
-    margin-top: -100px;
+    margin-top: 0px;
     margin-bottom: 50px;
     margin-left: 160px;
     margin-right: 160px;
@@ -71,7 +71,7 @@ body {
     flex-wrap: wrap;
     justify-content: center;
     width: 100%;
-    margin-top: 50px;
+    margin-top: 20px;
 }
 
 .phrase {
@@ -151,7 +151,7 @@ body, html {
     font-size: 24px;
     color: gray;
     width: 100%;
-    padding: 10px 0;
+    padding: 2px 0;
     
 }
 /* The Modal (background) */
