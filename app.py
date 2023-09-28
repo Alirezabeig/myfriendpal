@@ -1,7 +1,8 @@
+
 import sqlite3
 import json
 from database import initialize_db
-from flask import Flask, request, jsonify, render_template
+from flask import Flask, request, jsonify, render_template,redirect
 from twilio.rest import Client
 import os
 from dotenv import load_dotenv
