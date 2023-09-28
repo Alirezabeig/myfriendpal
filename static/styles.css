@@ -1,51 +1,41 @@
-/* Global styles */
-body, html {
-    margin: 0;
-    padding: 0;
+body {
     font-family: 'Avenir-Heavy', Helvetica, sans-serif;
 }
 
-/* Flexbox wrapper */
-.wrapper {
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-}
-
-/* Main container */
-.container {
-    flex: 1 0 auto;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 0;
-    margin: 0;
-}
-
-/* Title */
 .title {
     display: flex;
-    margin: 60px 160px 50px;
+    margin-top: 60px;
+    margin-bottom: 50px;
+    margin-left: 160px;
+    margin-right: 160px;
+    
     justify-content: center;
     align-items: center;
     font-size: 75px;
-    text-align: center;
+    text-align: center;  /* Add this line */
 }
 
-/* Input and button styles */
 #phoneInput, #activatePal button {
     width: 250px;
-    height: 50px;
+    height: 50px;  /* Increase the height */
     box-sizing: border-box;
     border-radius: 10px;
     margin-bottom: 8px;
     box-shadow: 0 4px 8px rgba(0,0,0,0.1);
     border: 1px solid rgba(0,0,0,0.2);
-    font-size: 18px;
+    font-size: 18px;  /* Increase the font size */
 }
 
 #phoneInput, #phoneInput::placeholder {
+    font-family: 'Avenir-Heavy', Helvetica, sans-serif; /* Set the font-family for both */
+    font-size: 16px;
+    margin-right: 16px;
+    padding-left: 15px;
+}
+
+
+
+#phoneInput {
     font-family: 'Avenir-Heavy', Helvetica, sans-serif;
     font-size: 16px;
     margin-right: 16px;
@@ -63,15 +53,20 @@ body, html {
     align-items: center;
 }
 
-/* Responsive styles */
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
 @media (max-width: 600px) {
     #phoneInput, #activatePal button {
         width: 200px;
     }
 }
-
-/* Phrases and images */
 .phrases {
+    position: relative;
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
@@ -80,10 +75,14 @@ body, html {
 }
 
 .phrase {
+    position: relative;
     display: flex;
     flex-direction: column;
     align-items: center;
-    margin: 20px 15px 20px 15px;
+    margin-right: 15px;
+    margin-left: 15px;
+    margin-right: 20px;
+    margin-top: 20px;
 }
 
 .phrases span {
@@ -93,27 +92,68 @@ body, html {
 }
 
 .phrase img {
-    width: 200px;
-    height: 200px;
+    width: 200px; /* Or any other size you want */
+    height: 200px; /* Or any other size you want */
     margin-top: 20px;
 }
 
-/* Tooltip */
+.hover-img {
+  cursor: pointer;
+}
 .tooltip {
-  /* ... (your existing tooltip styles) ... */
+  visibility: hidden;
+  position: absolute;
+  background-color: rgba(85, 85, 85, 1); /* Semi-transparent gray background */
+  color: white;  /* Text color set to white */
+  text-align: center;
+  padding: 8px 16px;
+  border-radius: 6px;
+  min-width: 150px;  /* Set a minimum width for the tooltip */
+  width: auto; /* Allow the width to expand based on content */
+    
+  height: 100px;  /* Set the height to a fixed value */
+  top: 50%;  /* Position at the center vertically */
+  left: 50%;  /* Position at the center horizontally */
+  transform: translate(-50%, -50%);  /* Adjust for exact centering */
+  opacity: 0;
+  transition: opacity 0.3s;
+  z-index: 2;  /* To make sure the tooltip is above the image */
 }
 
-/* Footer */
+
+.phrase:hover .tooltip {
+  visibility: visible;
+  opacity: 1;
+}
+body, html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    font-family: 'Avenir-Heavy', Helvetica, sans-serif;
+}
+
+.wrapper {
+    min-height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
 .footer {
-    flex-shrink: 0;
     text-align: center;
     font-family: 'Avenir-Heavy', Helvetica, sans-serif;
     font-size: 24px;
     color: gray;
     width: 100%;
     padding: 20px 0;
+    
 }
-
 /* The Modal (background) */
 .modal {
   display: none; /* Hidden by default */
