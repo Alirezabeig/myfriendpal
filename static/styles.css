@@ -125,16 +125,34 @@ body {
   visibility: visible;
   opacity: 1;
 }
+body, html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    font-family: 'Avenir-Heavy', Helvetica, sans-serif;
+}
+
+.wrapper {
+    min-height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
 .footer {
     text-align: center;
     font-family: 'Avenir-Heavy', Helvetica, sans-serif;
-    font-size: 24px; /* Adjust the font size as needed */
+    font-size: 24px;
     color: gray;
-    position: absolute;
-    bottom: 0;
-    left: 0;
     width: 100%;
-    padding: 20px 0; /* Adjust the padding as needed */
+    padding: 20px 0;
+    
 }
 /* The Modal (background) */
 .modal {

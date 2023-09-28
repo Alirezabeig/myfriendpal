@@ -72,7 +72,7 @@ document.addEventListener('DOMContentLoaded', function () {
       })
       .then(response => response.json())
       .then(data => {
-        modalText.innerText = "Great! Pal is now going to message you on your phone. Just a couple points to remind you..";  // Update modal text
+        modalText.innerText = "Great! Pal is now going to message you on your phone to pick up the conversation.";  // Update modal text
         modalBulletPoints.innerHTML = `
           <li>Your first random point</li>
           <li>Your second random point</li>
