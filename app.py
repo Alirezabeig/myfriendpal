@@ -96,10 +96,25 @@ def sms_reply():
     return jsonify({'message': 'Reply sent!'})
     
 def save_conversation(phone_number, conversation):
-    
     try:
-        print("save_conversation called")
-        logging.info(f"Attempting to save conversation for {phone_number}: {json.dumps(conversation)}")
+        connection = sqlite3.connect('conversations.db')
+        cursor = connection.cursor()
+        
+        # Serialize the conversation list to a JSON string
+        serialized_conversation = json.dumps(conversation)
+        
+        # Update the conversation if the phone number already exists
+        cursor.execute("UPDATE conversations SET conversation = ? WHERE phone_number = ?", (serialized_conversation, phone_number))
+        
+        # If no rows were updated, insert a new row
+        if cursor.rowcount == 0:
+            cursor.execute("INSERT INTO conversations (phone_number, conversation) VALUES (?, ?)", (phone_number, serialized_conversation))
+        
+        # Commit the changes and close the connection
+        connection.commit()
+        connection.close()
+        
+        logging.info(f"Successfully saved conversation for {phone_number}: {serialized_conversation}")
     except Exception as e:
         logging.error(f"Could not save conversation: {e}")
 
@@ -117,6 +132,24 @@ def load_conversation(phone_number):
         return json.loads(row[0])
     else:
         return None
+        
+@app.route('/get_conversations', methods=['GET'])
+def get_all_conversations():
+    connection = sqlite3.connect('conversations.db')
+    cursor = connection.cursor()
+    
+    cursor.execute("SELECT phone_number, conversation FROM conversations")
+    rows = cursor.fetchall()
+    
+    connection.close()
+    
+    conversations_dict = {}
+    for row in rows:
+        phone_number, conversation = row
+        conversations_dict[phone_number] = json.loads(conversation)
+    
+    return jsonify(conversations_dict)
+
 
 if __name__ == '__main__':
     initialize_db()
