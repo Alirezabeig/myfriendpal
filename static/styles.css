@@ -4,7 +4,7 @@ body {
 
 .title {
     display: flex;
-    margin-top: 60px;
+    margin-top: 30px;
     margin-bottom: 50px;
     margin-left: 160px;
     margin-right: 160px;
@@ -151,7 +151,7 @@ body, html {
     font-size: 24px;
     color: gray;
     width: 100%;
-    padding: 20px 0;
+    padding: 10px 0;
     
 }
 /* The Modal (background) */
