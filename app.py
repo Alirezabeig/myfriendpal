@@ -25,6 +25,13 @@ openai.api_key = gpt4_api_key
 
 conversations = {}  # This will hold the conversation history
 initialize_db()
+
+@app.before_request
+def enforce_https():
+    if request.headers.get('X-Forwarded-Proto') == 'http':
+        url = request.url.replace('http://', 'https://', 1)
+        return redirect(url, code=301)
+
     
 def generate_response(user_input, phone_number):
     # Load existing conversation from database
