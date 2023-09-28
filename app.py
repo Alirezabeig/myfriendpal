@@ -7,9 +7,7 @@ import os
 from dotenv import load_dotenv
 import logging
 import openai
-from flask_httpauth import HTTPBasicAuth
 
-auth = HTTPBasicAuth()
 
 logging.basicConfig(level=logging.INFO)
 
