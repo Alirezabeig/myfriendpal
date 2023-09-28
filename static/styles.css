@@ -215,6 +215,7 @@ body, html {
 
     #phoneInput, #activatePal button {
         width: 220px;
+        
     }
 
     .modal-content {
@@ -231,6 +232,7 @@ body, html {
     }
 
     #activatePal {
+        margin-top: 16px
         display: flex;
         justify-content: center;  /* Centers the button */
     }
