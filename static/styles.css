@@ -208,3 +208,27 @@ body, html {
   margin-right: 15px;
 }
 
+/* Media queries for responsiveness */
+
+/* For tablets and larger mobile devices */
+@media (max-width: 768px) {
+    .title {
+        font-size: 50px;
+        margin: 0 40px 30px 40px;
+    }
+
+    .phrase img {
+        width: 150px;
+        height: 150px;
+    }
+    
+    /* ... */
+}
+
+/* For smaller mobile devices */
+@media (max-width: 480px) {
+    .title {
+        font-size: 30px;
+        margin: 0 20px 20px 20px;
+    }
+
