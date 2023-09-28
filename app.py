@@ -111,12 +111,8 @@ def save_conversation(phone_number, conversation):
         # Serialize the conversation list to a JSON string
         serialized_conversation = json.dumps(conversation)
         
-        # Update the conversation if the phone number already exists
-        cursor.execute("UPDATE conversations SET conversation = ? WHERE phone_number = ?", (serialized_conversation, phone_number))
-        
-        # If no rows were updated, insert a new row
-        if cursor.rowcount == 0:
-            cursor.execute("INSERT INTO conversations (phone_number, conversation) VALUES (?, ?)", (phone_number, serialized_conversation))
+        # Insert or replace the conversation using the phone number as the key
+        cursor.execute("INSERT OR REPLACE INTO conversations (phone_number, conversation) VALUES (?, ?)", (phone_number, serialized_conversation))
         
         # Commit the changes and close the connection
         connection.commit()
@@ -125,7 +121,6 @@ def save_conversation(phone_number, conversation):
         logging.info(f"Successfully saved conversation for {phone_number}: {serialized_conversation}")
     except Exception as e:
         logging.error(f"Could not save conversation: {e}")
-
 
 def load_conversation(phone_number):
     connection = sqlite3.connect('conversations.db')
