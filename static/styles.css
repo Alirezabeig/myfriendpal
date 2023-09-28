@@ -30,7 +30,7 @@ body {
     font-family: 'Avenir-Heavy', Helvetica, sans-serif;
     font-size: 16px;
     margin-right: 16px;
-    padding-left: 15px;
+    padding-left: 5px;
 }
 
 #activatePal button {
@@ -53,7 +53,7 @@ body {
 
 @media (max-width: 600px) {
     #phoneInput, #activatePal button {
-        width: 200px;
+        width: 220px;
     }
 }
 
