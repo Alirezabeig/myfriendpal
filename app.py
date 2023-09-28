@@ -7,9 +7,7 @@ import os
 from dotenv import load_dotenv
 import logging
 import openai
-from flask_httpauth import HTTPBasicAuth
 
-auth = HTTPBasicAuth()
 
 logging.basicConfig(level=logging.INFO)
 
@@ -135,16 +133,8 @@ def load_conversation(phone_number):
         return json.loads(row[0])
     else:
         return None
-    
-@auth.verify_password
-def verify_password(username, password):
-    if username == 'admin' and password == 'secret':  # Replace these with your desired username and password
-        return True
-    return False
-
-    
+        
 @app.route('/get_conversations', methods=['GET'])
-@auth.login_required
 def get_all_conversations():
     connection = sqlite3.connect('conversations.db')
     cursor = connection.cursor()
