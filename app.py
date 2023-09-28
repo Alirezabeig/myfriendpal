@@ -25,7 +25,7 @@ gpt4_api_key = os.environ.get('GPT4_API_KEY')
 openai.api_key = gpt4_api_key
 
 conversations = {}  # This will hold the conversation history
-initialize_db()
+
 
 @app.before_request
 def enforce_https():
