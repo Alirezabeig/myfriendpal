@@ -208,7 +208,7 @@ body, html {
 @media (max-width: 480px) {
     .title {
         font-size: 30px;
-        margin: 0 20px 20px 20px;
+        margin: 20px 20px 20px 20px;  /* Added 20px of top margin */
     }
 
     #phoneInput, #activatePal button {
@@ -217,5 +217,10 @@ body, html {
 
     .modal-content {
         width: 80%;
+    }
+
+    #inputContainer {  /* Added these rules */
+        flex-direction: column;
+        align-items: center;
     }
 }
