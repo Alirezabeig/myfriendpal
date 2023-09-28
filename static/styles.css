@@ -1,3 +1,130 @@
+body {
+    font-family: 'Avenir-Heavy', Helvetica, sans-serif;
+}
+
+.title {
+    display: flex;
+    margin-top: 0px;
+    margin-bottom: 50px;
+    margin-left: 160px;
+    margin-right: 160px;
+    
+    justify-content: center;
+    align-items: center;
+    font-size: 75px;
+    text-align: center;  /* Add this line */
+}
+
+#phoneInput, #activatePal button {
+    width: 250px;
+    height: 50px;  /* Increase the height */
+    box-sizing: border-box;
+    border-radius: 10px;
+    margin-bottom: 8px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    border: 1px solid rgba(0,0,0,0.2);
+    font-size: 18px;  /* Increase the font size */
+}
+
+#phoneInput, #phoneInput::placeholder {
+    font-family: 'Avenir-Heavy', Helvetica, sans-serif; /* Set the font-family for both */
+    font-size: 16px;
+    margin-right: 16px;
+    padding-left: 15px;
+}
+
+
+
+#phoneInput {
+    font-family: 'Avenir-Heavy', Helvetica, sans-serif;
+    font-size: 16px;
+    margin-right: 16px;
+    padding-left: 15px;
+}
+
+#activatePal button {
+    font-family: 'Avenir-Heavy', Helvetica, sans-serif;
+    background-color: black;
+    color: white;
+}
+
+#inputContainer {
+    display: flex;
+    align-items: center;
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+@media (max-width: 600px) {
+    #phoneInput, #activatePal button {
+        width: 200px;
+    }
+}
+.phrases {
+    position: relative;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    width: 100%;
+    margin-top: 20px;
+}
+
+.phrase {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-right: 15px;
+    margin-left: 15px;
+    margin-right: 20px;
+    margin-top: 20px;
+}
+
+.phrases span {
+    text-align: center;
+    font-size: 18px;
+    color: gray;
+}
+
+.phrase img {
+    width: 200px; /* Or any other size you want */
+    height: 200px; /* Or any other size you want */
+    margin-top: 20px;
+}
+
+.hover-img {
+  cursor: pointer;
+}
+.tooltip {
+  visibility: hidden;
+  position: absolute;
+  background-color: rgba(85, 85, 85, 1); /* Semi-transparent gray background */
+  color: white;  /* Text color set to white */
+  text-align: center;
+  padding: 8px 16px;
+  border-radius: 6px;
+  min-width: 150px;  /* Set a minimum width for the tooltip */
+  width: auto; /* Allow the width to expand based on content */
+    
+  height: 100px;  /* Set the height to a fixed value */
+  top: 50%;  /* Position at the center vertically */
+  left: 50%;  /* Position at the center horizontally */
+  transform: translate(-50%, -50%);  /* Adjust for exact centering */
+  opacity: 0;
+  transition: opacity 0.3s;
+  z-index: 2;  /* To make sure the tooltip is above the image */
+}
+
+
+.phrase:hover .tooltip {
+  visibility: visible;
+  opacity: 1;
+}
 body, html {
     margin: 0;
     padding: 0;
@@ -18,107 +145,15 @@ body, html {
     align-items: center;
     justify-content: center;
 }
-
-.title {
-    display: flex;
-    flex-wrap: wrap; /* Added this line */
-    margin-top: -100px;
-    margin-bottom: 50px;
-    margin-left: 160px;
-    margin-right: 160px;
-    justify-content: center;
-    align-items: center;
-    font-size: 75px;
-    text-align: center;
-}
-
-#phoneInput, #activatePal button {
-    width: 250px;
-    height: 50px;
-    box-sizing: border-box;
-    border-radius: 10px;
-    margin-bottom: 8px;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-    border: 1px solid rgba(0,0,0,0.2);
-    font-size: 18px;
-}
-
-#phoneInput, #phoneInput::placeholder {
-    font-family: 'Avenir-Heavy', Helvetica, sans-serif;
-    font-size: 16px;
-    margin-right: 16px;
-    padding-left: 15px;
-}
-
-#activatePal button {
-    font-family: 'Avenir-Heavy', Helvetica, sans-serif;
-    background-color: black;
-    color: white;
-}
-
-#inputContainer {
-    display: flex;
-    align-items: center;
-}
-
-@media (max-width: 600px) {
-    #phoneInput, #activatePal button {
-        width: 200px;
-    }
-}
-
-.phrases {
-    position: relative;
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    width: 100%;
-    margin-top: 20px; /* Reduced from 50px */
-}
-
-.phrase {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin-right: 15px;
-    margin-left: 15px;
-    margin-top: 20px;
-}
-
-.phrases span {
-    text-align: center;
-    font-size: 18px;
-    color: gray;
-}
-
-.phrase img {
-    width: 200px;
-    height: 200px;
-    margin-top: 20px;
-}
-
-.hover-img {
-  cursor: pointer;
-}
-
-.tooltip {
-  /* ...existing styles... */
-}
-
-.phrase:hover .tooltip {
-  /* ...existing styles... */
-}
-
 .footer {
     text-align: center;
     font-family: 'Avenir-Heavy', Helvetica, sans-serif;
     font-size: 24px;
     color: gray;
     width: 100%;
-    padding: 5px 0; /* Reduced from 10px 0 */
+    padding: 2px 0;
+    
 }
-
 /* The Modal (background) */
 .modal {
   display: none; /* Hidden by default */
