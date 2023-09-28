@@ -12,30 +12,21 @@ body {
     justify-content: center;
     align-items: center;
     font-size: 75px;
-    text-align: center;  /* Add this line */
+    text-align: center;
 }
 
 #phoneInput, #activatePal button {
     width: 250px;
-    height: 50px;  /* Increase the height */
+    height: 50px;
     box-sizing: border-box;
     border-radius: 10px;
     margin-bottom: 8px;
     box-shadow: 0 4px 8px rgba(0,0,0,0.1);
     border: 1px solid rgba(0,0,0,0.2);
-    font-size: 18px;  /* Increase the font size */
+    font-size: 18px;
 }
 
 #phoneInput, #phoneInput::placeholder {
-    font-family: 'Avenir-Heavy', Helvetica, sans-serif; /* Set the font-family for both */
-    font-size: 16px;
-    margin-right: 16px;
-    padding-left: 15px;
-}
-
-
-
-#phoneInput {
     font-family: 'Avenir-Heavy', Helvetica, sans-serif;
     font-size: 16px;
     margin-right: 16px;
@@ -65,6 +56,7 @@ body {
         width: 200px;
     }
 }
+
 .phrases {
     position: relative;
     display: flex;
@@ -93,44 +85,43 @@ body {
 }
 
 .phrase img {
-    width: 200px; /* Or any other size you want */
-    height: 200px; /* Or any other size you want */
+    width: 200px;
+    height: 200px;
     margin-top: 20px;
 }
 
 .hover-img {
   cursor: pointer;
 }
+
 .tooltip {
   visibility: hidden;
   position: absolute;
-  background-color: rgba(85, 85, 85, 1); /* Semi-transparent gray background */
-  color: white;  /* Text color set to white */
+  background-color: rgba(85, 85, 85, 1);
+  color: white;
   text-align: center;
   padding: 8px 16px;
   border-radius: 6px;
-  min-width: 150px;  /* Set a minimum width for the tooltip */
-  width: auto; /* Allow the width to expand based on content */
-    
-  height: 100px;  /* Set the height to a fixed value */
-  top: 50%;  /* Position at the center vertically */
-  left: 50%;  /* Position at the center horizontally */
-  transform: translate(-50%, -50%);  /* Adjust for exact centering */
+  min-width: 150px;
+  width: auto;
+  height: 100px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   opacity: 0;
   transition: opacity 0.3s;
-  z-index: 2;  /* To make sure the tooltip is above the image */
+  z-index: 2;
 }
-
 
 .phrase:hover .tooltip {
   visibility: visible;
   opacity: 1;
 }
+
 body, html {
     margin: 0;
     padding: 0;
     height: 100%;
-    font-family: 'Avenir-Heavy', Helvetica, sans-serif;
 }
 
 .wrapper {
@@ -146,42 +137,38 @@ body, html {
     align-items: center;
     justify-content: center;
 }
+
 .footer {
     text-align: center;
-    font-family: 'Avenir-Heavy', Helvetica, sans-serif;
     font-size: 24px;
     color: gray;
     width: 100%;
     padding: 2px 0;
     margin-top: 10px;
-    
-}
-/* The Modal (background) */
-.modal {
-  display: none; /* Hidden by default */
-  position: fixed; /* Stay in place */
-  z-index: 1; /* Sit on top */
-  left: 0;
-  top: 0;
-  width: 100%; /* Full width */
-  height: 100%; /* Full height */
-  overflow: auto; /* Enable scroll if needed */
-  background-color: rgb(0,0,0); /* Fallback color */
-  background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
 }
 
-/* Modal Content */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0,0,0,0.4);
+}
+
 .modal-content {
   position: relative;
   background-color: #fefefe;
-  margin: 15% auto; /* 15% from the top and centered */
+  margin: 15% auto;
   padding: 20px;
   border: 1px solid #888;
-  width: 20%; /* Reduce width to 50% */
-  border-radius: 12px; /* Rounded corners */
+  width: 20%;
+  border-radius: 12px;
 }
 
-/* The Close Button */
 .close {
   color: #aaa;
   float: right;
@@ -195,22 +182,18 @@ body, html {
   text-decoration: none;
   cursor: pointer;
 }
-/* Modal Header */
+
 .modal-header {
   display: flex;
   align-items: center;
 }
 
-/* Modal Image */
 .modal-image {
   width: 40px;
   height: 40px;
   margin-right: 15px;
 }
 
-/* Media queries for responsiveness */
-
-/* For tablets and larger mobile devices */
 @media (max-width: 768px) {
     .title {
         font-size: 50px;
@@ -221,14 +204,19 @@ body, html {
         width: 150px;
         height: 150px;
     }
-    
-    /* ... */
 }
 
-/* For smaller mobile devices */
 @media (max-width: 480px) {
     .title {
         font-size: 30px;
         margin: 0 20px 20px 20px;
     }
 
+    #phoneInput, #activatePal button {
+        width: 180px;
+    }
+
+    .modal-content {
+        width: 80%;
+    }
+}
