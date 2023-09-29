@@ -17,7 +17,7 @@ if should_initialize_db.lower() == 'true':
     initialize_db()
     
     
-print("Before calling the initialize_db")
+print("Before calling initialize_db")
 initialize_db()
 print("After calling initialize_db")
 
