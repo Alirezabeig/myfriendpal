@@ -11,8 +11,13 @@ import openai
 
 logging.basicConfig(level=logging.INFO)
 load_dotenv()
+should_initialize_db = os.environ.get('INITIALIZE_DB', 'False')
 
-print("Before calling initialize_db")
+if should_initialize_db.lower() == 'true':
+    initialize_db()
+    
+    
+print("Before calling the initialize_db")
 initialize_db()
 print("After calling initialize_db")
 
