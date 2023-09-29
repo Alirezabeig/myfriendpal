@@ -25,5 +25,6 @@ Werkzeug==2.3.7
 yarl==1.9.2
 zipp==3.17.0
 openai==0.28.1
-MySQL-python==1.2.5
+mysqlclient==2.1.0
+
 
