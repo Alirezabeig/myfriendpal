@@ -1,5 +1,5 @@
 
-import MySQLdb
+import pymysql
 import json
 from database import initialize_db
 from flask import Flask, request, jsonify, render_template,redirect
@@ -11,15 +11,6 @@ import openai
 
 logging.basicConfig(level=logging.INFO)
 load_dotenv()
-
-
-should_initialize_db = os.environ.get('INITIALIZE_DB', 'False')
-print(f"Environment variable INITIALIZE_DB is set to: {os.environ.get('INITIALIZE_DB', 'Not Set')}")
-print(f"should_initialize_db is set to: {should_initialize_db}")
-if should_initialize_db.lower() == 'true':
-    print("Before calling the initialize_db")
-    initialize_db()
-    print("After calling initialize_db")
 
 
 app = Flask(__name__)
@@ -43,7 +34,7 @@ def enforce_https():
 
     
 def generate_response(user_input, phone_number):
-    # Load existing conversation from database
+    
     print("generate_response called")
     conversation = load_conversation(phone_number)
     
@@ -144,23 +135,6 @@ def load_conversation(phone_number):
     else:
         return None
         
-@app.route('/get_conversations', methods=['GET'])
-def get_all_conversations():
-    connection = get_connection()
-    cursor = connection.cursor()
-    
-    cursor.execute("SELECT phone_number, conversation FROM conversations")
-    rows = cursor.fetchall()
-    
-    connection.close()
-    
-    conversations_dict = {}
-    for row in rows:
-        phone_number, conversation = row
-        conversations_dict[phone_number] = json.loads(conversation)
-    
-    return jsonify(conversations_dict)
-
 
 if __name__ == '__main__':
     

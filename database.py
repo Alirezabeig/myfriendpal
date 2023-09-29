@@ -1,6 +1,6 @@
 # database.py
 
-import MySQLdb
+import pymysql
 import os
 
 def get_connection():
