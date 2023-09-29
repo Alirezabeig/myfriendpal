@@ -15,9 +15,11 @@ load_dotenv()
 app = Flask(__name__)
 
 SCOPES = ['https://www.googleapis.com/auth/calendar.readonly']
-CALENDAR_CREDENTIALS_FILE = 'calendar-credentials.json'  # Create this file
-CALENDAR_API_SERVICE_NAME = 'calendar'
-CALENDAR_API_VERSION = 'v3'
+
+CALENDAR_CREDENTIALS_FILE = os.environ.get('CALENDAR_CREDENTIALS_FILE')
+CALENDAR_API_SERVICE_NAME = os.environ.get('CALENDAR_API_SERVICE_NAME')
+CALENDAR_API_VERSION = os.environ.get('CALENDAR_API_VERSION')
+
 
 TWILIO_ACCOUNT_SID = os.environ.get('TWILIO_ACCOUNT_SID')
 TWILIO_AUTH_TOKEN = os.environ.get('TWILIO_AUTH_TOKEN')
@@ -142,8 +144,5 @@ def authorize_google_calendar():
 
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 5002))  # Fall back to 5002 for local development
-  # 5000 is just a common default for local testing
-
-  # Fetch the port from environment variables or set to 5000
     app.run(host="0.0.0.0", port=port)  # Run the app
 
