@@ -1,8 +1,4 @@
-
-import sqlite3
-import json
-from database import initialize_db
-from flask import Flask, request, jsonify, render_template,redirect
+from flask import Flask, request, jsonify, render_template
 from twilio.rest import Client
 import os
 from dotenv import load_dotenv
@@ -10,8 +6,8 @@ import logging
 import openai
 
 logging.basicConfig(level=logging.INFO)
-load_dotenv()
 
+load_dotenv()
 
 app = Flask(__name__)
 
@@ -25,39 +21,22 @@ gpt4_api_key = os.environ.get('GPT4_API_KEY')
 openai.api_key = gpt4_api_key
 
 conversations = {}  # This will hold the conversation history
-initialize_db()
 
-@app.before_request
-def enforce_https():
-    if request.headers.get('X-Forwarded-Proto') == 'http':
-        url = request.url.replace('http://', 'https://', 1)
-        return redirect(url, code=301)
-
-    
 def generate_response(user_input, phone_number):
-    
-    print("generate_response called")
-    conversation = load_conversation(phone_number)
-    
-    if conversation is None:
-        conversation = [
-            {"role": "system", "content":
-            "1. You are like a friend. Your name is Pal. You have no other name. 2. Your language is like a friend. You are built by love and prespration. 3. if someone asks you how you are built , always respond a funny and spirtual answer. 4.Also always make sure you know the name of the person you are chatting with and make sure to alway listen to their daily success and challenges and respond accordingly. 5. Also learn from users what acitivities they like or they like to improve any personlaity traits or habits. 6. always offer kind warm friendly (unlike machines) to them, like life-coach friend. 7. don't get annoying by using jagon. 8. keep it concise, your responses should be maximum 30 words"},
+    global conversations
+    if phone_number not in conversations:
+        conversations[phone_number] = [
+            {"role": "system", "content": "You are like a friend. Your name is Pal . you have no other name. Your language is like a friend. You are built by love and prespration. if someone asks you how you are built , always respond a funny and spirtual answer. Also make sure you know the name of the person you are chatting with and make sure to alway listen to their daily success and challenges and respond accordingly"},
         ]
-        
-    conversation.append({"role": "user", "content": user_input})
+    conversations[phone_number].append({"role": "user", "content": user_input})
     
     try:
         response = openai.ChatCompletion.create(
             model="gpt-4",
-            messages=conversation
+            messages=conversations[phone_number]
         )
         gpt4_reply = response['choices'][0]['message']['content'].strip()
-        conversation.append({"role": "assistant", "content": gpt4_reply})
-        
-        # Save updated conversation back to the database
-        save_conversation(phone_number, conversation)
-        
+        conversations[phone_number].append({"role": "assistant", "content": gpt4_reply})
         return gpt4_reply
     except Exception as e:
         logging.error(f"Failed to generate message with GPT-4: {e}")
@@ -90,7 +69,6 @@ def send_message():
 
 @app.route("/sms", methods=['POST'])
 def sms_reply():
-    logging.info("sms_reply called")
     user_input = request.values.get('Body', None)
     phone_number = request.values.get('From', None)
 
@@ -104,39 +82,9 @@ def sms_reply():
     )
 
     return jsonify({'message': 'Reply sent!'})
-    
-def save_conversation(phone_number, conversation):
-    try:
-        connection = get_connection()
-        cursor = connection.cursor()
-
-        serialized_conversation = json.dumps(conversation)
-
-        cursor.execute("INSERT OR REPLACE INTO conversations (phone_number, conversation) VALUES (?, ?)", (phone_number, serialized_conversation))
-
-        connection.commit()
-        connection.close()
-
-        logging.info(f"Successfully saved conversation for {phone_number}: {serialized_conversation}")
-    except Exception as e:
-        logging.error(f"Could not save conversation: {e}")
-
-def load_conversation(phone_number):
-    connection = get_connection()
-    cursor = connection.cursor()
-
-    cursor.execute("SELECT conversation FROM conversations WHERE phone_number = ?", (phone_number,))
-    row = cursor.fetchone()
-
-    connection.close()
-
-    if row:
-        return json.loads(row[0])
-    else:
-        return None
 
 
 if __name__ == '__main__':
-    
     port = int(os.environ.get("PORT", 5001))  # Fetch the port from environment variables or set to 5000
-    app.run(host="0.0.0.0", port=port)
+    app.run(host="0.0.0.0", port=port)  # Run the app
+
