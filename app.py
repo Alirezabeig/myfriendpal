@@ -1,5 +1,5 @@
 
-import pymysql
+import sqlite3
 import json
 from database import initialize_db
 from flask import Flask, request, jsonify, render_template,redirect
@@ -25,6 +25,7 @@ gpt4_api_key = os.environ.get('GPT4_API_KEY')
 openai.api_key = gpt4_api_key
 
 conversations = {}  # This will hold the conversation history
+initialize_db()
 
 @app.before_request
 def enforce_https():
@@ -111,7 +112,7 @@ def save_conversation(phone_number, conversation):
 
         serialized_conversation = json.dumps(conversation)
 
-        cursor.execute("INSERT INTO conversations (phone_number, conversation) VALUES (%s, %s) ON DUPLICATE KEY UPDATE conversation = %s", (phone_number, serialized_conversation, serialized_conversation))
+        cursor.execute("INSERT OR REPLACE INTO conversations (phone_number, conversation) VALUES (?, ?)", (phone_number, serialized_conversation))
 
         connection.commit()
         connection.close()
@@ -120,12 +121,11 @@ def save_conversation(phone_number, conversation):
     except Exception as e:
         logging.error(f"Could not save conversation: {e}")
 
-
 def load_conversation(phone_number):
     connection = get_connection()
     cursor = connection.cursor()
 
-    cursor.execute("SELECT conversation FROM conversations WHERE phone_number = %s", (phone_number,))
+    cursor.execute("SELECT conversation FROM conversations WHERE phone_number = ?", (phone_number,))
     row = cursor.fetchone()
 
     connection.close()
@@ -134,7 +134,7 @@ def load_conversation(phone_number):
         return json.loads(row[0])
     else:
         return None
-        
+
 
 if __name__ == '__main__':
     
