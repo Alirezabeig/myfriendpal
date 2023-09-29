@@ -1,5 +1,5 @@
 
-import sqlite3
+import MySQLdb
 import json
 from database import initialize_db
 from flask import Flask, request, jsonify, render_template,redirect
@@ -49,7 +49,8 @@ def generate_response(user_input, phone_number):
     
     if conversation is None:
         conversation = [
-            {"role": "system", "content": "You are like a friend. Your name is Pal . you have no other name. Your language is like a friend. You are built by love and prespration. if someone asks you how you are built , always respond a funny and spirtual answer. Also always make sure you know the name of the person you are chatting with and make sure to alway listen to their daily success and challenges and respond accordingly. Also learn from users what acitivities or what they llike to improve and always offer kind warm friendly (unlike machines) to them, like life coach friend."},
+            {"role": "system", "content":
+            "1. You are like a friend. Your name is Pal. You have no other name. 2. Your language is like a friend. You are built by love and prespration. 3. if someone asks you how you are built , always respond a funny and spirtual answer. 4.Also always make sure you know the name of the person you are chatting with and make sure to alway listen to their daily success and challenges and respond accordingly. 5. Also learn from users what acitivities they like or they like to improve any personlaity traits or habits. 6. always offer kind warm friendly (unlike machines) to them, like life-coach friend. 7. don't get annoying by using jagon. 8. keep it concise, your responses should be maximum 30 words"},
         ]
         
     conversation.append({"role": "user", "content": user_input})
@@ -113,28 +114,26 @@ def sms_reply():
     
 def save_conversation(phone_number, conversation):
     try:
-        connection = sqlite3.connect('conversations.db')
+        connection = get_connection()
         cursor = connection.cursor()
-        
-        # Serialize the conversation list to a JSON string
+
         serialized_conversation = json.dumps(conversation)
-        
-        # Insert or replace the conversation using the phone number as the key
-        cursor.execute("INSERT OR REPLACE INTO conversations (phone_number, conversation) VALUES (?, ?)", (phone_number, serialized_conversation))
-        
-        # Commit the changes and close the connection
+
+        cursor.execute("INSERT INTO conversations (phone_number, conversation) VALUES (%s, %s) ON DUPLICATE KEY UPDATE conversation = %s", (phone_number, serialized_conversation, serialized_conversation))
+
         connection.commit()
         connection.close()
-        
+
         logging.info(f"Successfully saved conversation for {phone_number}: {serialized_conversation}")
     except Exception as e:
         logging.error(f"Could not save conversation: {e}")
 
+
 def load_conversation(phone_number):
-    connection = sqlite3.connect('conversations.db')
+    connection = get_connection()
     cursor = connection.cursor()
 
-    cursor.execute("SELECT conversation FROM conversations WHERE phone_number = ?", (phone_number,))
+    cursor.execute("SELECT conversation FROM conversations WHERE phone_number = %s", (phone_number,))
     row = cursor.fetchone()
 
     connection.close()
@@ -146,7 +145,7 @@ def load_conversation(phone_number):
         
 @app.route('/get_conversations', methods=['GET'])
 def get_all_conversations():
-    connection = sqlite3.connect('conversations.db')
+    connection = get_connection()
     cursor = connection.cursor()
     
     cursor.execute("SELECT phone_number, conversation FROM conversations")

@@ -1,16 +1,25 @@
-import sqlite3
+# database.py
+
+import MySQLdb
 import os
 
+def get_connection():
+    return MySQLdb.connect(
+        host=os.environ.get('DB_HOST', "database-1.cteawawmvpgi.us-east-1.rds.amazonaws.com"),  # Fallback to hardcoded host
+        user=os.environ.get('DB_USER', "admin"),  # Fallback to hardcoded user
+        passwd=os.environ.get('DB_PASSWORD', "fhc85C75*Dfj#$jf5"),  # Fallback to hardcoded password
+        db=os.environ.get('DB_NAME', "conversations")  # Fallback to hardcoded db name
+    )
+
 def initialize_db():
-    print("Initialize DB function entered")
-    print("Current working directory:", os.getcwd())
-    print("Database has been initialized")
-    connection = sqlite3.connect('conversations.db')
+    connection = get_connection()
     cursor = connection.cursor()
     
+    # Create table if it doesn't exist
     cursor.execute('''CREATE TABLE IF NOT EXISTS conversations
-                      (phone_number TEXT PRIMARY KEY,
-                       conversation TEXT)''')  # Changed from BLOB to TEXT
+                      (phone_number VARCHAR(15) PRIMARY KEY,
+                       conversation TEXT)''')
     
+    # Commit the changes and close the connection
     connection.commit()
     connection.close()
