@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 #!/Users/toodle/myenv/bin/python3
+=======
+#!/Users/toodle/myenv/venv/bin/python
+>>>>>>> 5f23b430f51d092ddd608bc83b301292573eab80
 # -*- coding: utf-8 -*-
 import re
 import sys
