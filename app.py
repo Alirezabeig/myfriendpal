@@ -14,6 +14,8 @@ load_dotenv()
 
 
 should_initialize_db = os.environ.get('INITIALIZE_DB', 'False')
+print(f"Environment variable INITIALIZE_DB is set to: {os.environ.get('INITIALIZE_DB', 'Not Set')}")
+print(f"should_initialize_db is set to: {should_initialize_db}")
 if should_initialize_db.lower() == 'true':
     print("Before calling the initialize_db")
     initialize_db()
