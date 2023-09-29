@@ -26,6 +26,7 @@ openai.api_key = gpt4_api_key
 
 conversations = {}  # This will hold the conversation history
 
+initialize_db()
 
 @app.before_request
 def enforce_https():
@@ -155,6 +156,6 @@ def get_all_conversations():
 
 
 if __name__ == '__main__':
-    initialize_db()
+    
     port = int(os.environ.get("PORT", 5001))  # Fetch the port from environment variables or set to 5000
     app.run(host="0.0.0.0", port=port)
