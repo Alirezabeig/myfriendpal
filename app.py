@@ -141,7 +141,8 @@ def authorize_google_calendar():
     return "Google Calendar integration successful! You can now go back to your chat."
 
 if __name__ == '__main__':
-    port = int(os.environ.get("PORT", 5000))  # 5000 is just a common default for local testing
+    port = int(os.environ.get("PORT", 5002))  # Fall back to 5002 for local development
+  # 5000 is just a common default for local testing
 
   # Fetch the port from environment variables or set to 5000
     app.run(host="0.0.0.0", port=port)  # Run the app
