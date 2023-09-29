@@ -10,8 +10,11 @@ import logging
 import openai
 
 logging.basicConfig(level=logging.INFO)
-
 load_dotenv()
+
+print("Before calling initialize_db")
+initialize_db()
+print("After calling initialize_db")
 
 app = Flask(__name__)
 
@@ -25,8 +28,6 @@ gpt4_api_key = os.environ.get('GPT4_API_KEY')
 openai.api_key = gpt4_api_key
 
 conversations = {}  # This will hold the conversation history
-
-## initialize_db()
 
 @app.before_request
 def enforce_https():
