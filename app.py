@@ -98,6 +98,7 @@ def send_message():
 
 @app.route("/sms", methods=['POST'])
 def sms_reply():
+    logging.info("sms_reply called")
     user_input = request.values.get('Body', None)
     phone_number = request.values.get('From', None)
 
