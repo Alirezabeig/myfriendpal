@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='1.png') }}">
+            
+            
+    <title>Pal</title>
+    <link <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400&display=swap" rel="stylesheet">
+
+        <link rel="stylesheet" href="/static/styles.css">
+
+</head>
+<body>
+    
+    <div id="myModal" class="modal">
+      <div class="modal-content">
+        <span class="close">&times;</span>
+        <p id="modalText">Some text in the Modal..</p>
+      </div>
+    </div>
+    
+    <div id="myModal2" class="modal">
+      <div class="modal-content">
+        <span class="close">&times;</span>
+        <div class="modal-header">
+          <img src="{{ url_for('static', filename='cong.jpg') }}" alt="congratulations" class="modal-image">
+          <span id="modalText">Modal text</span>
+        </div>
+        <ul id="modalBulletPoints">
+          <li>Pal is still training and becoming better.</li>
+          <li>Pal will learn from you & about you.</li>
+          <li>Pal hopes to become your bff.</li>
+        </ul>
+      </div>
+    </div>
+
+
+    <div class="wrapper">
+        <div class="container">
+            <h1 class="title">Pal is Your AI Friend. It Helps You Become a Better Version of Yourself!</h1>
+            <form id="activateForm">
+                <div id="inputContainer"> <!-- New container -->
+                    <input type="text" id="phoneInput" placeholder="Enter your phone number" required>
+                    <div id="activatePal">
+                        <button type="submit">Activate Pal Today!</button>
+                    </div>
+                </div>
+            </form>
+            </form>
+            <div class="phrases" >
+                
+                
+                <div class="phrase" id="phrase1">
+                    <span>Talk Anytime.</span>
+                    <img src="{{ url_for('static', filename='pic.jpg') }}" alt="Image 1">
+                        <span class="tooltip"></span>
+
+                </div>
+                <div class="phrase" id="phrase2">
+                    <span>Smart & Fun.</span>
+                    <img src="{{ url_for('static', filename='pic1.jpg') }}" alt="Image 1">
+                        <span class="tooltip"></span>
+                </div>
+                <div class="phrase" id="phrase3">
+                    <span>Always Here.</span>
+                    <img src="{{ url_for('static', filename='pic2.jpg') }}" alt="Image 1">
+                        <span class="tooltip"></span>
+                </div>
+                <div class="phrase" id="phrase4">
+                    <span>Instant Help.</span>
+                    <img src="{{ url_for('static', filename='pic3.jpg') }}" alt="Image 1">
+                        <span class="tooltip"></span>
+
+                </div>
+                <div class="phrase" id="phrase5">
+                    <span>Life Coach.</span>
+                    <img src="{{ url_for('static', filename='pic4.jpg') }}" alt="Image 1">
+                        <span class="tooltip"></span>
+
+                </div>
+                <div class="phrase" id="phrase6">
+                    <span>Real Connection.</span>
+                    <img src="{{ url_for('static', filename='pic5.jpg') }}" alt="Image 1">
+                        <span class="tooltip"></span>
+
+                </div>
+            </div>
+
+                    </div>
+                </div>
+        </div>
+        <div class="footer">
+            <p>Powered by homemade AI filled with love and passion!</p>
+        </div>
+
+    </div>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
