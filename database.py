@@ -4,6 +4,7 @@ import os
 def initialize_db():
     print("Current working directory:", os.getcwd())
     print("Database has been initialized")
+    
     connection = sqlite3.connect('conversations.db')
     cursor = connection.cursor()
     
