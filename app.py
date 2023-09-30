@@ -1,6 +1,3 @@
-from google_auth_oauthlib.flow import InstalledAppFlow
-from google.oauth2 import service_account
-from googleapiclient.discovery import build
 from flask import Flask, request, jsonify, render_template
 from twilio.rest import Client
 import os
@@ -13,13 +10,6 @@ logging.basicConfig(level=logging.INFO)
 load_dotenv()
 
 app = Flask(__name__)
-
-SCOPES = ['https://www.googleapis.com/auth/calendar.readonly']
-
-CALENDAR_CREDENTIALS_FILE = os.environ.get('CALENDAR_CREDENTIALS_FILE')
-CALENDAR_API_SERVICE_NAME = os.environ.get('CALENDAR_API_SERVICE_NAME')
-CALENDAR_API_VERSION = os.environ.get('CALENDAR_API_VERSION')
-
 
 TWILIO_ACCOUNT_SID = os.environ.get('TWILIO_ACCOUNT_SID')
 TWILIO_AUTH_TOKEN = os.environ.get('TWILIO_AUTH_TOKEN')
@@ -36,7 +26,7 @@ def generate_response(user_input, phone_number):
     global conversations
     if phone_number not in conversations:
         conversations[phone_number] = [
-            {"role": "system", "content": "1. You are like a friend. Your name is Pal . 2. You have no other name. Your language is like a friend. 3. You are built by love and prespration. 4. if someone asks you how you are built , always respond a funny and spirtual answer. Also make sure you know the name of the person you are chatting with and make sure to alway listen to their daily success and challenges and respond accordingly. 5. never answer cheesy and useles stuff 6. keep it concise to maximum 30 words"},
+            {"role": "system", "content": "You are like a friend. Your name is Pal . you have no other name. Your language is like a friend. You are built by love and prespration. if someone asks you how you are built , always respond a funny and spirtual answer. Also make sure you know the name of the person you are chatting with and make sure to alway listen to their daily success and challenges and respond accordingly"},
         ]
     conversations[phone_number].append({"role": "user", "content": user_input})
     
@@ -63,7 +53,7 @@ def send_message():
         data = request.json
         phone_number = data.get('phone_number')
         
-        greeting_message = "Hey there, I am exited to connect with you now!"  # Hardcoded greeting message
+        greeting_message = "Hey there, I am exited to connect with you!"  # Hardcoded greeting message
         
         message = client.messages.create(
             to=phone_number,
@@ -76,75 +66,25 @@ def send_message():
         logging.error(f"Failed to send message: {e}")
         return jsonify({'message': 'Failed to send message', 'error': str(e)})
 
-def initialize_google_calendar():
-    """Initialize the Google Calendar API."""
-    creds = None
-
-    if os.path.exists(CALENDAR_CREDENTIALS_FILE):
-        creds = service_account.Credentials.from_service_account_file(
-            CALENDAR_CREDENTIALS_FILE, scopes=SCOPES)
-    
-    if not creds or not creds.valid:
-        flow = InstalledAppFlow.from_client_config(
-            {
-                "installed": {
-                    "client_id": "1084838804894-s7bra6uila2ffshf1712qnb9lf2hk781.apps.googleusercontent.com",
-                    "client_secret": "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",
-                    "redirect_uris": ["urn:ietf:wg:oauth:2.0:oob", "http://localhost"]
-                }
-            },
-            SCOPES
-        )
-        creds = flow.run_local_server(port=0)
-    
-    with open(CALENDAR_CREDENTIALS_FILE, 'w') as token:
-        token.write(creds.to_json())
-    
-    return build(CALENDAR_API_SERVICE_NAME, CALENDAR_API_VERSION, credentials=creds)
 
 @app.route("/sms", methods=['POST'])
 def sms_reply():
-    logging.info("Received SMS")
-    
     user_input = request.values.get('Body', None)
     phone_number = request.values.get('From', None)
 
-    # Check if the user's response contains the keyword for connecting Google Calendar
-    if "calendar" in user_input.lower():
-        # Redirect the user to Google OAuth consent screen
-        return redirect(url_for('authorize_google_calendar'))
-    else:
-        # Generate a regular GPT-4 response
-        response_text = generate_response(user_input, phone_number)
+    # Generate response using GPT-4
+    gpt4_response = generate_response(user_input, phone_number)
     
-    # Send the response back to the user
     message = client.messages.create(
         to=phone_number,
         from_=TWILIO_PHONE_NUMBER,
-        body=response_text
+        body=gpt4_response
     )
 
     return jsonify({'message': 'Reply sent!'})
-        
-@app.route("/authorize_google_calendar")
-def authorize_google_calendar():
-    flow = InstalledAppFlow.from_client_config(
-        {
-            "installed": {
-                "client_id": "1084838804894-s7bra6uila2ffshf1712qnb9lf2hk781.apps.googleusercontent.com",
-                "client_secret": "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",
-                "redirect_uris": ["urn:ietf:wg:oauth:2.0:oob", "http://localhost"]
-            }
-        },
-        SCOPES
-    )
-    creds = flow.run_local_server(port=0)
-    with open(CALENDAR_CREDENTIALS_FILE, 'w') as token:
-        token.write(creds.to_json())
-    
-    return "Google Calendar integration successful! You can now go back to your chat."
+
 
 if __name__ == '__main__':
-    port = int(os.environ.get("PORT", 5002))  # Fall back to 5002 for local development
+    port = int(os.environ.get("PORT", 5002))  # Fetch the port from environment variables or set to 5000
     app.run(host="0.0.0.0", port=port)  # Run the app
 
