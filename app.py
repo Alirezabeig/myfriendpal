@@ -104,6 +104,8 @@ def initialize_google_calendar():
 
 @app.route("/sms", methods=['POST'])
 def sms_reply():
+    logging.info("Received SMS")
+    
     user_input = request.values.get('Body', None)
     phone_number = request.values.get('From', None)
 
@@ -123,7 +125,7 @@ def sms_reply():
     )
 
     return jsonify({'message': 'Reply sent!'})
-
+        
 @app.route("/authorize_google_calendar")
 def authorize_google_calendar():
     flow = InstalledAppFlow.from_client_config(
