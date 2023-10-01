@@ -17,10 +17,8 @@ app = Flask(__name__)
 
 SCOPES = ['https://www.googleapis.com/auth/calendar.readonly']
 
-CLIENT_SECRETS_PATH = os.environ.get('CLIENT_SECRETS_PATH')
 CALENDAR_API_SERVICE_NAME = os.environ.get('CALENDAR_API_SERVICE_NAME')
 CALENDAR_API_VERSION = os.environ.get('CALENDAR_API_VERSION')
-
 GOOGLE_CLIENT_ID = os.environ.get('GOOGLE_CLIENT_ID')
 GOOGLE_CLIENT_SECRET = os.environ.get('GOOGLE_CLIENT_SECRET')
 
@@ -39,7 +37,7 @@ def generate_response(user_input, phone_number):
     global conversations
     if phone_number not in conversations:
         conversations[phone_number] = [
-            {"role": "system", "content": "1. You are like a friend. Your name is Pal . 2. You have no other name. Your language is like a friend. 3. You are built by love and prespration. 4. if someone asks you how you are built , always respond a funny and spirtual answer. Also make sure you know the name of the person you are chatting with and make sure to alway listen to their daily success and challenges and respond accordingly. 5. never answer cheesy and useles stuff 6. keep it concise to maximum 30 words"},
+            {"role": "system", "content": "1. You are like a friend. Your name is Pal . 2. You have no other name. Your language is like a friend. 3. You are built by love and prespration. 4. if someone asks you how you are built , always respond a funny and spirtual answer. Also make sure you know the name of the person you are chatting with and make sure to alway listen to their daily success and challenges and respond accordingly. 5. never answer cheesy and useles stuff 6. keep it concise to maximum 30 words. 7. no need to explain yourself."},
         ]
     conversations[phone_number].append({"role": "user", "content": user_input})
     
@@ -63,6 +61,8 @@ def index():
 @app.route('/send_message', methods=['POST'])
 def send_message():
     app.logger.info('Inside send_message')
+    print("send-message function kicked in")
+
     try:
         data = request.json
         phone_number = data.get('phone_number')
@@ -80,6 +80,8 @@ def send_message():
             body=greeting_message
         )
         logging.info(f"Message sent with ID: {message.sid}")
+        print("Try under-send message kicked in")
+
         return jsonify({'message': 'Message sent!'})
     except Exception as e:
         logging.error(f"Failed to send message: {e}")
@@ -88,14 +90,19 @@ def send_message():
 def initialize_google_calendar():
     """Initialize the Google Calendar API and return Auth URL."""
     creds = None
-
-    flow = InstalledAppFlow.from_client_secrets_file(
-        CLIENT_SECRETS_PATH, SCOPES
+    flow = InstalledAppFlow.from_client_config(
+        {
+            "installed": {
+                "client_id": GOOGLE_CLIENT_ID,
+                "client_secret": GOOGLE_CLIENT_SECRET,
+                "redirect_uris": ["https://www.myfriendpal.com/oauth2callback"]
+            }
+        },
+        SCOPES
     )
     auth_url, _ = flow.authorization_url("https://www.myfriendpal.com/oauth2callback")
     
-    return auth_url  # Return Auth URL
-
+    return auth_url
 
 @app.route("/sms", methods=['POST'])
 def sms_reply():
@@ -153,12 +160,20 @@ def authorize_google_calendar():
 @app.route('/oauth2callback')
 def oauth2callback():
     app.logger.info('Inside oauth2callback')
-    flow = InstalledAppFlow.from_client_secrets_file(os.environ.get('CLIENT_SECRETS_PATH'), SCOPES)
+    flow = InstalledAppFlow.from_client_config(
+        {
+            "installed": {
+                "client_id": GOOGLE_CLIENT_ID,
+                "client_secret": GOOGLE_CLIENT_SECRET,
+                "redirect_uris": ["https://www.myfriendpal.com/oauth2callback"]
+            }
+        },
+        SCOPES
+    )
     flow.fetch_token(authorization_response=request.url)
     creds = flow.credentials
     # Save these credentials; you'll use them to interact with the Google Calendar API
     return "Google Calendar integrated successfully!"
-
 
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 5002))  # Fall back to 5002 for local development
