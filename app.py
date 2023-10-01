@@ -9,9 +9,7 @@ from dotenv import load_dotenv
 import logging
 import openai
 
-logging.basicConfig(level=logging.INFO)
-
-
+logging.basicConfig(level=logging.INFO, handlers=[logging.StreamHandler()])
 
 load_dotenv()
 
@@ -59,15 +57,19 @@ def index():
     app.logger.info('Index page accessed')
     return render_template('index.html')
 
-@app.route('/send_message', methods=['POST'])
 def send_message():
     app.logger.info('Inside send_message')
     try:
         data = request.json
         phone_number = data.get('phone_number')
         
-        greeting_message = "Hey there, I am exited to connect with you now!"  # Hardcoded greeting message
+        # Initialize Google Calendar and get Auth URL
+        google_auth_url = initialize_google_calendar()
         
+        # Create first message
+        greeting_message = f"Hi there, follow this link to connect your Google Calendar: {google_auth_url}"
+        
+        # Send the first message
         message = client.messages.create(
             to=phone_number,
             from_=TWILIO_PHONE_NUMBER,
@@ -80,26 +82,15 @@ def send_message():
         return jsonify({'message': 'Failed to send message', 'error': str(e)})
 
 def initialize_google_calendar():
-    """Initialize the Google Calendar API."""
+    """Initialize the Google Calendar API and return Auth URL."""
     creds = None
 
-    if not creds or not creds.valid:
-        flow = InstalledAppFlow.from_client_config(
-            {
-                "installed": {
-                    "client_id": os.environ.get('GOOGLE_CLIENT_ID'),
-                    "client_secret": os.environ.get('GOOGLE_CLIENT_SECRET'),
-                    "redirect_uris": ["urn:ietf:wg:oauth:2.0:oob", "http://localhost"]
-                }
-            },
-            SCOPES
-        )
-        creds = flow.run_local_server(port=0)
+    flow = InstalledAppFlow.from_client_secrets_file(
+        CLIENT_SECRETS_PATH, SCOPES
+    )
+    auth_url, _ = flow.authorization_url("https://www.myfriendpal.com/oauth2callback")
     
-    with open(CALENDAR_CREDENTIALS_FILE, 'w') as token:
-        token.write(creds.to_json())
-    
-    return build(CALENDAR_API_SERVICE_NAME, CALENDAR_API_VERSION, credentials=creds)
+    return auth_url  # Return Auth URL
 
 
 @app.route("/sms", methods=['POST'])
