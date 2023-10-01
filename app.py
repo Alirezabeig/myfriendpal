@@ -8,7 +8,8 @@ from dotenv import load_dotenv
 import logging
 import openai
 
-logging.basicConfig(level=logging.INFO)
+logging.info("This is a test log.")
+
 load_dotenv()
 
 app = Flask(__name__)
@@ -98,6 +99,7 @@ def initialize_google_calendar():
 
 @app.route("/sms", methods=['POST'])
 def sms_reply():
+    app.logger.info("Received SMS")
     logging.info("Received SMS")
     
     user_input = request.values.get('Body', None)
@@ -106,8 +108,10 @@ def sms_reply():
     # Check if the user's response contains the keyword for connecting Google Calendar
     if "calendar" in user_input.lower():
         # Generate the Google Auth URL and send via SMS
+        logging.info("Detected calendar keyword.")
         flow = InstalledAppFlow.from_client_secrets_file(os.environ.get('CLIENT_SECRETS_PATH'), SCOPES)
         auth_url, _ = flow.authorization_url("https://www.myfriendpal.com/oauth2callback")
+        logging.info(f"Generated auth URL: {auth_url}")
         
         # Send the Auth URL via SMS
         message = client.messages.create(
@@ -155,6 +159,7 @@ def oauth2callback():
 
 
 if __name__ == '__main__':
+    logging.basicConfig(level=logging.INFO)
     port = int(os.environ.get("PORT", 5002))  # Fall back to 5002 for local development
     app.run(host="0.0.0.0", port=port)  # Run the app
 
