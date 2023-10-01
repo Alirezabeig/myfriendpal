@@ -9,17 +9,15 @@ import logging
 import openai
 
 logging.basicConfig(level=logging.INFO)
-
 load_dotenv()
 
 app = Flask(__name__)
 
 SCOPES = ['https://www.googleapis.com/auth/calendar.readonly']
 
-CALENDAR_CREDENTIALS_FILE = os.environ.get('CALENDAR_CREDENTIALS_FILE')
+CLIENT_SECRETS_PATH = os.environ.get('CLIENT_SECRETS_PATH')
 CALENDAR_API_SERVICE_NAME = os.environ.get('CALENDAR_API_SERVICE_NAME')
 CALENDAR_API_VERSION = os.environ.get('CALENDAR_API_VERSION')
-
 
 TWILIO_ACCOUNT_SID = os.environ.get('TWILIO_ACCOUNT_SID')
 TWILIO_AUTH_TOKEN = os.environ.get('TWILIO_AUTH_TOKEN')
@@ -56,7 +54,6 @@ def generate_response(user_input, phone_number):
 def index():
     return render_template('index.html')
 
-
 @app.route('/send_message', methods=['POST'])
 def send_message():
     try:
@@ -80,16 +77,12 @@ def initialize_google_calendar():
     """Initialize the Google Calendar API."""
     creds = None
 
-    if os.path.exists(CALENDAR_CREDENTIALS_FILE):
-        creds = service_account.Credentials.from_service_account_file(
-            CALENDAR_CREDENTIALS_FILE, scopes=SCOPES)
-    
     if not creds or not creds.valid:
         flow = InstalledAppFlow.from_client_config(
             {
                 "installed": {
-                    "client_id": "1084838804894-s7bra6uila2ffshf1712qnb9lf2hk781.apps.googleusercontent.com",
-                    "client_secret": "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",
+                    "client_id": os.environ.get('GOOGLE_CLIENT_ID'),
+                    "client_secret": os.environ.get('GOOGLE_CLIENT_SECRET'),
                     "redirect_uris": ["urn:ietf:wg:oauth:2.0:oob", "http://localhost"]
                 }
             },
@@ -102,23 +95,31 @@ def initialize_google_calendar():
     
     return build(CALENDAR_API_SERVICE_NAME, CALENDAR_API_VERSION, credentials=creds)
 
+
 @app.route("/sms", methods=['POST'])
 def sms_reply():
     logging.info("Received SMS")
-    print("sms_reply")
+    
     user_input = request.values.get('Body', None)
     phone_number = request.values.get('From', None)
 
     # Check if the user's response contains the keyword for connecting Google Calendar
     if "calendar" in user_input.lower():
-        # Redirect the user to Google OAuth consent screen
-        return redirect(url_for('authorize_google_calendar'))
+        # Generate the Google Auth URL and send via SMS
+        flow = InstalledAppFlow.from_client_secrets_file(os.environ.get('CLIENT_SECRETS_PATH'), SCOPES)
+        auth_url, _ = flow.authorization_url("https://www.myfriendpal.com/oauth2callback")
+        
+        # Send the Auth URL via SMS
+        message = client.messages.create(
+            to=phone_number,
+            from_=TWILIO_PHONE_NUMBER,
+            body=f"Please authorize Google Calendar by visiting this link: {auth_url}"
+        )
     else:
         # Generate a regular GPT-4 response
         response_text = generate_response(user_input, phone_number)
-    
-    # Send the response back to the user
-    message = client.messages.create(
+        # Send the response back to the user
+        message = client.messages.create(
         to=phone_number,
         from_=TWILIO_PHONE_NUMBER,
         body=response_text
@@ -131,8 +132,8 @@ def authorize_google_calendar():
     flow = InstalledAppFlow.from_client_config(
         {
             "installed": {
-                "client_id": "1084838804894-s7bra6uila2ffshf1712qnb9lf2hk781.apps.googleusercontent.com",
-                "client_secret": "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",
+                "client_id": os.environ.get('GOOGLE_CLIENT_ID'),
+                "client_secret": os.environ.get('GOOGLE_CLIENT_SECRET'),
                 "redirect_uris": ["urn:ietf:wg:oauth:2.0:oob", "http://localhost"]
             }
         },
@@ -143,6 +144,15 @@ def authorize_google_calendar():
         token.write(creds.to_json())
     
     return "Google Calendar integration successful! You can now go back to your chat."
+
+@app.route('/oauth2callback')
+def oauth2callback():
+    flow = InstalledAppFlow.from_client_secrets_file(os.environ.get('CLIENT_SECRETS_PATH'), SCOPES)
+    flow.fetch_token(authorization_response=request.url)
+    creds = flow.credentials
+    # Save these credentials; you'll use them to interact with the Google Calendar API
+    return "Google Calendar integrated successfully!"
+
 
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 5002))  # Fall back to 5002 for local development
