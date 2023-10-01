@@ -61,17 +61,16 @@ def index():
 @app.route('/send_message', methods=['POST'])
 def send_message():
     app.logger.info('Inside send_message')
-    print("send-message function kicked in")
 
     try:
         data = request.json
         phone_number = data.get('phone_number')
         
         # Initialize Google Calendar and get Auth URL
-        google_auth_url = initialize_google_calendar()
+        #google_auth_url = initialize_google_calendar()
         
         # Create first message
-        greeting_message = f"Hi there, follow this link to connect your Google Calendar: {google_auth_url}"
+        greeting_message = f"Hi there, follow this link to connect your Google Calendar"
         
         # Send the first message
         message = client.messages.create(
