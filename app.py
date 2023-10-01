@@ -1,3 +1,4 @@
+
 from google_auth_oauthlib.flow import InstalledAppFlow
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
@@ -7,12 +8,14 @@ import os
 from dotenv import load_dotenv
 import logging
 import openai
+logging.basicConfig(level=logging.INFO)  # Move this line to the very top of your script
 
-logging.info("This is a test log.")
+
 
 load_dotenv()
 
 app = Flask(__name__)
+app.logger.setLevel(logging.INFO)
 
 SCOPES = ['https://www.googleapis.com/auth/calendar.readonly']
 
