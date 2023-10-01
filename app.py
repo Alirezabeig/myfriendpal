@@ -8,14 +8,14 @@ import os
 from dotenv import load_dotenv
 import logging
 import openai
-logging.basicConfig(level=logging.INFO)  # Move this line to the very top of your script
+
+logging.basicConfig(level=logging.INFO)
 
 
 
 load_dotenv()
 
 app = Flask(__name__)
-app.logger.setLevel(logging.INFO)
 
 SCOPES = ['https://www.googleapis.com/auth/calendar.readonly']
 
@@ -56,10 +56,12 @@ def generate_response(user_input, phone_number):
 
 @app.route('/')
 def index():
+    app.logger.info('Index page accessed')
     return render_template('index.html')
 
 @app.route('/send_message', methods=['POST'])
 def send_message():
+    app.logger.info('Inside send_message')
     try:
         data = request.json
         phone_number = data.get('phone_number')
@@ -102,8 +104,8 @@ def initialize_google_calendar():
 
 @app.route("/sms", methods=['POST'])
 def sms_reply():
-    app.logger.info("Received SMS")
-    logging.info("Received SMS")
+    app.logger.info('SMS reply triggered')
+   
     
     user_input = request.values.get('Body', None)
     phone_number = request.values.get('From', None)
@@ -136,6 +138,7 @@ def sms_reply():
         
 @app.route("/authorize_google_calendar")
 def authorize_google_calendar():
+    app.logger.info('Google Calendar authorization')
     flow = InstalledAppFlow.from_client_config(
         {
             "installed": {
@@ -154,6 +157,7 @@ def authorize_google_calendar():
 
 @app.route('/oauth2callback')
 def oauth2callback():
+    app.logger.info('Inside oauth2callback')
     flow = InstalledAppFlow.from_client_secrets_file(os.environ.get('CLIENT_SECRETS_PATH'), SCOPES)
     flow.fetch_token(authorization_response=request.url)
     creds = flow.credentials
@@ -162,7 +166,6 @@ def oauth2callback():
 
 
 if __name__ == '__main__':
-    logging.basicConfig(level=logging.INFO)
     port = int(os.environ.get("PORT", 5002))  # Fall back to 5002 for local development
     app.run(host="0.0.0.0", port=port)  # Run the app
 
