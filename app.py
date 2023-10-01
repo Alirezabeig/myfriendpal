@@ -57,6 +57,7 @@ def index():
     app.logger.info('Index page accessed')
     return render_template('index.html')
 
+@app.route('/send_message', methods=['POST'])
 def send_message():
     app.logger.info('Inside send_message')
     try:
