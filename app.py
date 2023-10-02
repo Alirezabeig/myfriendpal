@@ -9,9 +9,10 @@ from dotenv import load_dotenv
 import logging
 import openai
 
-logging.basicConfig(level=logging.INFO, handlers=[logging.StreamHandler()])
+logging.basicConfig(level=logging.DEBUG, handlers=[logging.StreamHandler()])
 
 load_dotenv()
+print(os.environ)
 
 app = Flask(__name__)
 app.logger.setLevel(logging.INFO)
@@ -58,7 +59,7 @@ def generate_response(user_input, phone_number):
 
 @app.route('/')
 def index():
-    print("landing page triggered")
+    print("hello world!")
     app.logger.info('Index page accessed')
     return render_template('index.html')
 
@@ -160,6 +161,7 @@ def oauth2callback():
 
 
 if __name__ == '__main__':
+    app.debug = True
     port = int(os.environ.get("PORT", 5002))  # Fall back to 5002 for local development
     app.run(host="0.0.0.0", port=port)  # Run the app
 
