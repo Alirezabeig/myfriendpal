@@ -55,12 +55,14 @@ def generate_response(user_input, phone_number):
 
 @app.route('/')
 def index():
+    print("landing page triggered")
     app.logger.info('Index page accessed')
     return render_template('index.html')
 
 @app.route('/send_message', methods=['POST'])
 def send_message():
     app.logger.info('Inside send_message')
+    print("inside_send_message")
     try:
         data = request.json
         phone_number = data.get('phone_number')
@@ -72,7 +74,7 @@ def send_message():
             raise ValueError("Failed to initialize Google Calendar")
 
         # Create first message
-        greeting_message = f"Hi there, follow this link to connect your Google Calendar"
+        greeting_message = f"Hi there, follow this link to connect your Google Calendar {google_auth_url} "
 
         # Send the first message
         message = client.messages.create(
