@@ -56,6 +56,7 @@ def generate_response(user_input, phone_number):
     except Exception as e:
         logging.error(f"Failed to generate message with GPT-4: {e}")
         return "Sorry, I couldn't understand that."
+        
 def get_calendar_service():
     # Load the saved credentials
     creds = None
@@ -110,7 +111,7 @@ def initialize_google_calendar():
     try:
         ##SCOPES = ['https://www.googleapis.com/auth/calendar.readonly']
         flow = InstalledAppFlow.from_client_secrets_file('client_secret.json', SCOPES)
-        auth_url, _ = flow.authorization_url("https://www.myfriendpal.com/oauth2callback")
+        auth_url, _ = flow.authorization_url()
         
         logging.info(f"Auth URL generated: {auth_url}")
         return auth_url
