@@ -105,6 +105,10 @@ def send_message():
         logging.error(f"Failed to send message: {e}")
         return jsonify({'message': 'Failed to send message', 'error': str(e)})
 
+@app.route('/privacy_policy')
+def privacy_policy():
+    return render_template('privacy_policy.html')
+
 
 def initialize_google_calendar():
     """Initialize the Google Calendar API and return Auth URL."""
