@@ -2,6 +2,7 @@
 # gpt4_utils.py
 import logging
 import openai
+import os
 
 logging.basicConfig(level=logging.DEBUG, handlers=[logging.StreamHandler()])
 gpt4_api_key = os.environ.get('GPT4_API_KEY')
