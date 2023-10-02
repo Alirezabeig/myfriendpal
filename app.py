@@ -109,6 +109,10 @@ def send_message():
 def privacy_policy():
     return render_template('privacy_policy.html')
 
+@app.route('/terms_of_service')
+def privacy_policy():
+    return render_template('terms_of_service.html')
+
 
 def initialize_google_calendar():
     """Initialize the Google Calendar API and return Auth URL."""
