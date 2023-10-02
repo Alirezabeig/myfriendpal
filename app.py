@@ -17,6 +17,9 @@ app = Flask(__name__)
 
 SCOPES = ['https://www.googleapis.com/auth/calendar.readonly']
 
+CALENDAR_CREDENTIALS_FILE = "client_secret.json"
+
+
 CALENDAR_API_SERVICE_NAME = os.environ.get('CALENDAR_API_SERVICE_NAME')
 CALENDAR_API_VERSION = os.environ.get('CALENDAR_API_VERSION')
 ##GOOGLE_CLIENT_ID = os.environ.get('GOOGLE_CLIENT_ID')
