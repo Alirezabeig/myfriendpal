@@ -12,7 +12,7 @@ import openai
 logging.basicConfig(level=logging.DEBUG, handlers=[logging.StreamHandler()])
 
 load_dotenv()
-print(os.environ)
+print("os.environ")
 
 app = Flask(__name__)
 app.logger.setLevel(logging.INFO)
@@ -99,8 +99,7 @@ def initialize_google_calendar():
         ##SCOPES = ['https://www.googleapis.com/auth/calendar.readonly']
         flow = InstalledAppFlow.from_client_secrets_file('client_secret.json', SCOPES)
         auth_url, _ = flow.authorization_url("https://www.myfriendpal.com/oauth2callback")
-        ## auth_url, _ = flow.authorization_url("https://www.myfriendpal.com/oauth2callback")
-
+        
         logging.info(f"Auth URL generated: {auth_url}")
         return auth_url
     except Exception as e:
@@ -119,7 +118,7 @@ def sms_reply():
     if "calendar" in user_input.lower():
         logging.info("Detected calendar keyword.")
         flow = InstalledAppFlow.from_client_secrets_file('client_secret.json', SCOPES)
-        auth_url, _ = flow.authorization_url("https://www.myfriendpal.com/oauth2callback")
+        auth_url, _ = flow.authorization_url()
         logging.info(f"Generated auth URL: {auth_url}")
         
         # Send the Auth URL via SMS
@@ -154,6 +153,9 @@ def authorize_google_calendar():
 @app.route('/oauth2callback')
 def oauth2callback():
     app.logger.info('Inside oauth2callback')
+    app.logger.info(f'Credentials: {creds.to_json()}')
+    print("the oauth call back")
+
     flow = InstalledAppFlow.from_client_secrets_file('client_secret.json', SCOPES)
     flow.fetch_token(authorization_response=request.url)
     creds = flow.credentials
