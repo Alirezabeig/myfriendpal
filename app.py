@@ -8,6 +8,8 @@ import os
 from dotenv import load_dotenv
 import logging
 import openai
+import psycopg2
+from psycopg2 import OperationalError
 
 logging.basicConfig(level=logging.DEBUG, handlers=[logging.StreamHandler()])
 
@@ -34,6 +36,19 @@ client = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
 
 gpt4_api_key = os.environ.get('GPT4_API_KEY')
 openai.api_key = gpt4_api_key
+
+def create_connection():
+    try:
+        connection = psycopg2.connect(
+            host=os.environ.get("DB_HOST"),
+            port=os.environ.get("DB_PORT"),
+            user=os.environ.get("DB_USER"),
+            password=os.environ.get("DB_PASSWORD"),
+            database=os.environ.get("DB_NAME")
+        )
+        return connection
+    except OperationalError as e:
+        print(f"The error '{e}' occurred")
 
 conversations = {}  # This will hold the conversation history
 
@@ -182,8 +197,9 @@ def authorize_google_calendar():
 
 @app.route('/oauth2callback')
 def oauth2callback():
-    app.logger.info('Inside oauth2callback')
     
+    app.logger.info('Inside oauth2callback')
+    logging.info(f"Received request URL: {request.url}")
     # Create the OAuth2 flow and fetch the token
     flow = InstalledAppFlow.from_client_secrets_file('client_secret.json', SCOPES)
     flow.fetch_token(authorization_response=request.url)

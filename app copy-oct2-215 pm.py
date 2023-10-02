@@ -1,5 +1,3 @@
-
-
 from google_auth_oauthlib.flow import InstalledAppFlow
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
@@ -106,6 +104,14 @@ def send_message():
         logging.error(f"Failed to send message: {e}")
         return jsonify({'message': 'Failed to send message', 'error': str(e)})
 
+@app.route('/privacy_policy')
+def privacy_policy():
+    return render_template('privacy_policy.html')
+
+@app.route('/terms_of_service')
+def terms_of_service():
+    return render_template('terms_of_service.html')
+
 
 def initialize_google_calendar():
     """Initialize the Google Calendar API and return Auth URL."""
@@ -127,35 +133,41 @@ def initialize_google_calendar():
 def sms_reply():
     app.logger.info('SMS reply triggered')
    
-    
     user_input = request.values.get('Body', None)
     phone_number = request.values.get('From', None)
 
     # Check if the user's response contains the keyword for connecting Google Calendar
     if "calendar" in user_input.lower():
         logging.info("Detected calendar keyword.")
-        flow = InstalledAppFlow.from_client_secrets_file('client_secret.json', SCOPES)
-        auth_url, _ = flow.authorization_url()
-        logging.info(f"Generated auth URL: {auth_url}")
         
-        # Send the Auth URL via SMS
-        message = client.messages.create(
-            to=phone_number,
-            from_=TWILIO_PHONE_NUMBER,
-            body=f"Please authorize Google Calendar by visiting this link: {auth_url}"
-        )
+        # Here, instead of generating the auth URL with InstalledAppFlow,
+        # you simply call your existing initialize_google_calendar() function
+        auth_url = initialize_google_calendar()
+        
+        if auth_url:  # Check if auth_url is not None
+            logging.info(f"Generated auth URL: {auth_url}")
+            
+            # Send the Auth URL via SMS
+            message = client.messages.create(
+                to=phone_number,
+                from_=TWILIO_PHONE_NUMBER,
+                body=f"Please authorize Google Calendar by visiting this link: {auth_url}"
+            )
+        else:
+            logging.error("Failed to generate auth URL.")
     else:
         # Generate a regular GPT-4 response
         response_text = generate_response(user_input, phone_number)
+        
         # Send the response back to the user
         message = client.messages.create(
-        to=phone_number,
-        from_=TWILIO_PHONE_NUMBER,
-        body=response_text
-    )
+            to=phone_number,
+            from_=TWILIO_PHONE_NUMBER,
+            body=response_text
+        )
 
     return jsonify({'message': 'Reply sent!'})
-        
+    
 @app.route("/authorize_google_calendar")
 def authorize_google_calendar():
     app.logger.info('Google Calendar authorization')
@@ -169,8 +181,9 @@ def authorize_google_calendar():
 
 @app.route('/oauth2callback')
 def oauth2callback():
-    app.logger.info('Inside oauth2callback')
     
+    app.logger.info('Inside oauth2callback')
+    logging.info(f"Received request URL: {request.url}")
     # Create the OAuth2 flow and fetch the token
     flow = InstalledAppFlow.from_client_secrets_file('client_secret.json', SCOPES)
     flow.fetch_token(authorization_response=request.url)
