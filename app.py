@@ -19,8 +19,8 @@ SCOPES = ['https://www.googleapis.com/auth/calendar.readonly']
 
 CALENDAR_API_SERVICE_NAME = os.environ.get('CALENDAR_API_SERVICE_NAME')
 CALENDAR_API_VERSION = os.environ.get('CALENDAR_API_VERSION')
-GOOGLE_CLIENT_ID = os.environ.get('GOOGLE_CLIENT_ID')
-GOOGLE_CLIENT_SECRET = os.environ.get('GOOGLE_CLIENT_SECRET')
+##GOOGLE_CLIENT_ID = os.environ.get('GOOGLE_CLIENT_ID')
+##GOOGLE_CLIENT_SECRET = os.environ.get('GOOGLE_CLIENT_SECRET')
 
 TWILIO_ACCOUNT_SID = os.environ.get('TWILIO_ACCOUNT_SID')
 TWILIO_AUTH_TOKEN = os.environ.get('TWILIO_AUTH_TOKEN')
@@ -109,9 +109,8 @@ def sms_reply():
 
     # Check if the user's response contains the keyword for connecting Google Calendar
     if "calendar" in user_input.lower():
-        # Generate the Google Auth URL and send via SMS
         logging.info("Detected calendar keyword.")
-        flow = InstalledAppFlow.from_client_secrets_file(os.environ.get('CLIENT_SECRETS_PATH'), SCOPES)
+        flow = InstalledAppFlow.from_client_secrets_file('client_secret.json', SCOPES)
         auth_url, _ = flow.authorization_url("https://www.myfriendpal.com/oauth2callback")
         logging.info(f"Generated auth URL: {auth_url}")
         
@@ -136,39 +135,22 @@ def sms_reply():
 @app.route("/authorize_google_calendar")
 def authorize_google_calendar():
     app.logger.info('Google Calendar authorization')
-    flow = InstalledAppFlow.from_client_config(
-        {
-            "installed": {
-                "client_id": os.environ.get('GOOGLE_CLIENT_ID'),
-                "client_secret": os.environ.get('GOOGLE_CLIENT_SECRET'),
-                "redirect_uris": ["urn:ietf:wg:oauth:2.0:oob", "http://localhost"]
-            }
-        },
-        SCOPES
-    )
+    flow = InstalledAppFlow.from_client_secrets_file('client_secret.json', SCOPES)
     creds = flow.run_local_server(port=0)
     with open(CALENDAR_CREDENTIALS_FILE, 'w') as token:
         token.write(creds.to_json())
     
     return "Google Calendar integration successful! You can now go back to your chat."
 
+
 @app.route('/oauth2callback')
 def oauth2callback():
     app.logger.info('Inside oauth2callback')
-    flow = InstalledAppFlow.from_client_config(
-        {
-            "installed": {
-                "client_id": GOOGLE_CLIENT_ID,
-                "client_secret": GOOGLE_CLIENT_SECRET,
-                "redirect_uris": ["https://www.myfriendpal.com/oauth2callback"]
-            }
-        },
-        SCOPES
-    )
+    flow = InstalledAppFlow.from_client_secrets_file('client_secret.json', SCOPES)
     flow.fetch_token(authorization_response=request.url)
     creds = flow.credentials
-    # Save these credentials; you'll use them to interact with the Google Calendar API
     return "Google Calendar integrated successfully!"
+
 
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 5002))  # Fall back to 5002 for local development
