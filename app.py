@@ -110,7 +110,7 @@ def privacy_policy():
     return render_template('privacy_policy.html')
 
 @app.route('/terms_of_service')
-def privacy_policy():
+def terms_of_service():
     return render_template('terms_of_service.html')
 
 
