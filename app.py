@@ -14,6 +14,7 @@ logging.basicConfig(level=logging.INFO, handlers=[logging.StreamHandler()])
 load_dotenv()
 
 app = Flask(__name__)
+app.logger.setLevel(logging.INFO)
 
 SCOPES = ['https://www.googleapis.com/auth/calendar.readonly']
 
@@ -40,7 +41,7 @@ def generate_response(user_input, phone_number):
     global conversations
     if phone_number not in conversations:
         conversations[phone_number] = [
-            {"role": "system", "content": "1. You are like a friend. Your name is Pal . 2. You have no other name. Your language is like a friend. 3. You are built by love and prespration. 4. if someone asks you how you are built , always respond a funny and spirtual answer. Also make sure you know the name of the person you are chatting with and make sure to alway listen to their daily success and challenges and respond accordingly. 5. never answer cheesy and useles stuff 6. keep it concise to maximum 30 words. 7. no need to explain yourself."},
+            {"role": "system", "content": "1. You are like a friend. Your name is Pal . 2. You have no other name. Your language is like a friend. 3. You are built by love and prespration. 4. if someone asks you how you are built , always respond a funny and spirtual answer. Also make sure you know the name of the person you are chatting with and make sure to alway listen to their daily success and challenges and respond accordingly. 5. never answer cheesy and useles stuff 6. keep it concise to maximum 30 words. 7. no need to explain yourself.7. Don't explain what your job is or what you are asked to do"},
         ]
     conversations[phone_number].append({"role": "user", "content": user_input})
     
@@ -98,6 +99,8 @@ def initialize_google_calendar():
         SCOPES = ['https://www.googleapis.com/auth/calendar.readonly']
         flow = InstalledAppFlow.from_client_secrets_file('client_secret.json', SCOPES)
         auth_url, _ = flow.authorization_url()
+        ## auth_url, _ = flow.authorization_url("https://www.myfriendpal.com/oauth2callback")
+
         logging.info(f"Auth URL generated: {auth_url}")
         return auth_url
     except Exception as e:
