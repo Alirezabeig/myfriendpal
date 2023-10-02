@@ -5,6 +5,7 @@ from googleapiclient.discovery import build
 from flask import Flask, request, jsonify, render_template
 from twilio.rest import Client
 import os
+from google.oauth2.credentials import Credentials
 from dotenv import load_dotenv
 import logging
 import openai
@@ -56,7 +57,20 @@ def generate_response(user_input, phone_number):
     except Exception as e:
         logging.error(f"Failed to generate message with GPT-4: {e}")
         return "Sorry, I couldn't understand that."
+        
+def get_calendar_service():
+    # Load the saved credentials
+    creds = None
+    if os.path.exists('token.json'):
+        with open('token.json', 'r') as token_file:
+            creds = Credentials.from_authorized_user_file('token.json', SCOPES)
 
+    # If we have valid credentials, proceed to call Google Calendar APIs
+    if creds and not creds.expired:
+        return build('calendar', 'v3', credentials=creds)
+    else:
+        return None
+        
 @app.route('/')
 def index():
     print("hello world!")
@@ -153,12 +167,20 @@ def authorize_google_calendar():
 @app.route('/oauth2callback')
 def oauth2callback():
     app.logger.info('Inside oauth2callback')
-    app.logger.info(f'Credentials: {creds.to_json()}')
-    print("the oauth call back")
-
+    
+    # Create the OAuth2 flow and fetch the token
     flow = InstalledAppFlow.from_client_secrets_file('client_secret.json', SCOPES)
     flow.fetch_token(authorization_response=request.url)
     creds = flow.credentials
+    
+    # Log the credentials after they are created
+    app.logger.info(f'Credentials: {creds.to_json()}')
+    print("the oauth call back")
+
+    # Save the credentials for future use
+    with open('token.json', 'w') as token_file:
+        token_file.write(creds.to_json())
+    
     return "Google Calendar integrated successfully!"
 
 
