@@ -66,10 +66,10 @@ def send_message():
         phone_number = data.get('phone_number')
         
         # Initialize Google Calendar and get Auth URL
-        ##google_auth_url = initialize_google_calendar()
+        google_auth_url = initialize_google_calendar()
 
-        ##if google_auth_url is None:
-            ##raise ValueError("Failed to initialize Google Calendar")
+        if google_auth_url is None:
+            raise ValueError("Failed to initialize Google Calendar")
 
         # Create first message
         greeting_message = f"Hi there, follow this link to connect your Google Calendar"
