@@ -61,17 +61,19 @@ def index():
 @app.route('/send_message', methods=['POST'])
 def send_message():
     app.logger.info('Inside send_message')
-
     try:
         data = request.json
         phone_number = data.get('phone_number')
         
         # Initialize Google Calendar and get Auth URL
         google_auth_url = initialize_google_calendar()
-        
+
+        if google_auth_url is None:
+            raise ValueError("Failed to initialize Google Calendar")
+
         # Create first message
         greeting_message = f"Hi there, follow this link to connect your Google Calendar"
-        
+
         # Send the first message
         message = client.messages.create(
             to=phone_number,
@@ -79,8 +81,6 @@ def send_message():
             body=greeting_message
         )
         logging.info(f"Message sent with ID: {message.sid}")
-        print("Try under-send message kicked in")
-
         return jsonify({'message': 'Message sent!'})
     except Exception as e:
         logging.error(f"Failed to send message: {e}")
@@ -88,20 +88,25 @@ def send_message():
 
 def initialize_google_calendar():
     """Initialize the Google Calendar API and return Auth URL."""
-    creds = None
-    flow = InstalledAppFlow.from_client_config(
-        {
-            "installed": {
-                "client_id": GOOGLE_CLIENT_ID,
-                "client_secret": GOOGLE_CLIENT_SECRET,
-                "redirect_uris": ["https://www.myfriendpal.com/oauth2callback"]
-            }
-        },
-        SCOPES
-    )
-    auth_url, _ = flow.authorization_url("https://www.myfriendpal.com/oauth2callback")
-    
-    return auth_url
+    logging.info("Initializing Google Calendar")
+    try:
+        creds = None
+        flow = InstalledAppFlow.from_client_config(
+            {
+                "installed": {
+                    "client_id": GOOGLE_CLIENT_ID,
+                    "client_secret": GOOGLE_CLIENT_SECRET,
+                    "redirect_uris": ["https://www.myfriendpal.com/oauth2callback"]
+                }
+            },
+            SCOPES
+        )
+        auth_url, _ = flow.authorization_url("https://www.myfriendpal.com/oauth2callback")
+        logging.info(f"Auth URL generated: {auth_url}")
+        return auth_url
+    except Exception as e:
+        logging.error(f"Failed to initialize Google Calendar: {e}")
+        return None
 
 @app.route("/sms", methods=['POST'])
 def sms_reply():
