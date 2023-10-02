@@ -20,7 +20,6 @@ SCOPES = ['https://www.googleapis.com/auth/calendar.readonly']
 
 CALENDAR_CREDENTIALS_FILE = "client_secret.json"
 
-
 CALENDAR_API_SERVICE_NAME = os.environ.get('CALENDAR_API_SERVICE_NAME')
 CALENDAR_API_VERSION = os.environ.get('CALENDAR_API_VERSION')
 ##GOOGLE_CLIENT_ID = os.environ.get('GOOGLE_CLIENT_ID')
@@ -96,9 +95,9 @@ def initialize_google_calendar():
     """Initialize the Google Calendar API and return Auth URL."""
     logging.info("Initializing Google Calendar")
     try:
-        SCOPES = ['https://www.googleapis.com/auth/calendar.readonly']
+        ##SCOPES = ['https://www.googleapis.com/auth/calendar.readonly']
         flow = InstalledAppFlow.from_client_secrets_file('client_secret.json', SCOPES)
-        auth_url, _ = flow.authorization_url()
+        auth_url, _ = flow.authorization_url("https://www.myfriendpal.com/oauth2callback")
         ## auth_url, _ = flow.authorization_url("https://www.myfriendpal.com/oauth2callback")
 
         logging.info(f"Auth URL generated: {auth_url}")
