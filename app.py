@@ -66,10 +66,10 @@ def send_message():
         phone_number = data.get('phone_number')
         
         # Initialize Google Calendar and get Auth URL
-        google_auth_url = initialize_google_calendar()
+        ##google_auth_url = initialize_google_calendar()
 
-        if google_auth_url is None:
-            raise ValueError("Failed to initialize Google Calendar")
+        ##if google_auth_url is None:
+            ##raise ValueError("Failed to initialize Google Calendar")
 
         # Create first message
         greeting_message = f"Hi there, follow this link to connect your Google Calendar"
@@ -90,18 +90,9 @@ def initialize_google_calendar():
     """Initialize the Google Calendar API and return Auth URL."""
     logging.info("Initializing Google Calendar")
     try:
-        creds = None
-        flow = InstalledAppFlow.from_client_config(
-            {
-                "installed": {
-                    "client_id": GOOGLE_CLIENT_ID,
-                    "client_secret": GOOGLE_CLIENT_SECRET,
-                    "redirect_uris": ["https://www.myfriendpal.com/oauth2callback"]
-                }
-            },
-            SCOPES
-        )
-        auth_url, _ = flow.authorization_url("https://www.myfriendpal.com/oauth2callback")
+        SCOPES = ['https://www.googleapis.com/auth/calendar.readonly']
+        flow = InstalledAppFlow.from_client_secrets_file('client_secret.json', SCOPES)
+        auth_url, _ = flow.authorization_url()
         logging.info(f"Auth URL generated: {auth_url}")
         return auth_url
     except Exception as e:
