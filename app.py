@@ -1,4 +1,5 @@
 
+from werkzeug.middleware.proxy_fix import ProxyFix
 from google_auth_oauthlib.flow import InstalledAppFlow
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
@@ -33,6 +34,7 @@ TWILIO_AUTH_TOKEN = os.environ.get('TWILIO_AUTH_TOKEN')
 TWILIO_PHONE_NUMBER = '+18666421882'
 
 client = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
+app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1)
 
 gpt4_api_key = os.environ.get('GPT4_API_KEY')
 openai.api_key = gpt4_api_key
@@ -130,7 +132,6 @@ def terms_of_service():
 @app.route("/headers")
 def headers():
     return dict(request.headers)
-
 
 def initialize_google_calendar():
     """Initialize the Google Calendar API and return Auth URL."""
