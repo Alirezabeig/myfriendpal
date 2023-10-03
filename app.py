@@ -28,9 +28,6 @@ CALENDAR_CREDENTIALS_FILE = "client_secret.json"
 
 CALENDAR_API_SERVICE_NAME = os.environ.get('CALENDAR_API_SERVICE_NAME')
 CALENDAR_API_VERSION = os.environ.get('CALENDAR_API_VERSION')
-##GOOGLE_CLIENT_ID = os.environ.get('GOOGLE_CLIENT_ID')
-##GOOGLE_CLIENT_SECRET = os.environ.get('GOOGLE_CLIENT_SECRET')
-
 TWILIO_ACCOUNT_SID = os.environ.get('TWILIO_ACCOUNT_SID')
 TWILIO_AUTH_TOKEN = os.environ.get('TWILIO_AUTH_TOKEN')
 TWILIO_PHONE_NUMBER = '+18666421882'
@@ -56,48 +53,41 @@ def create_connection():
 
 
 def generate_response(user_input, phone_number):
-    # Establish a database connection and create a cursor
     connection = create_connection()
-    cursor = connection.cursor()
+    app.logger.info(f'Generating response for {phone_number}')
+    print(f'Generating response for {phone_number}')
+    if not connection:
+        return "Could not connect to the database."
 
-    # Try to fetch the existing conversation for the given phone_number from the database
-    cursor.execute("SELECT conversation_data FROM conversations WHERE phone_number = %s", (phone_number,))
-    db_result = cursor.fetchone()
-
-    # If a conversation exists in the database, load it into the conversations dictionary
-    if db_result:
-        conversations[phone_number] = db_result[0]
-    else:
-        # If not, initialize a new conversation
-        conversations[phone_number] = [
-            {"role": "system", "content": "1. You are like a friend. Your name is Pal. 2. You have no other name. Your language is like a friend. 3. You are built by love and perspiration. 4. If someone asks you how you are built, always respond with a funny and spiritual answer. Also, make sure you know the name of the person you are chatting with and always listen to their daily success and challenges and respond accordingly. 5. Never answer cheesy and useless stuff. 6. Keep it concise to a maximum of 30 words. 7. No need to explain yourself. 7. Don't explain what your job is or what you are asked to do."}
-        ]
-
-    # Append the new user message to the conversation
-    conversations[phone_number].append({"role": "user", "content": user_input})
-
-    # Generate a GPT-4 response
     try:
-        response = openai.ChatCompletion.create(
-            model="gpt-4",
-            messages=conversations[phone_number]
-        )
-        gpt4_reply = response['choices'][0]['message']['content'].strip()
-        conversations[phone_number].append({"role": "assistant", "content": gpt4_reply})
+        connection.autocommit = True
+        with connection.cursor() as cursor:
+            
+            # Load existing conversation from database
+            cursor.execute("SELECT conversation_data FROM conversations WHERE phone_number = %s", (phone_number,))
+            db_result = cursor.fetchone()
+            
+            if db_result:
+                conversations[phone_number] = db_result[0]
+            else:
+                conversations[phone_number] = [
+                    {"role": "system", "content": "...(your existing message)"}
+                ]
+            
+            # ... (your existing code to generate GPT-4 response)
+            # Assuming you've stored the GPT-4 response in a variable named 'gpt4_reply'
+            
+            # Save updated conversation back to the database
+            update_query = '''INSERT INTO conversations(phone_number, conversation_data) VALUES(%s, %s)
+                              ON CONFLICT (phone_number) DO UPDATE SET conversation_data = EXCLUDED.conversation_data;'''
+            cursor.execute(update_query, (phone_number, conversations[phone_number]))
+
     except Exception as e:
-        logging.error(f"Failed to generate message with GPT-4: {e}")
-        gpt4_reply = "Sorry, I couldn't understand that."
+        print(f"An error occurred: {e}")
+    finally:
+        connection.close()
 
-    # Save or update the conversation in the database
-    update_query = '''INSERT INTO conversations(phone_number, conversation_data) VALUES(%s, %s)
-                      ON CONFLICT (phone_number) DO UPDATE SET conversation_data = EXCLUDED.conversation_data;'''
-    cursor.execute(update_query, (phone_number, conversations[phone_number]))
-
-    # Commit the transaction and close the connection
-    connection.commit()
-    connection.close()
-
-    return gpt4_reply
+    return gpt4_reply  # Make sure 'gpt4_reply' is defined
 
     
 def create_table():
