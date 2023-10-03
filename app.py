@@ -19,17 +19,13 @@ print("os.environ")
 
 app = Flask(__name__)
 app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1)
-
 app.logger.setLevel(logging.INFO)
-
 SCOPES = ['https://www.googleapis.com/auth/calendar.events.readonly']
 
 CALENDAR_CREDENTIALS_FILE = "client_secret.json"
 
 CALENDAR_API_SERVICE_NAME = os.environ.get('CALENDAR_API_SERVICE_NAME')
 CALENDAR_API_VERSION = os.environ.get('CALENDAR_API_VERSION')
-##GOOGLE_CLIENT_ID = os.environ.get('GOOGLE_CLIENT_ID')
-##GOOGLE_CLIENT_SECRET = os.environ.get('GOOGLE_CLIENT_SECRET')
 
 TWILIO_ACCOUNT_SID = os.environ.get('TWILIO_ACCOUNT_SID')
 TWILIO_AUTH_TOKEN = os.environ.get('TWILIO_AUTH_TOKEN')
@@ -40,21 +36,11 @@ client = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
 gpt4_api_key = os.environ.get('GPT4_API_KEY')
 openai.api_key = gpt4_api_key
 
-
-if 'DYNO' in os.environ:
-    print("Running on Heroku")
-else:
-    print("Running locally")
-
 def create_connection():
     try:
-        connection = psycopg2.connect(
-            host=os.environ.get("DB_HOST"),
-            port=os.environ.get("DB_PORT"),
-            user=os.environ.get("DB_USER"),
-            password=os.environ.get("DB_PASSWORD"),
-            database=os.environ.get("DB_NAME")
-        )
+        # Your existing code
+        # ...
+        create_table()  # Add this line to create the table if it doesn't exist
         return connection
     except OperationalError as e:
         print(f"The error '{e}' occurred")
@@ -63,24 +49,42 @@ conversations = {}  # This will hold the conversation history
 
 def generate_response(user_input, phone_number):
     global conversations
-    if phone_number not in conversations:
+    connection = create_connection()
+    cursor = connection.cursor()
+
+    # Load existing conversation from database
+    cursor.execute("SELECT conversation_data FROM conversations WHERE phone_number = %s", (phone_number,))
+    db_result = cursor.fetchone()
+    if db_result:
+        conversations[phone_number] = db_result[0]
+    else:
         conversations[phone_number] = [
-            {"role": "system", "content": "1. You are like a friend. Your name is Pal . 2. You have no other name. Your language is like a friend. 3. You are built by love and prespration. 4. if someone asks you how you are built , always respond a funny and spirtual answer. Also make sure you know the name of the person you are chatting with and make sure to alway listen to their daily success and challenges and respond accordingly. 5. never answer cheesy and useles stuff 6. keep it concise to maximum 30 words. 7. no need to explain yourself.7. Don't explain what your job is or what you are asked to do"},
+            {"role": "system", "content": "...(your existing message)"}
         ]
-    conversations[phone_number].append({"role": "user", "content": user_input})
     
+    # ... (your existing code to generate GPT-4 response)
+    
+    # Save updated conversation back to database
+    update_query = '''INSERT INTO conversations(phone_number, conversation_data) VALUES(%s, %s)
+                      ON CONFLICT (phone_number) DO UPDATE SET conversation_data = EXCLUDED.conversation_data;'''
+    cursor.execute(update_query, (phone_number, conversations[phone_number]))
+    connection.commit()
+    connection.close()
+    
+    return gpt4_reply
+    
+def create_table():
     try:
-        response = openai.ChatCompletion.create(
-            model="gpt-4",
-            messages=conversations[phone_number]
-        )
-        gpt4_reply = response['choices'][0]['message']['content'].strip()
-        conversations[phone_number].append({"role": "assistant", "content": gpt4_reply})
-        return gpt4_reply
-    except Exception as e:
-        logging.error(f"Failed to generate message with GPT-4: {e}")
-        return "Sorry, I couldn't understand that."
-        
+        connection = create_connection()
+        cursor = connection.cursor()
+        create_table_query = '''CREATE TABLE IF NOT EXISTS conversations
+              (phone_number TEXT PRIMARY KEY,
+               conversation_data JSONB NOT NULL); '''
+        cursor.execute(create_table_query)
+        connection.commit()
+    except OperationalError as e:
+        print(f"The error '{e}' occurred")
+
 def get_calendar_service():
     # Load the saved credentials
     creds = None
