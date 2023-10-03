@@ -1,0 +1,5 @@
+5333d63319e52db3e9b9898de0936e1ed1f65822 422393088 lib/python3.9/site-packages/torch/lib/libtorch_cpu.dylib
+8351b2e0fdd02520994eb96e5c2178e6044f20b9 66911328 lib/python3.9/site-packages/numpy/.dylibs/libopenblas64_.0.dylib
+5496163b89921c32bd19a18e563460002a8ae8e0 21830336 lib/python3.9/site-packages/torch/lib/libtorch_python.dylib
+47393df9a06b6cec9f2abb996c52c9f53d2d061e 9786555 static/background.jpg
+286d6b79e3e6260cfe72375dc008bac8ec2f4275 8509200 venv/lib/python3.9/site-packages/cryptography/hazmat/bindings/_rust.abi3.so
