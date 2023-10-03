@@ -19,13 +19,17 @@ print("os.environ")
 
 app = Flask(__name__)
 app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1)
+
 app.logger.setLevel(logging.INFO)
+
 SCOPES = ['https://www.googleapis.com/auth/calendar.events.readonly']
 
 CALENDAR_CREDENTIALS_FILE = "client_secret.json"
 
 CALENDAR_API_SERVICE_NAME = os.environ.get('CALENDAR_API_SERVICE_NAME')
 CALENDAR_API_VERSION = os.environ.get('CALENDAR_API_VERSION')
+##GOOGLE_CLIENT_ID = os.environ.get('GOOGLE_CLIENT_ID')
+##GOOGLE_CLIENT_SECRET = os.environ.get('GOOGLE_CLIENT_SECRET')
 
 TWILIO_ACCOUNT_SID = os.environ.get('TWILIO_ACCOUNT_SID')
 TWILIO_AUTH_TOKEN = os.environ.get('TWILIO_AUTH_TOKEN')
@@ -38,40 +42,54 @@ openai.api_key = gpt4_api_key
 
 def create_connection():
     try:
-        # Your existing code
-        # ...
-        create_table()  # Add this line to create the table if it doesn't exist
+        connection = psycopg2.connect(
+            host=os.environ.get("DB_HOST"),
+            port=os.environ.get("DB_PORT"),
+            user=os.environ.get("DB_USER"),
+            password=os.environ.get("DB_PASSWORD"),
+            database=os.environ.get("DB_NAME")
+        )
+        create_table()
         return connection
     except OperationalError as e:
         print(f"The error '{e}' occurred")
 
-conversations = {}  # This will hold the conversation history
 
 def generate_response(user_input, phone_number):
-    global conversations
     connection = create_connection()
-    cursor = connection.cursor()
+    if not connection:
+        return "Could not connect to the database."
 
-    # Load existing conversation from database
-    cursor.execute("SELECT conversation_data FROM conversations WHERE phone_number = %s", (phone_number,))
-    db_result = cursor.fetchone()
-    if db_result:
-        conversations[phone_number] = db_result[0]
-    else:
-        conversations[phone_number] = [
-            {"role": "system", "content": "...(your existing message)"}
-        ]
-    
-    # ... (your existing code to generate GPT-4 response)
-    
-    # Save updated conversation back to database
-    update_query = '''INSERT INTO conversations(phone_number, conversation_data) VALUES(%s, %s)
-                      ON CONFLICT (phone_number) DO UPDATE SET conversation_data = EXCLUDED.conversation_data;'''
-    cursor.execute(update_query, (phone_number, conversations[phone_number]))
-    connection.commit()
-    connection.close()
-    
-    return gpt4_reply
+    try:
+        connection.autocommit = True
+        with connection.cursor() as cursor:
+            
+            # Load existing conversation from database
+            cursor.execute("SELECT conversation_data FROM conversations WHERE phone_number = %s", (phone_number,))
+            db_result = cursor.fetchone()
+            
+            if db_result:
+                conversations[phone_number] = db_result[0]
+            else:
+                conversations[phone_number] = [
+                    {"role": "system", "content": "...(your existing message)"}
+                ]
+            
+            # ... (your existing code to generate GPT-4 response)
+            # Assuming you've stored the GPT-4 response in a variable named 'gpt4_reply'
+            
+            # Save updated conversation back to the database
+            update_query = '''INSERT INTO conversations(phone_number, conversation_data) VALUES(%s, %s)
+                              ON CONFLICT (phone_number) DO UPDATE SET conversation_data = EXCLUDED.conversation_data;'''
+            cursor.execute(update_query, (phone_number, conversations[phone_number]))
+
+    except Exception as e:
+        print(f"An error occurred: {e}")
+    finally:
+        connection.close()
+
+    return gpt4_reply  # Make sure 'gpt4_reply' is defined
+
     
 def create_table():
     try:
