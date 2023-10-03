@@ -22,7 +22,7 @@ app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1)
 
 app.logger.setLevel(logging.INFO)
 
-SCOPES = ['https://www.googleapis.com/auth/calendar.readonly']
+SCOPES = ['https://www.googleapis.com/auth/calendar.events.readonly']
 
 CALENDAR_CREDENTIALS_FILE = "client_secret.json"
 
