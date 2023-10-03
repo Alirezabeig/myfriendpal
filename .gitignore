@@ -1,0 +1,2 @@
+venv/ # Add venv/ folder to .gitignore
+venv/
