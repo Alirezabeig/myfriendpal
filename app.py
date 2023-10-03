@@ -53,7 +53,7 @@ def create_connection():
             password=os.environ.get("DB_PASSWORD"),
             database=os.environ.get("DB_NAME")
         )
-        create_table()
+        create_table(connection)
         return connection
     except Exception as e:
         print(f"The error '{e}' occurred")
@@ -97,9 +97,8 @@ def generate_response(user_input, phone_number):
     return gpt4_reply  # Make sure 'gpt4_reply' is defined
 
     
-def create_table():
+def create_table(connection):
     try:
-        connection = create_connection()
         cursor = connection.cursor()
         create_table_query = '''CREATE TABLE IF NOT EXISTS conversations
               (phone_number TEXT PRIMARY KEY,
