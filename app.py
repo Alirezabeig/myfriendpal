@@ -227,11 +227,6 @@ def oauth2callback():
     return redirect('/')
 
 if __name__ == '__main__':
-    conn = create_connection()
-    if conn is not None:
-        print("Database connection successful.")
-    else:
-        print("Failed to connect to database.")
     app.debug = True
     port = int(os.environ.get("PORT", 5002))  # Fall back to 5002 for local development
     app.run(host="0.0.0.0", port=port)  # Run the app
