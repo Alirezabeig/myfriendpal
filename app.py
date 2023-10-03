@@ -87,7 +87,6 @@ def get_calendar_service():
         
 @app.route('/')
 def index():
-    print("hello world!")
     app.logger.info('Index page accessed')
     return render_template('index.html')
 
@@ -106,7 +105,7 @@ def send_message():
             raise ValueError("Failed to initialize Google Calendar")
 
         # Create first message
-        greeting_message = f"Hi there, follow this link to connect your Google Calendar {google_auth_url} "
+        greeting_message = f"Hi there, I am so excited to connect with you. What is your name?"
 
         # Send the first message
         message = client.messages.create(
