@@ -218,7 +218,8 @@ def oauth2callback():
     with open('token.json', 'w') as token_file:
         token_file.write(creds.to_json())
     
-    return "Google Calendar integrated successfully!"
+    return redirect('/')
+
 
 
 if __name__ == '__main__':
