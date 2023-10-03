@@ -40,6 +40,12 @@ client = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
 gpt4_api_key = os.environ.get('GPT4_API_KEY')
 openai.api_key = gpt4_api_key
 
+
+if 'DYNO' in os.environ:
+    print("Running on Heroku")
+else:
+    print("Running locally")
+
 def create_connection():
     try:
         connection = psycopg2.connect(
@@ -220,9 +226,12 @@ def oauth2callback():
     
     return redirect('/')
 
-
-
 if __name__ == '__main__':
+    conn = create_connection()
+    if conn is not None:
+        print("Database connection successful.")
+    else:
+        print("Failed to connect to database.")
     app.debug = True
     port = int(os.environ.get("PORT", 5002))  # Fall back to 5002 for local development
     app.run(host="0.0.0.0", port=port)  # Run the app
