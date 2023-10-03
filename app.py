@@ -1,9 +1,9 @@
 
+from flask import Flask, request, jsonify, render_template
 from werkzeug.middleware.proxy_fix import ProxyFix
 from google_auth_oauthlib.flow import InstalledAppFlow
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
-from flask import Flask, request, jsonify, render_template
 from twilio.rest import Client
 import os
 from dotenv import load_dotenv
@@ -18,6 +18,8 @@ load_dotenv()
 print("os.environ")
 
 app = Flask(__name__)
+app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1)
+
 app.logger.setLevel(logging.INFO)
 
 SCOPES = ['https://www.googleapis.com/auth/calendar.readonly']
@@ -34,7 +36,6 @@ TWILIO_AUTH_TOKEN = os.environ.get('TWILIO_AUTH_TOKEN')
 TWILIO_PHONE_NUMBER = '+18666421882'
 
 client = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
-app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1)
 
 gpt4_api_key = os.environ.get('GPT4_API_KEY')
 openai.api_key = gpt4_api_key
