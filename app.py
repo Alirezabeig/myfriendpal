@@ -127,6 +127,10 @@ def privacy_policy():
 def terms_of_service():
     return render_template('terms_of_service.html')
 
+@app.route("/headers")
+def headers():
+    return dict(request.headers)
+
 
 def initialize_google_calendar():
     """Initialize the Google Calendar API and return Auth URL."""
