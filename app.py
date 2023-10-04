@@ -54,6 +54,7 @@ def create_connection():
             password=db_password,
             database=db_name
         )
+        cursor = connection.cursor()
         cursor.execute("SELECT 1;")
         test_result = cursor.fetchone()
         
