@@ -55,52 +55,59 @@ def create_connection():
         create_table(connection)
         return connection
     except Exception as e:
-        print(f"The error '{e}' occurred")
+        print(f"The full error is: {e}")
         return None
 
 def generate_response(user_input, phone_number):
+    # Step 1: Connect to the Database
     connection = create_connection()
-    app.logger.info(f'Generating response for {phone_number}')
-    print(f'Generating response for {phone_number}')
     if not connection:
+        # Step 2: Check Connection
         return "Could not connect to the database."
 
     try:
         connection.autocommit = True
         with connection.cursor() as cursor:
-            
-            # Load existing conversation from database
+            # Step 3: Fetch Previous Conversations
             cursor.execute("SELECT conversation_data FROM conversations WHERE phone_number = %s", (phone_number,))
             db_result = cursor.fetchone()
-            
+
+            # Step 4: Initialize Conversation
             if db_result:
-                conversations[phone_number] = db_result[0]
+                conversation_data = db_result[0]
             else:
-                conversations[phone_number] = [
+                conversation_data = [
                     {"role": "system", "content": "...(your existing message)"}
                 ]
+
+            # Step 5: Generate GPT-4 Response
+            # Assuming get_gpt4_response is your function that takes user_input and returns GPT-4 generated response
+            gpt4_reply = get_gpt4_response(user_input)
             
-            # ... (your existing code to generate GPT-4 response)
-            # Assuming you've stored the GPT-4 response in a variable named 'gpt4_reply'
-            
-            # Save updated conversation back to the database
+            # Step 6: Update the Conversation
+            conversation_data.append({"role": "user", "content": user_input})
+            conversation_data.append({"role": "bot", "content": gpt4_reply})
+
+            # Step 7: Save Back to Database
             update_query = '''INSERT INTO conversations(phone_number, conversation_data) VALUES(%s, %s)
                               ON CONFLICT (phone_number) DO UPDATE SET conversation_data = EXCLUDED.conversation_data;'''
-            cursor.execute(update_query, (phone_number, conversations[phone_number]))
+            cursor.execute(update_query, (phone_number, conversation_data))
 
     except Exception as e:
         print(f"An error occurred: {e}")
     finally:
         connection.close()
 
-    return gpt4_reply  # Make sure 'gpt4_reply' is defined
+    return gpt4_reply
 
     
 def create_table(connection):
     try:
         cursor = connection.cursor()
+        # Change this SQL query based on your requirements
         create_table_query = '''CREATE TABLE IF NOT EXISTS conversations
-              (phone_number TEXT PRIMARY KEY,
+              (id SERIAL PRIMARY KEY,
+               phone_number TEXT NOT NULL,
                conversation_data JSONB NOT NULL); '''
         cursor.execute(create_table_query)
         connection.commit()
