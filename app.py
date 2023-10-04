@@ -1,9 +1,9 @@
 
 from flask import Flask, request, jsonify, render_template
 from werkzeug.middleware.proxy_fix import ProxyFix
-from google_auth_oauthlib.flow import InstalledAppFlow
-from google.oauth2 import service_account
-from googleapiclient.discovery import build
+#from google_auth_oauthlib.flow import InstalledAppFlow
+#from google.oauth2 import service_account
+#from googleapiclient.discovery import build
 from twilio.rest import Client
 import os
 from dotenv import load_dotenv
@@ -31,7 +31,6 @@ conn = psycopg2.connect(
 )
 print("Successfully connected", conn)
 
-
 #SCOPES = ['https://www.googleapis.com/auth/calendar.events.readonly']
 #CALENDAR_CREDENTIALS_FILE = "client_secret.json"
 #
@@ -47,7 +46,7 @@ gpt4_api_key = os.environ.get('GPT4_API_KEY')
 openai.api_key = gpt4_api_key
 conversations = {}
 def create_connection():
-    print("Inside create_connection function")
+    print("Inside create_connection function and it is kicking")
     try:
         db_host = os.environ.get("DB_HOST")
         db_port = os.environ.get("DB_PORT")
@@ -79,26 +78,6 @@ def create_connection():
         print(f"An explicit error occurred: {e}")
         logging.error(f"The full error is: {e}")
         return None
-
-def generate_response(user_input, phone_number):
-    global conversations
-    if phone_number not in conversations:
-        conversations[phone_number] = [
-            {"role": "system", "content": "1. You are like a friend. Your name is Pal . 2. You have no other name. Your language is like a friend. 3. You are built by love and prespration. 4. if someone asks you how you are built , always respond a funny and spirtual answer. Also make sure you know the name of the person you are chatting with and make sure to alway listen to their daily success and challenges and respond accordingly. 5. never answer cheesy and useles stuff 6. keep it concise to maximum 30 words. 7. no need to explain yourself.7. Don't explain what your job is or what you are asked to do"},
-        ]
-    conversations[phone_number].append({"role": "user", "content": user_input})
-    
-    try:
-        response = openai.ChatCompletion.create(
-            model="gpt-4",
-            messages=conversations[phone_number]
-        )
-        gpt4_reply = response['choices'][0]['message']['content'].strip()
-        conversations[phone_number].append({"role": "assistant", "content": gpt4_reply})
-        return gpt4_reply
-    except Exception as e:
-        logging.error(f"Failed to generate message with GPT-4: {e}")
-        return "Sorry, I couldn't understand that."
         
 def create_table(connection):
     try:
@@ -121,7 +100,44 @@ def create_table(connection):
     except Error as e:
         print(f"An explicit error occurred: {e}")
         logging.error(f"The full error is: {e}")
+
+def generate_response(user_input, phone_number, connection):
+    cursor = connection.cursor()
+    # Check if the conversation exists in the database
+    cursor.execute("SELECT conversation_data FROM conversations WHERE phone_number = %s", (phone_number,))
+    row = cursor.fetchone()
+    if row is None:
+        initial_conversation = [
+            {"role": "system", "content": "hi there, nice meeting you."}
+        ]
+        cursor.execute("INSERT INTO conversations (phone_number, conversation_data) VALUES (%s, %s)", (phone_number, json.dumps(initial_conversation)))
+        connection.commit()
+        conversation_history = initial_conversation
+    else:
+        conversation_history = json.loads(row[0])
         
+    # Append the new user message
+    conversation_history.append({"role": "user", "content": user_input})
+    
+    try:
+        response = openai.ChatCompletion.create(
+            model="gpt-4",
+            messages=conversation_history
+        )
+        gpt4_reply = response['choices'][0]['message']['content'].strip()
+        
+        # Append GPT-4 reply to the conversation history
+        conversation_history.append({"role": "assistant", "content": gpt4_reply})
+        
+        # Update the database record
+        cursor.execute("UPDATE conversations SET conversation_data = %s WHERE phone_number = %s", (json.dumps(conversation_history), phone_number))
+        connection.commit()
+        
+        return gpt4_reply
+    except Exception as e:
+        logging.error(f"Failed to generate message with GPT-4: {e}")
+        return "Sorry, I couldn't understand that."
+
 @app.route('/')
 def index():
     print("The website is up and running")
@@ -164,18 +180,24 @@ def sms_reply():
    
     user_input = request.values.get('Body', None)
     phone_number = request.values.get('From', None)
-        # Generate a regular GPT-4 response
-    response_text = generate_response(user_input, phone_number)
-        
-        # Send the response back to the user
-    message = client.messages.create(
-    to=phone_number,
-    from_=TWILIO_PHONE_NUMBER,
-    body=response_text
-        )
 
+    # Use the database connection
+    connection = create_connection()
+    if connection is None:
+        return jsonify({'message': 'Database connection failed'})
+
+    # Generate a regular GPT-4 response
+    response_text = generate_response(user_input, phone_number, connection)
+        
+    # Send the response back to the user
+    message = client.messages.create(
+        to=phone_number,
+        from_=TWILIO_PHONE_NUMBER,
+        body=response_text
+    )
+    connection.close()
     return jsonify({'message': 'Reply sent!'})
-    
+
 if __name__ == '__main__':
     print("Script is starting")
     app.debug = True
