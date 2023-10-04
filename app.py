@@ -46,12 +46,20 @@ openai.api_key = gpt4_api_key
 def create_connection():
     
     try:
+        db_host = os.environ.get("DB_HOST")
+        db_port = os.environ.get("DB_PORT")
+        db_user = os.environ.get("DB_USER")
+        db_password = os.environ.get("DB_PASSWORD")
+        db_name = os.environ.get("DB_NAME")
+        
+        print(f"Attempting to connect to: host={db_host} port={db_port} user={db_user} dbname={db_name}")
+        
         connection = psycopg2.connect(
-            host=os.environ.get("DB_HOST"),
-            port=os.environ.get("DB_PORT"),
-            user=os.environ.get("DB_USER"),
-            password=os.environ.get("DB_PASSWORD"),
-            database=os.environ.get("DB_NAME")
+            host=db_host,
+            port=db_port,
+            user=db_user,
+            password=db_password,
+            database=db_name
         )
         create_table(connection)
         return connection
