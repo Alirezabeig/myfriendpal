@@ -69,6 +69,7 @@ def get_gpt4_response(conversation):
             messages=conversation
         )
         gpt4_reply = response['choices'][0]['message']['content'].strip()
+        print("gpt4_reply", {gpt4_reply})
         return gpt4_reply
     except Exception as e:
         print(f"An explicit error occurred: {e}")
@@ -95,6 +96,8 @@ def generate_response(user_input, phone_number):
             
             # Using the new function to get GPT-4 response
             gpt4_reply = get_gpt4_response(conversation)
+            print("GPT4 response:", gpt4_reply)
+
             if gpt4_reply is None:
                 return "Sorry, something went wrong this time."
                 
