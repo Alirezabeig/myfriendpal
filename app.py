@@ -43,13 +43,7 @@ gpt4_api_key = os.environ.get('GPT4_API_KEY')
 openai.api_key = gpt4_api_key
 
 def create_connection():
-    print("Environment Variables:")
-    print("DB_HOST:", os.environ.get("DB_HOST"))
-    print("DB_PORT:", os.environ.get("DB_PORT"))
-    print("DB_USER:", os.environ.get("DB_USER"))
-    print("DB_PASSWORD:", os.environ.get("DB_PASSWORD"))
-    print("DB_NAME:", os.environ.get("DB_NAME"))
-
+    
     try:
         connection = psycopg2.connect(
             host=os.environ.get("DB_HOST"),
