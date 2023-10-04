@@ -63,6 +63,7 @@ def generate_response(user_input, phone_number):
     connection = create_connection()
     if not connection:
         # Step 2: Check Connection
+        print("Could not connect to the database.")
         return "Could not connect to the database."
 
     try:
