@@ -100,27 +100,53 @@ def create_table(connection):
     except Error as e:
         print(f"An explicit error occurred: {e}")
         logging.error(f"The full error is: {e}")
-
+        
 def generate_response(user_input, phone_number):
     global conversations
-    if phone_number not in conversations:
-        conversations[phone_number] = [
-            {"role": "system", "content": "1. You are like a friend. Your name is Pal . 2. You have no other name. Your language is like a friend. 3. You are built by love and prespration. 4. if someone asks you how you are built , always respond a funny and spirtual answer. Also make sure you know the name of the person you are chatting with and make sure to alway listen to their daily success and challenges and respond accordingly. 5. never answer cheesy and useles stuff 6. keep it concise to maximum 30 words. 7. no need to explain yourself.7. Don't explain what your job is or what you are asked to do"},
-        ]
-    conversations[phone_number].append({"role": "user", "content": user_input})
-    
+    connection = create_connection()  # Assuming this function returns a valid DB connection
+    cursor = connection.cursor()
     try:
+        # Fetch existing conversation from the database based on the phone_number
+        fetch_query = "SELECT conversation_data FROM conversations WHERE phone_number = %s;"
+        cursor.execute(fetch_query, (phone_number,))
+        result = cursor.fetchone()
+
+        if result:
+            conversations[phone_number] = json.loads(result[0])
+        else:
+            conversations[phone_number] = [{"role": "system", "content": "System initialized conversation"}]
+
+        conversations[phone_number].append({"role": "user", "content": user_input})
+
+        # Generate GPT-4 response
         response = openai.ChatCompletion.create(
             model="gpt-4",
             messages=conversations[phone_number]
         )
         gpt4_reply = response['choices'][0]['message']['content'].strip()
         conversations[phone_number].append({"role": "assistant", "content": gpt4_reply})
-        return gpt4_reply
-    except Exception as e:
-        logging.error(f"Failed to generate message with GPT-4: {e}")
-        return "Sorry, I couldn't understand that."
         
+        # Update the database with the latest conversation
+        updated_data = json.dumps(conversations[phone_number])
+        if result:
+            update_query = "UPDATE conversations SET conversation_data = %s WHERE phone_number = %s;"
+            cursor.execute(update_query, (updated_data, phone_number))
+        else:
+            insert_query = "INSERT INTO conversations (phone_number, conversation_data) VALUES (%s, %s);"
+            cursor.execute(insert_query, (phone_number, updated_data))
+        
+        connection.commit()
+        
+        return gpt4_reply
+        
+    except Exception as e:
+        logging.error(f"An error occurred: {e}")
+        return "Sorry, I couldn't understand that."
+
+    finally:
+        cursor.close()
+        connection.close()
+
 
         
 @app.route('/')
@@ -161,7 +187,7 @@ def terms_of_service():
 
 @app.route("/sms", methods=['POST'])
 def sms_reply():
-    app.logger.info('SMS reply triggered')
+    print("SMS reply triggered")
    
     user_input = request.values.get('Body', None)
     phone_number = request.values.get('From', None)
