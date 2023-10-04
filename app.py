@@ -79,6 +79,8 @@ def get_gpt4_response(conversation):
 
 def generate_response(user_input, phone_number):
     connection = create_connection()
+    print(f"Connection connected *** $$")
+    
     if not connection:
         return "Could not connect to the database."
 
