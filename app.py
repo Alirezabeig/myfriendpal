@@ -60,6 +60,18 @@ def create_connection():
         print(f"The full error is: {e}")
         return None
 
+def get_gpt4_response(conversation):
+    try:
+        response = openai.ChatCompletion.create(
+            model="gpt-4",
+            messages=conversation
+        )
+        gpt4_reply = response['choices'][0]['message']['content'].strip()
+        return gpt4_reply
+    except Exception as e:
+        logging.error(f"An error occurred while getting GPT-4 response: {e}")
+        return None
+
 def generate_response(user_input, phone_number):
     connection = create_connection()
     if not connection:
@@ -68,31 +80,23 @@ def generate_response(user_input, phone_number):
     try:
         connection.autocommit = True
         with connection.cursor() as cursor:
-            # Fetch Previous Conversations, note the change to `conversation_data`
             cursor.execute("SELECT conversation_data FROM conversations WHERE phone_number = %s", (phone_number,))
             db_result = cursor.fetchone()
 
             if db_result:
                 conversation = json.loads(db_result[0])
             else:
-                conversation = [
-                    {"role": "system", "content": "...(your existing message)"}
-                ]
+                conversation = [{"role": "system", "content": "...(your existing message)"}]
                 
-            # Append user's latest input to conversation
             conversation.append({"role": "user", "content": user_input})
             
-            # Step 4: Generate GPT-4 Response
-            response = openai.ChatCompletion.create(
-                model="gpt-4",
-                messages=conversation
-            )
-            gpt4_reply = response['choices'][0]['message']['content'].strip()
-            
-            # Append GPT-4's reply to conversation
+            # Using the new function to get GPT-4 response
+            gpt4_reply = get_gpt4_response(conversation)
+            if gpt4_reply is None:
+                return "Sorry, something went wrong."
+                
             conversation.append({"role": "assistant", "content": gpt4_reply})
             
-            # Step 5: Save Back to Database
             update_query = '''INSERT INTO conversations(phone_number, conversation) VALUES(%s, %s)
                               ON CONFLICT (phone_number) DO UPDATE SET conversation = EXCLUDED.conversation;'''
             cursor.execute(update_query, (phone_number, json.dumps(conversation)))
@@ -104,7 +108,8 @@ def generate_response(user_input, phone_number):
         connection.close()
 
     return gpt4_reply
-    
+
+ 
 def create_table(connection):
     try:
         cursor = connection.cursor()
