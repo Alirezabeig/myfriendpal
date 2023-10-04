@@ -44,9 +44,11 @@ client = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
 
 gpt4_api_key = os.environ.get('GPT4_API_KEY')
 openai.api_key = gpt4_api_key
-conversations = {}
+
+##conversations = {}
+
 def create_connection():
-    print("Inside create_connection function and it is kicking")
+    print("Into the create_connection function and it is kicking")
     try:
         db_host = os.environ.get("DB_HOST")
         db_port = os.environ.get("DB_PORT")
@@ -138,6 +140,8 @@ def generate_response(user_input, phone_number, connection):
         logging.error(f"Failed to generate message with GPT-4: {e}")
         return "Sorry, I couldn't understand that."
 
+
+
 @app.route('/')
 def index():
     print("The website is up and running")
@@ -185,7 +189,6 @@ def sms_reply():
     connection = create_connection()
     if connection is None:
         return jsonify({'message': 'Database connection failed'})
-
     # Generate a regular GPT-4 response
     response_text = generate_response(user_input, phone_number, connection)
         
