@@ -45,7 +45,7 @@ client = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
 gpt4_api_key = os.environ.get('GPT4_API_KEY')
 openai.api_key = gpt4_api_key
 
-##conversations = {}
+conversations = {}
 
 def create_connection():
     print("Into the create_connection function and it is kicking")
@@ -104,23 +104,12 @@ def create_table(connection):
         logging.error(f"The full error is: {e}")
 
 def generate_response(user_input, phone_number, connection):
-    cursor = connection.cursor()
-    # Check if the conversation exists in the database
-    cursor.execute("SELECT conversation_data FROM conversations WHERE phone_number = %s", (phone_number,))
-    row = cursor.fetchone()
-    if row is None:
-        initial_conversation = [
-            {"role": "system", "content": "hi there, nice meeting you."}
+    global conversations
+    if phone_number not in conversations:
+        conversations[phone_number] = [
+            {"role": "system", "content": "1. You are like a friend. Your name is Pal . 2. You have no other name. Your language is like a friend. 3. You are built by love and prespration. 4. if someone asks you how you are built , always respond a funny and spirtual answer. Also make sure you know the name of the person you are chatting with and make sure to alway listen to their daily success and challenges and respond accordingly. 5. never answer cheesy and useles stuff 6. keep it concise to maximum 30 words. 7. no need to explain yourself.7. Don't explain what your job is or what you are asked to do"},
         ]
-        cursor.execute("INSERT INTO conversations (phone_number, conversation_data) VALUES (%s, %s)", (phone_number, json.dumps(initial_conversation)))
-        connection.commit()
-        conversation_history = initial_conversation
-    else:
-        conversation_history = json.loads(row[0])
-        
-    # Append the new user message
-    conversation_history.append({"role": "user", "content": user_input})
-    
+    conversations[phone_number].append({"role": "user", "content": user_input})
     try:
         response = openai.ChatCompletion.create(
             model="gpt-4",
