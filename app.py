@@ -1,5 +1,4 @@
 
-##app.py
 from flask import Flask, request, jsonify, render_template
 from werkzeug.middleware.proxy_fix import ProxyFix
 from google_auth_oauthlib.flow import InstalledAppFlow
@@ -13,8 +12,6 @@ import json
 import openai
 import psycopg2
 from psycopg2 import OperationalError
-import calendar_utils
-import gpt4_utils
 
 logging.basicConfig(level=logging.DEBUG, handlers=[logging.StreamHandler()])
 
@@ -61,6 +58,18 @@ def create_connection():
         return connection
     except Exception as e:
         print(f"The full error is: {e}")
+        return None
+
+def get_gpt4_response(conversation):
+    try:
+        response = openai.ChatCompletion.create(
+            model="gpt-4",
+            messages=conversation
+        )
+        gpt4_reply = response['choices'][0]['message']['content'].strip()
+        return gpt4_reply
+    except Exception as e:
+        logging.error(f"An error occurred while getting GPT-4 response: {e}")
         return None
 
 def generate_response(user_input, phone_number):
@@ -113,6 +122,19 @@ def create_table(connection):
         connection.commit()
     except OperationalError as e:
         print(f"The error '{e}' occurred")
+
+def get_calendar_service():
+    # Load the saved credentials
+    creds = None
+    if os.path.exists('token.json'):
+        with open('token.json', 'r') as token_file:
+            creds = Credentials.from_authorized_user_file('token.json', SCOPES)
+
+    # If we have valid credentials, proceed to call Google Calendar APIs
+    if creds and not creds.expired:
+        return build('calendar', 'v3', credentials=creds)
+    else:
+        return None
         
 @app.route('/')
 def index():
@@ -159,7 +181,23 @@ def terms_of_service():
 @app.route("/headers")
 def headers():
     return dict(request.headers)
-    
+
+def initialize_google_calendar():
+    """Initialize the Google Calendar API and return Auth URL."""
+    logging.info("Initializing Google Calendar")
+    try:
+        client_id = "1084838804894-s7bra6uila2ffshf1712qnb9lf2hk781.apps.googleusercontent.com"
+        state_string = "some_random_string"
+        redirect_uri = "https://www.myfriendpal.com/oauth2callback"
+
+        auth_url = f"https://accounts.google.com/o/oauth2/auth?response_type=code&client_id={client_id}&scope=https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fcalendar.readonly&state={state_string}&access_type=offline&redirect_uri={redirect_uri}"
+
+        logging.info(f"Auth URL generated: {auth_url}")
+        return auth_url
+    except Exception as e:
+        logging.error(f"Failed to initialize Google Calendar: {e}")
+        return None
+
 @app.route("/sms", methods=['POST'])
 def sms_reply():
     app.logger.info('SMS reply triggered')
@@ -199,6 +237,17 @@ def sms_reply():
 
     return jsonify({'message': 'Reply sent!'})
     
+@app.route("/authorize_google_calendar")
+def authorize_google_calendar():
+    app.logger.info('Google Calendar authorization')
+    flow = InstalledAppFlow.from_client_secrets_file('client_secret.json', SCOPES)
+    creds = flow.run_local_server(port=0)
+    with open(CALENDAR_CREDENTIALS_FILE, 'w') as token:
+        token.write(creds.to_json())
+    
+    return "Google Calendar integration successful! You can now go back to your chat."
+
+
 @app.route('/oauth2callback')
 def oauth2callback():
     
