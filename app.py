@@ -8,6 +8,7 @@ from twilio.rest import Client
 import os
 from dotenv import load_dotenv
 import logging
+import json
 import openai
 import psycopg2
 from psycopg2 import OperationalError
@@ -59,48 +60,49 @@ def create_connection():
         return None
 
 def generate_response(user_input, phone_number):
-    # Step 1: Connect to the Database
     connection = create_connection()
     if not connection:
-        # Step 2: Check Connection
-        print("Could not connect to the database.")
         return "Could not connect to the database."
 
     try:
         connection.autocommit = True
         with connection.cursor() as cursor:
-            # Step 3: Fetch Previous Conversations
+            # Fetch Previous Conversations, note the change to `conversation_data`
             cursor.execute("SELECT conversation_data FROM conversations WHERE phone_number = %s", (phone_number,))
             db_result = cursor.fetchone()
 
-            # Step 4: Initialize Conversation
             if db_result:
-                conversation_data = db_result[0]
+                conversation = json.loads(db_result[0])
             else:
-                conversation_data = [
+                conversation = [
                     {"role": "system", "content": "...(your existing message)"}
                 ]
-
-            # Step 5: Generate GPT-4 Response
-            # Assuming get_gpt4_response is your function that takes user_input and returns GPT-4 generated response
-            gpt4_reply = get_gpt4_response(user_input)
+                
+            # Append user's latest input to conversation
+            conversation.append({"role": "user", "content": user_input})
             
-            # Step 6: Update the Conversation
-            conversation_data.append({"role": "user", "content": user_input})
-            conversation_data.append({"role": "bot", "content": gpt4_reply})
-
-            # Step 7: Save Back to Database
-            update_query = '''INSERT INTO conversations(phone_number, conversation_data) VALUES(%s, %s)
-                              ON CONFLICT (phone_number) DO UPDATE SET conversation_data = EXCLUDED.conversation_data;'''
-            cursor.execute(update_query, (phone_number, conversation_data))
+            # Step 4: Generate GPT-4 Response
+            response = openai.ChatCompletion.create(
+                model="gpt-4",
+                messages=conversation
+            )
+            gpt4_reply = response['choices'][0]['message']['content'].strip()
+            
+            # Append GPT-4's reply to conversation
+            conversation.append({"role": "assistant", "content": gpt4_reply})
+            
+            # Step 5: Save Back to Database
+            update_query = '''INSERT INTO conversations(phone_number, conversation) VALUES(%s, %s)
+                              ON CONFLICT (phone_number) DO UPDATE SET conversation = EXCLUDED.conversation;'''
+            cursor.execute(update_query, (phone_number, json.dumps(conversation)))
 
     except Exception as e:
         print(f"An error occurred: {e}")
+        return "Sorry, something went wrong."
     finally:
         connection.close()
 
     return gpt4_reply
-
     
 def create_table(connection):
     try:
