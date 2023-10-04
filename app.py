@@ -44,11 +44,9 @@ client = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
 
 gpt4_api_key = os.environ.get('GPT4_API_KEY')
 openai.api_key = gpt4_api_key
-
 conversations = {}
-
 def create_connection():
-    print("Into the create_connection function and it is kicking")
+    print("Inside create_connection function and it is kicking")
     try:
         db_host = os.environ.get("DB_HOST")
         db_port = os.environ.get("DB_PORT")
@@ -124,6 +122,7 @@ def generate_response(user_input, phone_number):
         return "Sorry, I couldn't understand that."
         
 
+        
 @app.route('/')
 def index():
     print("The website is up and running")
@@ -166,23 +165,18 @@ def sms_reply():
    
     user_input = request.values.get('Body', None)
     phone_number = request.values.get('From', None)
-
-    # Use the database connection
-    connection = create_connection()
-    if connection is None:
-        return jsonify({'message': 'Database connection failed'})
-    # Generate a regular GPT-4 response
-    response_text = generate_response(user_input, phone_number, connection)
+        # Generate a regular GPT-4 response
+    response_text = generate_response(user_input, phone_number)
         
-    # Send the response back to the user
+        # Send the response back to the user
     message = client.messages.create(
-        to=phone_number,
-        from_=TWILIO_PHONE_NUMBER,
-        body=response_text
-    )
-    connection.close()
-    return jsonify({'message': 'Reply sent!'})
+    to=phone_number,
+    from_=TWILIO_PHONE_NUMBER,
+    body=response_text
+        )
 
+    return jsonify({'message': 'Reply sent!'})
+    
 if __name__ == '__main__':
     print("Script is starting")
     app.debug = True
