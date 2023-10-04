@@ -16,13 +16,6 @@ from psycopg2 import OperationalError
 logging.basicConfig(level=logging.DEBUG, handlers=[logging.StreamHandler()])
 
 load_dotenv()
-print("os.environ")
-print("DB_HOST:", os.environ.get("DB_HOST"))
-print("DB_PORT:", os.environ.get("DB_PORT"))
-print("DB_USER:", os.environ.get("DB_USER"))
-print("DB_PASSWORD:", os.environ.get("DB_PASSWORD"))
-print("DB_NAME:", os.environ.get("DB_NAME"))
-
 app = Flask(__name__)
 app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1)
 
