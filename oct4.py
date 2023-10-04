@@ -80,6 +80,65 @@ def create_connection():
         logging.error(f"The full error is: {e}")
         return None
 
+def get_gpt4_response(conversation):
+    try:
+        response = openai.ChatCompletion.create(
+            model="gpt-4",
+            messages=conversation
+        )
+        gpt4_reply = response['choices'][0]['message']['content'].strip()
+        print("gpt4_reply", {gpt4_reply})
+        return gpt4_reply
+    except Exception as e:
+        print(f"An explicit error occurred: {e}")
+        logging.error(f"The full error is: {e}")
+        return None
+
+#def generate_response(user_input, phone_number):
+#    connection = create_connection()
+#    print(f"Connection connected *** $$")
+#
+#    if not connection:
+#        return "Could not connect to the database."
+#
+#    try:
+#        connection.autocommit = True
+#        with connection.cursor() as cursor:
+#            cursor.execute("SELECT conversation_data FROM conversations WHERE phone_number = %s", (phone_number,))
+#            db_result = cursor.fetchone()
+#
+#            if db_result:
+#                conversation = json.loads(db_result[0])
+#            else:
+#                conversation = [{"role": "system", "content": "...(your existing message)"}]
+#
+#            conversation.append({"role": "user", "content": user_input})
+#
+#            # Using the new function to get GPT-4 response
+#            gpt4_reply = get_gpt4_response(conversation)
+#            print("GPT4 response:", gpt4_reply)
+#
+#            if gpt4_reply is None:
+#                return "Sorry, something went wrong this time."
+#
+#            conversation.append({"role": "assistant", "content": gpt4_reply})
+#
+#            update_query = '''INSERT INTO conversations(phone_number, conversation) VALUES(%s, %s)
+#                              ON CONFLICT (phone_number) DO UPDATE SET conversation = EXCLUDED.conversation;'''
+#            cursor.execute(update_query, (phone_number, json.dumps(conversation)))
+#
+#    except Exception as e:
+#        logging.exception("An exception occurred")
+#        send_sms("Static test message")  # Replace this with your SMS function
+#        return "Sorry, something went wrong another past."
+#
+#    finally:
+#        connection.close()
+#
+#    return gpt4_reply
+
+ # This will hold the conversation history
+
 def generate_response(user_input, phone_number):
     global conversations
     if phone_number not in conversations:
@@ -121,6 +180,19 @@ def create_table(connection):
     except Error as e:
         print(f"An explicit error occurred: {e}")
         logging.error(f"The full error is: {e}")
+
+#def get_calendar_service():
+#    # Load the saved credentials
+#    creds = None
+#    if os.path.exists('token.json'):
+#        with open('token.json', 'r') as token_file:
+#            creds = Credentials.from_authorized_user_file('token.json', SCOPES)
+#
+#    # If we have valid credentials, proceed to call Google Calendar APIs
+#    if creds and not creds.expired:
+#        return build('calendar', 'v3', credentials=creds)
+#    else:
+#        return None
         
 @app.route('/')
 def index():
@@ -135,7 +207,14 @@ def send_message():
     try:
         data = request.json
         phone_number = data.get('phone_number')
-  
+        
+#        # Initialize Google Calendar and get Auth URL
+#        google_auth_url = initialize_google_calendar()
+#
+#        if google_auth_url is None:
+#            raise ValueError("Failed to initialize Google Calendar")
+
+        # Create first message
         greeting_message = f"Hi there, I am so excited to connect with you. What is your name?"
 
         # Send the first message
@@ -158,12 +237,49 @@ def privacy_policy():
 def terms_of_service():
     return render_template('terms_of_service.html')
 
+
+#def initialize_google_calendar():
+#    """Initialize the Google Calendar API and return Auth URL."""
+#    logging.info("Initializing Google Calendar")
+#    try:
+#        client_id = "1084838804894-s7bra6uila2ffshf1712qnb9lf2hk781.apps.googleusercontent.com"
+#        state_string = "some_random_string"
+#        redirect_uri = "https://www.myfriendpal.com/oauth2callback"
+#
+#        auth_url = f"https://accounts.google.com/o/oauth2/auth?response_type=code&client_id={client_id}&scope=https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fcalendar.readonly&state={state_string}&access_type=offline&redirect_uri={redirect_uri}"
+#
+#        logging.info(f"Auth URL generated: {auth_url}")
+#        return auth_url
+#    except Exception as e:
+#        logging.error(f"Failed to initialize Google Calendar: {e}")
+#        return None
+
 @app.route("/sms", methods=['POST'])
 def sms_reply():
     app.logger.info('SMS reply triggered')
    
     user_input = request.values.get('Body', None)
     phone_number = request.values.get('From', None)
+
+#
+#    if "calendar" in user_input.lower():
+#        logging.info("Detected calendar keyword.")
+#
+#
+#        auth_url = initialize_google_calendar()
+#
+#        if auth_url:  # Check if auth_url is not None
+#            logging.info(f"Generated auth URL: {auth_url}")
+#
+#            # Send the Auth URL via SMS
+#            message = client.messages.create(
+#                to=phone_number,
+#                from_=TWILIO_PHONE_NUMBER,
+#                body=f"Please authorize Google Calendar by visiting this link: {auth_url}"
+#            )
+#        else:
+#            logging.error("Failed to generate auth URL.")
+
         # Generate a regular GPT-4 response
     response_text = generate_response(user_input, phone_number)
         
@@ -176,6 +292,37 @@ def sms_reply():
 
     return jsonify({'message': 'Reply sent!'})
     
+#@app.route("/authorize_google_calendar")
+#def authorize_google_calendar():
+#    app.logger.info('Google Calendar authorization')
+#    flow = InstalledAppFlow.from_client_secrets_file('client_secret.json', SCOPES)
+#    creds = flow.run_local_server(port=0)
+#    with open(CALENDAR_CREDENTIALS_FILE, 'w') as token:
+#        token.write(creds.to_json())
+#
+#    return "Google Calendar integration successful! You can now go back to your chat."
+#
+#
+#@app.route('/oauth2callback')
+#def oauth2callback():
+#    print("Inside oauth2callback function")
+#    app.logger.info('Inside oauth2callback')
+#    logging.info(f"Received request URL: {request.url}")
+#    # Create the OAuth2 flow and fetch the token
+#    flow = InstalledAppFlow.from_client_secrets_file('client_secret.json', SCOPES)
+#    flow.fetch_token(authorization_response=request.url)
+#    creds = flow.credentials
+#
+#    # Log the credentials after they are created
+#    app.logger.info(f'Credentials: {creds.to_json()}')
+#    print("the oauth call back")
+#
+#    # Save the credentials for future use
+#    with open('token.json', 'w') as token_file:
+#        token_file.write(creds.to_json())
+#
+#    return redirect('/')
+
 if __name__ == '__main__':
     print("Script is starting")
     app.debug = True
