@@ -14,7 +14,7 @@ import psycopg2
 from psycopg2 import OperationalError
 import traceback
 
-logging.basicConfig(level=logging.DEBUG, handlers=[logging.StreamHandler()])
+logging.basicConfig(level=logging.DEBUG)
 
 load_dotenv()
 print("DB_HOST is:", os.environ.get("DB_HOST"))
@@ -109,13 +109,10 @@ def generate_response(user_input, phone_number):
             cursor.execute(update_query, (phone_number, json.dumps(conversation)))
 
     except Exception as e:
-        print(f"An explicit error occurred: {e}")
-        print(f"Exception type: {type(e)}")
-        print(f"Exception arguments: {e.args}")
-        print("Traceback:")
-        traceback.print_exc()
-        logging.error(f"The full error is: {e}")
+        logging.exception("An exception occurred")
+        send_sms("Static test message")  # Replace this with your SMS function
         return "Sorry, something went wrong another past."
+    
     finally:
         connection.close()
 
