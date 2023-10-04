@@ -54,15 +54,6 @@ def create_connection():
             password=db_password,
             database=db_name
         )
-        cursor = connection.cursor()
-        cursor.execute("SELECT 1;")
-        test_result = cursor.fetchone()
-        
-        # Log the result (should log 1 if the connection works)
-        if test_result:
-            print(f"Test Query Result: {test_result[0]}")
-        else:
-            print("Test Query Failed, Result is None")
         create_table(connection)
         return connection
     except Exception as e:
@@ -109,7 +100,6 @@ def generate_response(user_input, phone_number):
     except Exception as e:
         logging.error(f"An error occurred in {__name__}: {e}")
         return "Sorry, something went wrong."
-    
     finally:
         connection.close()
 
