@@ -96,7 +96,7 @@ def generate_response(user_input, phone_number):
             # Using the new function to get GPT-4 response
             gpt4_reply = get_gpt4_response(conversation)
             if gpt4_reply is None:
-                return "Sorry, something went wrong."
+                return "Sorry, something went wrong this time."
                 
             conversation.append({"role": "assistant", "content": gpt4_reply})
             
@@ -107,7 +107,7 @@ def generate_response(user_input, phone_number):
     except Exception as e:
         print(f"An explicit error occurred: {e}")
         logging.error(f"The full error is: {e}")
-        return "Sorry, something went wrong."
+        return "Sorry, something went wrong another past."
     finally:
         connection.close()
 
