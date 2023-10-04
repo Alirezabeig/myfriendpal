@@ -16,6 +16,7 @@ from psycopg2 import OperationalError
 logging.basicConfig(level=logging.DEBUG, handlers=[logging.StreamHandler()])
 
 load_dotenv()
+print("DB_HOST is:", os.environ.get("DB_HOST"))
 app = Flask(__name__)
 app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1)
 
@@ -37,7 +38,7 @@ gpt4_api_key = os.environ.get('GPT4_API_KEY')
 openai.api_key = gpt4_api_key
 
 def create_connection():
-    
+    print("Inside create_connection function")
     try:
         db_host = os.environ.get("DB_HOST")
         db_port = os.environ.get("DB_PORT")
@@ -57,7 +58,8 @@ def create_connection():
         create_table(connection)
         return connection
     except Exception as e:
-        print(f"The full error is: {e}")
+        print(f"An explicit error occurred: {e}")
+        logging.error(f"The full error is: {e}")
         return None
 
 def get_gpt4_response(conversation):
@@ -69,7 +71,8 @@ def get_gpt4_response(conversation):
         gpt4_reply = response['choices'][0]['message']['content'].strip()
         return gpt4_reply
     except Exception as e:
-        logging.error(f"An error occurred while getting GPT-4 response: {e}")
+        print(f"An explicit error occurred: {e}")
+        logging.error(f"The full error is: {e}")
         return None
 
 def generate_response(user_input, phone_number):
@@ -102,7 +105,8 @@ def generate_response(user_input, phone_number):
             cursor.execute(update_query, (phone_number, json.dumps(conversation)))
 
     except Exception as e:
-        logging.error(f"An error occurred in {__name__}: {e}")
+        print(f"An explicit error occurred: {e}")
+        logging.error(f"The full error is: {e}")
         return "Sorry, something went wrong."
     finally:
         connection.close()
@@ -121,7 +125,8 @@ def create_table(connection):
         cursor.execute(create_table_query)
         connection.commit()
     except OperationalError as e:
-        print(f"The error '{e}' occurred")
+        print(f"An explicit error occurred: {e}")
+        logging.error(f"The full error is: {e}")
 
 def get_calendar_service():
     # Load the saved credentials
@@ -138,6 +143,7 @@ def get_calendar_service():
         
 @app.route('/')
 def index():
+    print("The website is up and running")
     app.logger.info('Index page accessed')
     return render_template('index.html')
 
@@ -250,7 +256,7 @@ def authorize_google_calendar():
 
 @app.route('/oauth2callback')
 def oauth2callback():
-    
+    print("Inside oauth2callback function")
     app.logger.info('Inside oauth2callback')
     logging.info(f"Received request URL: {request.url}")
     # Create the OAuth2 flow and fetch the token
@@ -269,6 +275,7 @@ def oauth2callback():
     return redirect('/')
 
 if __name__ == '__main__':
+    print("Script is starting")
     app.debug = True
     port = int(os.environ.get("PORT", 5002))  # Fall back to 5002 for local development
     app.run(host="0.0.0.0", port=port)  # Run the app
