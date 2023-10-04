@@ -12,6 +12,7 @@ import json
 import openai
 import psycopg2
 from psycopg2 import OperationalError
+import traceback
 
 logging.basicConfig(level=logging.DEBUG, handlers=[logging.StreamHandler()])
 
@@ -109,6 +110,10 @@ def generate_response(user_input, phone_number):
 
     except Exception as e:
         print(f"An explicit error occurred: {e}")
+        print(f"Exception type: {type(e)}")
+        print(f"Exception arguments: {e.args}")
+        print("Traceback:")
+        traceback.print_exc()
         logging.error(f"The full error is: {e}")
         return "Sorry, something went wrong another past."
     finally:
