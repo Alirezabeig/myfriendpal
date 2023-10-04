@@ -45,7 +45,7 @@ def create_connection():
         db_password = os.environ.get("DB_PASSWORD")
         db_name = os.environ.get("DB_NAME")
         
-        print(f"Attempting to connect to: host={db_host} port={db_port} user={db_user} dbname={db_name}")
+        print("Attempting to connect to: host={db_host} port={db_port} user={db_user} dbname={db_name}")
         
         connection = psycopg2.connect(
             host=db_host,
