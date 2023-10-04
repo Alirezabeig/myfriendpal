@@ -102,7 +102,6 @@ def create_table(connection):
         logging.error(f"The full error is: {e}")
         
 def generate_response(user_input, phone_number):
-    global conversations
     connection = create_connection()  # Assuming this function returns a valid DB connection
     cursor = connection.cursor()
     try:
@@ -112,22 +111,22 @@ def generate_response(user_input, phone_number):
         result = cursor.fetchone()
 
         if result:
-            conversations[phone_number] = json.loads(result[0])
+            current_conversation = json.loads(result[0])
         else:
-            conversations[phone_number] = [{"role": "system", "content": "System initialized conversation"}]
+            current_conversation = [{"role": "system", "content": "System initialized conversation"}]
 
-        conversations[phone_number].append({"role": "user", "content": user_input})
+        current_conversation.append({"role": "user", "content": user_input})
 
         # Generate GPT-4 response
         response = openai.ChatCompletion.create(
             model="gpt-4",
-            messages=conversations[phone_number]
+            messages=current_conversation
         )
         gpt4_reply = response['choices'][0]['message']['content'].strip()
-        conversations[phone_number].append({"role": "assistant", "content": gpt4_reply})
+        current_conversation.append({"role": "assistant", "content": gpt4_reply})
         
         # Update the database with the latest conversation
-        updated_data = json.dumps(conversations[phone_number])
+        updated_data = json.dumps(current_conversation)
         if result:
             update_query = "UPDATE conversations SET conversation_data = %s WHERE phone_number = %s;"
             cursor.execute(update_query, (updated_data, phone_number))
@@ -135,17 +134,17 @@ def generate_response(user_input, phone_number):
             insert_query = "INSERT INTO conversations (phone_number, conversation_data) VALUES (%s, %s);"
             cursor.execute(insert_query, (phone_number, updated_data))
         
-        connection.commit()
-        
-        return gpt4_reply
-        
     except Exception as e:
         logging.error(f"An error occurred: {e}")
         return "Sorry, I couldn't understand that."
-
+        
     finally:
+        connection.commit()
         cursor.close()
         connection.close()
+
+    return gpt4_reply
+
 
 
         
