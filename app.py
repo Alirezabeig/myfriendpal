@@ -64,9 +64,10 @@ def check_for_calendar_keyword(user_input, phone_number):
             body=f"Please authorize Google Calendar access by clicking: {authorization_url}"
         )
         print(f"Authorization URL sent. Message SID: {message.sid}")  # Debug line
+        return True  # Return True to indicate "calendar" was found
     else:
         print("Calendar keyword not found.")  # Debug line
-
+        return False
 
 def create_connection():
     print("Inside create_connection function and it is kicking")
@@ -187,15 +188,14 @@ def sms_reply():
     
     print(f"User input: {user_input}, Phone number: {phone_number}")  # Debug line
     
-    check_for_calendar_keyword(user_input, phone_number)
-        # Generate a regular GPT-4 response
-    response_text = generate_response(user_input, phone_number)
-        
-        # Send the response back to the user
-    message = client.messages.create(
-    to=phone_number,
-    from_=TWILIO_PHONE_NUMBER,
-    body=response_text
+    calendar_keyword_found = check_for_calendar_keyword(user_input, phone_number)
+    
+    if not calendar_keyword_found:
+        response_text = generate_response(user_input, phone_number)
+        message = client.messages.create(
+            to=phone_number,
+            from_=TWILIO_PHONE_NUMBER,
+            body=response_text
         )
 
     return jsonify({'message': 'Reply sent!'})
