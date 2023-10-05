@@ -22,6 +22,7 @@ app = Flask(__name__)
 app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1)
 app.logger.setLevel(logging.INFO)
 
+
 conn = psycopg2.connect(
     host = os.environ.get("DB_HOST"),
     port = os.environ.get("DB_PORT"),
@@ -103,54 +104,25 @@ def create_table(connection):
         
 
 def generate_response(user_input, phone_number):
-    connection = create_connection()  # Assuming this function returns a valid DB connection
-    if connection is None:
-        logging.error("Could not establish database connection.")
-        return "Sorry, I couldn't understand that."
-
-    cursor = connection.cursor()
+    global conversations
+    if phone_number not in conversations:
+        conversations[phone_number] = [
+            {"role": "system", "content": "1. You are like a friend. Your name is Pal . 2. You have no other name. Your language is like a friend. 3. You are built by love and prespration. 4. if someone asks you how you are built , always respond a funny and spirtual answer. Also make sure you know the name of the person you are chatting with and make sure to alway listen to their daily success and challenges and respond accordingly. 5. never answer cheesy and useles stuff 6. keep it concise to maximum 30 words. 7. no need to explain yourself.7. Don't explain what your job is or what you are asked to do"},
+        ]
+    conversations[phone_number].append({"role": "user", "content": user_input})
     
     try:
-        # Fetch existing conversation from the database based on the phone_number
-        fetch_query = "SELECT conversation_data FROM conversations WHERE phone_number = %s;"
-        cursor.execute(fetch_query, (phone_number,))
-        result = cursor.fetchone()
-        
-        if result:
-            current_conversation = json.loads(result[0])
-        else:
-            current_conversation = [{"role": "system", "content": "System initialized conversation"}]
-        
-        current_conversation.append({"role": "user", "content": user_input})
-        
-        # Generate GPT-4 response
         response = openai.ChatCompletion.create(
             model="gpt-4",
-            messages=current_conversation
+            messages=conversations[phone_number]
         )
         gpt4_reply = response['choices'][0]['message']['content'].strip()
-        current_conversation.append({"role": "assistant", "content": gpt4_reply})
-        
-        # Update the database with the latest conversation
-        updated_data = json.dumps(current_conversation)
-        if result:
-            update_query = "UPDATE conversations SET conversation_data = %s WHERE phone_number = %s;"
-            cursor.execute(update_query, (updated_data, phone_number))
-        else:
-            insert_query = "INSERT INTO conversations (phone_number, conversation_data) VALUES (%s, %s);"
-            cursor.execute(insert_query, (phone_number, updated_data))
-
-        connection.commit()
+        conversations[phone_number].append({"role": "assistant", "content": gpt4_reply})
         return gpt4_reply
-
     except Exception as e:
-        logging.error(f"An error occurred: {e}")
-        logging.error(traceback.format_exc())
+        logging.error(f"Failed to generate message with GPT-4: {e}")
         return "Sorry, I couldn't understand that."
-
-    finally:
-        cursor.close()
-        connection.close()
+        
 
         
 @app.route('/')
