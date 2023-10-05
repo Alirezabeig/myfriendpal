@@ -12,12 +12,26 @@ CALENDAR_API_VERSION = 'v3'
 SCOPES = ['https://www.googleapis.com/auth/calendar']
 
 def get_google_calendar_authorization_url():
-    flow = InstalledAppFlow.from_client_secrets_file(
-        CALENDAR_CREDENTIALS_FILE, SCOPES)
-    authorization_url, _ = flow.authorization_url(
-        "https://accounts.google.com/o/oauth2/auth",
-        access_type='offline',
-        include_granted_scopes='true')
+    print("Generating Google Calendar authorization URL...")  # Debug line
+    flow = OAuth2WebServerFlow(
+        client_id=CLIENT_ID,
+        client_secret=CLIENT_SECRET,
+        scope=CALENDAR_SCOPE,
+        redirect_uri=REDIRECT_URI
+    )
+    
+    print("Type of flow:", type(flow))  # Debug line
+    print("Flow object:", flow)  # Debug line
+    
+    # Depending on your library version, this may vary.
+    # For example, you may only need to pass one argument.
+    try:
+        authorization_url = flow.authorization_url()
+    except Exception as e:
+        print("Error while generating URL:", e)
+        return None
+    
+    print(f"Generated authorization URL: {authorization_url}")  # Debug line
     
     return authorization_url
 
