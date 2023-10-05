@@ -14,7 +14,7 @@ import psycopg2
 from psycopg2 import OperationalError
 import traceback
 from psycopg2 import Error
-
+from calendar_utils import get_google_calendar_authorization_url
 
 load_dotenv()
 print("DB_HOST is:", os.environ.get("DB_HOST"))
@@ -36,6 +36,7 @@ print("Successfully connected", conn)
 #
 #CALENDAR_API_SERVICE_NAME = os.environ.get('CALENDAR_API_SERVICE_NAME')
 #CALENDAR_API_VERSION = os.environ.get('CALENDAR_API_VERSION')
+
 TWILIO_ACCOUNT_SID = os.environ.get('TWILIO_ACCOUNT_SID')
 TWILIO_AUTH_TOKEN = os.environ.get('TWILIO_AUTH_TOKEN')
 TWILIO_PHONE_NUMBER = '+18666421882'
@@ -47,6 +48,18 @@ openai.api_key = gpt4_api_key
 conversations = {}
 
 logging.basicConfig(level=logging.ERROR)
+
+def check_for_calendar_keyword(user_input, phone_number):
+    if "calendar" in user_input.lower():
+        authorization_url = get_google_calendar_authorization_url()
+        
+        # Use your existing Twilio setup to send the authorization URL
+        message = client.messages.create(
+            to=phone_number,
+            from_=TWILIO_PHONE_NUMBER,
+            body=f"Please authorize Google Calendar access by clicking: {authorization_url}"
+        )
+
 
 def create_connection():
     print("Inside create_connection function and it is kicking")
@@ -165,6 +178,7 @@ def sms_reply():
     print("SMS reply triggered")
     user_input = request.values.get('Body', None)
     phone_number = request.values.get('From', None)
+    check_for_calendar_keyword(user_input, phone_number)
         # Generate a regular GPT-4 response
     response_text = generate_response(user_input, phone_number)
         
