@@ -16,7 +16,6 @@ import traceback
 from psycopg2 import Error
 
 
-
 load_dotenv()
 print("DB_HOST is:", os.environ.get("DB_HOST"))
 app = Flask(__name__)
@@ -47,7 +46,7 @@ gpt4_api_key = os.environ.get('GPT4_API_KEY')
 openai.api_key = gpt4_api_key
 conversations = {}
 
-logging.basicConfig(level=logging.Error)
+logging.basicConfig(level=logging.ERROR)
 
 def create_connection():
     print("Inside create_connection function and it is kicking")
@@ -67,7 +66,8 @@ def create_connection():
             database=db_name
         )
         create_table(connection)
-        connection.close()
+        print("Connection created ***",connection)
+        return connection
         
     except OperationalError as oe:
         print(f"An OperationalError occurred: {oe}")
@@ -77,34 +77,40 @@ def create_connection():
         logging.error(f"The full error is: {e}")
         
 def create_table(connection):
+    print("Inside create_table()")
     try:
         cursor = connection.cursor()
-        # Change this SQL query based on your requirements
+        print("Cursor created.")
+        
         create_table_query = '''CREATE TABLE IF NOT EXISTS conversations
               (id SERIAL PRIMARY KEY,
                phone_number TEXT NOT NULL,
                conversation_data JSONB NOT NULL); '''
+        
         cursor.execute(create_table_query)
+        print("Table creation query executed.")
+        
         connection.commit()
+        print("Transaction committed.")
 
     except Error as e:
         print(f"An explicit error occurred: {e}")
-        logging.error(f"The full error is: {e}")
-    finally:
-        if cursor:
-            cursor.close()  # Close the cursor
-        
+
 
 def generate_response(user_input, phone_number):
+
     connection = create_connection()  # Assuming this function returns a valid DB connection
-    
     cursor = connection.cursor()
+    if not connection:
+        app.logger.info("Genereate response - database not connected.")
+    app.logger.info('generate response page accessed ')
     
     try:
         # Fetch existing conversation from the database based on the phone_number
         fetch_query = "SELECT conversation_data FROM conversations WHERE phone_number = %s;"
         cursor.execute(fetch_query, (phone_number,))
         result = cursor.fetchone()
+        
         
         if result:
             current_conversation = json.loads(result[0])
@@ -142,10 +148,29 @@ def generate_response(user_input, phone_number):
         cursor.close()
         connection.close()
 
+@app.route("/sms", methods=['POST'])
+def sms_reply():
+    print("SMS reply triggered")
+   
+    user_input = request.values.get('Body', None)
+    phone_number = request.values.get('From', None)
+        # Generate a regular GPT-4 response
+    response_text = generate_response(user_input, phone_number)
         
+        # Send the response back to the user
+    message = client.messages.create(
+    to=phone_number,
+    from_=TWILIO_PHONE_NUMBER,
+    body=response_text
+        )
+
+    return jsonify({'message': 'Reply sent!'})
+    
 @app.route('/')
 def index():
-    print("The website is up and running")
+    connection = create_connection()
+    if not connection:
+        app.logger.info("Could not connect to the database.")
     app.logger.info('Index page accessed')
     return render_template('index.html')
 
@@ -179,24 +204,6 @@ def privacy_policy():
 def terms_of_service():
     return render_template('terms_of_service.html')
 
-@app.route("/sms", methods=['POST'])
-def sms_reply():
-    print("SMS reply triggered")
-   
-    user_input = request.values.get('Body', None)
-    phone_number = request.values.get('From', None)
-        # Generate a regular GPT-4 response
-    response_text = generate_response(user_input, phone_number)
-        
-        # Send the response back to the user
-    message = client.messages.create(
-    to=phone_number,
-    from_=TWILIO_PHONE_NUMBER,
-    body=response_text
-        )
-
-    return jsonify({'message': 'Reply sent!'})
-    
 if __name__ == '__main__':
     print("Script is starting")
     app.debug = True
