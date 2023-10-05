@@ -98,24 +98,31 @@ def create_table(connection):
 
 
 def generate_response(user_input, phone_number):
-
+    
+    print("inside_generate response")
     connection = create_connection()  # Assuming this function returns a valid DB connection
     cursor = connection.cursor()
     if not connection:
-        app.logger.info("Genereate response - database not connected.")
+        app.logger.info("**** *** Genereate response - database not connected.")
+        print("Generate_response no working")
     app.logger.info('generate response page accessed ')
     
     try:
+        
         # Fetch existing conversation from the database based on the phone_number
         fetch_query = "SELECT conversation_data FROM conversations WHERE phone_number = %s;"
         cursor.execute(fetch_query, (phone_number,))
         result = cursor.fetchone()
+        app.logger.info("Connected ** to Genereate response")
+        print("Generate_response working")
         
         
         if result:
             current_conversation = json.loads(result[0])
+            print("Current_conversation_loads", current_conversation)
         else:
             current_conversation = [{"role": "system", "content": "System initialized conversation"}]
+            print("Current_conversation", current_conversation)
         
         current_conversation.append({"role": "user", "content": user_input})
         
@@ -151,7 +158,6 @@ def generate_response(user_input, phone_number):
 @app.route("/sms", methods=['POST'])
 def sms_reply():
     print("SMS reply triggered")
-   
     user_input = request.values.get('Body', None)
     phone_number = request.values.get('From', None)
         # Generate a regular GPT-4 response
