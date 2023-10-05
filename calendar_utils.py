@@ -32,7 +32,8 @@ def get_google_calendar_authorization_url():
     # Depending on your library version, this may vary.
     # For example, you may only need to pass one argument.
     try:
-        authorization_url = flow.authorization_url()
+        print("right before authorization")
+        authorization_url = flow.step1_get_authorization_url()
     except Exception as e:
         print("Error while generating URL:", e)
         return None
