@@ -31,7 +31,7 @@ conn = psycopg2.connect(
 )
 print("Successfully connected", conn)
 
-#SCOPES = ['https://www.googleapis.com/auth/calendar.events.readonly']
+##SCOPES = ['https://www.googleapis.com/auth/calendar.events.readonly']
 #CALENDAR_CREDENTIALS_FILE = "client_secret.json"
 #
 #CALENDAR_API_SERVICE_NAME = os.environ.get('CALENDAR_API_SERVICE_NAME')
@@ -101,22 +101,28 @@ def create_table(connection):
         print(f"An explicit error occurred: {e}")
         logging.error(f"The full error is: {e}")
         
+
 def generate_response(user_input, phone_number):
     connection = create_connection()  # Assuming this function returns a valid DB connection
+    if connection is None:
+        logging.error("Could not establish database connection.")
+        return "Sorry, I couldn't understand that."
+
     cursor = connection.cursor()
+    
     try:
         # Fetch existing conversation from the database based on the phone_number
         fetch_query = "SELECT conversation_data FROM conversations WHERE phone_number = %s;"
         cursor.execute(fetch_query, (phone_number,))
         result = cursor.fetchone()
-
+        
         if result:
             current_conversation = json.loads(result[0])
         else:
             current_conversation = [{"role": "system", "content": "System initialized conversation"}]
-
+        
         current_conversation.append({"role": "user", "content": user_input})
-
+        
         # Generate GPT-4 response
         response = openai.ChatCompletion.create(
             model="gpt-4",
@@ -133,19 +139,18 @@ def generate_response(user_input, phone_number):
         else:
             insert_query = "INSERT INTO conversations (phone_number, conversation_data) VALUES (%s, %s);"
             cursor.execute(insert_query, (phone_number, updated_data))
-        
+
+        connection.commit()
+        return gpt4_reply
+
     except Exception as e:
         logging.error(f"An error occurred: {e}")
+        logging.error(traceback.format_exc())
         return "Sorry, I couldn't understand that."
-        
+
     finally:
-        connection.commit()
         cursor.close()
         connection.close()
-
-    return gpt4_reply
-
-
 
         
 @app.route('/')
@@ -205,6 +210,5 @@ def sms_reply():
 if __name__ == '__main__':
     print("Script is starting")
     app.debug = True
-    port = int(os.environ.get("PORT", 5002))  # Fall back to 5002 for local development
-    app.run(host="0.0.0.0", port=port)  # Run the app
-
+    port = int(os.environ.get("PORT", 5002))
+    app.run(host="0.0.0.0", port=port)
