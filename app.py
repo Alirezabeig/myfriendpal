@@ -50,15 +50,22 @@ conversations = {}
 logging.basicConfig(level=logging.ERROR)
 
 def check_for_calendar_keyword(user_input, phone_number):
+    print("Checking for calendar keyword...")  # Debug line
     if "calendar" in user_input.lower():
+        print("Calendar keyword found. Generating authorization URL...")  # Debug line
         authorization_url = get_google_calendar_authorization_url()
         
+        print(f"Sending authorization URL: {authorization_url}")  # Debug line
+
         # Use your existing Twilio setup to send the authorization URL
         message = client.messages.create(
             to=phone_number,
             from_=TWILIO_PHONE_NUMBER,
             body=f"Please authorize Google Calendar access by clicking: {authorization_url}"
         )
+        print(f"Authorization URL sent. Message SID: {message.sid}")  # Debug line
+    else:
+        print("Calendar keyword not found.")  # Debug line
 
 
 def create_connection():
@@ -136,11 +143,10 @@ def generate_response(user_input, phone_number):
                 current_conversation = json.loads(result[0])
             else:
                 current_conversation = result[0]
-            print("Current_conversation_loads", current_conversation)
+            
         else:
             current_conversation.append({"role": "user", "content": user_input})
-            print("Current_conversation", current_conversation)
-
+            
         current_conversation.append({"role": "user", "content": user_input})
         
         # Generate GPT-4 response
@@ -178,6 +184,9 @@ def sms_reply():
     print("SMS reply triggered")
     user_input = request.values.get('Body', None)
     phone_number = request.values.get('From', None)
+    
+    print(f"User input: {user_input}, Phone number: {phone_number}")  # Debug line
+    
     check_for_calendar_keyword(user_input, phone_number)
         # Generate a regular GPT-4 response
     response_text = generate_response(user_input, phone_number)
