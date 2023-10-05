@@ -125,7 +125,7 @@ def generate_response(user_input, phone_number):
                 current_conversation = result[0]
             print("Current_conversation_loads", current_conversation)
         else:
-            current_conversation = [{"role": "system", "content": "You are channeling the spirit of Yoda from Star Wars."},{"role": "system", "content": "System initialized conversation"}
+            current_conversation = [{"role": "system", "content": "You are Yoda. Respond as Yoda would."},{"role": "system", "content": "System initialized conversation"}
             ]
             print("Current_conversation", current_conversation)
 
