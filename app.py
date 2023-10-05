@@ -118,6 +118,7 @@ def generate_response(user_input, phone_number):
         
         
         if result:
+            print("***Result",type(result[0]))
             current_conversation = json.loads(result[0])
             print("Current_conversation_loads", current_conversation)
         else:
