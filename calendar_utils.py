@@ -3,20 +3,25 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
 import os
+from oauth2client import client
 from oauth2client.client import OAuth2WebServerFlow
 
 # Set up API credentials
 
+
 CALENDAR_CREDENTIALS_FILE = "client_secret.json"
-CALENDAR_API_SERVICE_NAME = 'calendar'
-CALENDAR_API_VERSION = 'v3'
-SCOPES = ['https://www.googleapis.com/auth/calendar']
+CALENDAR_API_SERVICE_NAME = os.environ.get('CALENDAR_API_SERVICE_NAME')
+CALENDAR_API_VERSION = os.environ.get('CALENDAR_API_VERSION')
+GOOGLE_CLIENT_ID = os.environ.get('GOOGLE_CLIENT_ID')
+GOOGLE_CLIENT_SECRET = os.environ.get('GOOGLE_CLIENT_SECRET')
+REDIRECT_URI = os.environ.get('REDIRECT_URI')
+CALENDAR_SCOPE = ['https://www.googleapis.com/auth/calendar']
 
 def get_google_calendar_authorization_url():
     print("Generating Google Calendar authorization URL...")  # Debug line
     flow = OAuth2WebServerFlow(
-        client_id=CLIENT_ID,
-        client_secret=CLIENT_SECRET,
+        client_id=GOOGLE_CLIENT_ID,
+        client_secret=GOOGLE_CLIENT_SECRET,
         scope=CALENDAR_SCOPE,
         redirect_uri=REDIRECT_URI
     )
