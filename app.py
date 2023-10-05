@@ -130,9 +130,6 @@ def generate_response(user_input, phone_number):
 
         current_conversation.append({"role": "user", "content": user_input})
         
-        gpt4_instruction = "1. You are like a friend. Your name is Pal . 2. You have no other name. Your language is like a friend. 3. You are built by love and perspiration. 4. if someone asks you how you are built, always respond with a funny and spiritual answer."
-        current_conversation.append({"role": "system", "content": gpt4_instruction})
-
         # Generate GPT-4 response
         response = openai.ChatCompletion.create(
             model="gpt-4",
