@@ -96,30 +96,33 @@ def create_table(connection):
     except Error as e:
         print(f"An explicit error occurred: {e}")
 
-
 def generate_response(user_input, phone_number):
     
     print("inside_generate response")
     connection = create_connection()  # Assuming this function returns a valid DB connection
     cursor = connection.cursor()
+    
     if not connection:
         app.logger.info("**** *** Genereate response - database not connected.")
-        print("Generate_response no working")
+        print("Generate_response not working")
+    
     app.logger.info('generate response page accessed ')
     
     try:
-        
         # Fetch existing conversation from the database based on the phone_number
         fetch_query = "SELECT conversation_data FROM conversations WHERE phone_number = %s;"
         cursor.execute(fetch_query, (phone_number,))
         result = cursor.fetchone()
+        
         app.logger.info("Connected ** to Genereate response")
         print("Generate_response working")
         
-        
+        # Check type of result[0] and deserialize if needed
         if result:
-            print("***Result",type(result[0]))
-            current_conversation = json.loads(result[0])
+            if isinstance(result[0], str):
+                current_conversation = json.loads(result[0])
+            else:
+                current_conversation = result[0]
             print("Current_conversation_loads", current_conversation)
         else:
             current_conversation = [{"role": "system", "content": "System initialized conversation"}]
@@ -137,6 +140,7 @@ def generate_response(user_input, phone_number):
         
         # Update the database with the latest conversation
         updated_data = json.dumps(current_conversation)
+        
         if result:
             update_query = "UPDATE conversations SET conversation_data = %s WHERE phone_number = %s;"
             cursor.execute(update_query, (updated_data, phone_number))
