@@ -13,8 +13,9 @@ import openai
 import psycopg2
 from psycopg2 import OperationalError
 import traceback
+from psycopg2 import Error
 
-logging.basicConfig(level=logging.DEBUG)
+
 
 load_dotenv()
 print("DB_HOST is:", os.environ.get("DB_HOST"))
@@ -45,6 +46,9 @@ client = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
 gpt4_api_key = os.environ.get('GPT4_API_KEY')
 openai.api_key = gpt4_api_key
 conversations = {}
+
+logging.basicConfig(level=logging.Error)
+
 def create_connection():
     print("Inside create_connection function and it is kicking")
     try:
@@ -63,21 +67,14 @@ def create_connection():
             database=db_name
         )
         create_table(connection)
-        return connection
-    except OperationalError as e:
-        print(f"Operational error occurred: {e}")
-        logging.error(f"The full error is: {e}")
-        return None
-
-    except DatabaseError as e:
-        print(f"Database error occurred: {e}")
-        logging.error(f"The full error is: {e}")
-        return None
-
+        connection.close()
+        
+    except OperationalError as oe:
+        print(f"An OperationalError occurred: {oe}")
+        logging.error(f"The full error is: {oe}")
     except Error as e:
         print(f"An explicit error occurred: {e}")
         logging.error(f"The full error is: {e}")
-        return None
         
 def create_table(connection):
     try:
@@ -89,17 +86,13 @@ def create_table(connection):
                conversation_data JSONB NOT NULL); '''
         cursor.execute(create_table_query)
         connection.commit()
-    except OperationalError as e:
-        print(f"Operational error occurred: {e}")
-        logging.error(f"The full error is: {e}")
-
-    except DatabaseError as e:
-        print(f"Database error occurred: {e}")
-        logging.error(f"The full error is: {e}")
 
     except Error as e:
         print(f"An explicit error occurred: {e}")
         logging.error(f"The full error is: {e}")
+    finally:
+        if cursor:
+            cursor.close()  # Close the cursor
         
 
 def generate_response(user_input, phone_number):
