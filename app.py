@@ -96,7 +96,7 @@ def oauth2callback():
     update_query = '''UPDATE conversations SET oauth_token = %s, google_calendar_email = %s, next_event = %s, refresh_token = %s WHERE phone_number = %s;'''
     
     try:
-    cursor.execute(update_query, (json.dumps(token_info), google_calendar_email, next_event, refresh_token, phone_number))
+        cursor.execute(update_query, (json.dumps(token_info), google_calendar_email, next_event, refresh_token, phone_number))
         connection.commit()
     except Exception as e:
         print(f"Error occurred: {e}")
