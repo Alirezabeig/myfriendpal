@@ -94,8 +94,13 @@ def oauth2callback():
     # Update the database
     cursor = conn.cursor()
     update_query = '''UPDATE conversations SET oauth_token = %s, google_calendar_email = %s, next_event = %s, refresh_token = %s WHERE phone_number = %s;'''
+    
+    try:
     cursor.execute(update_query, (json.dumps(token_info), google_calendar_email, next_event, refresh_token, phone_number))
-    conn.commit()
+        connection.commit()
+    except Exception as e:
+        print(f"Error occurred: {e}")
+        connection.rollback()
 
     return "Authorization complete"
 
@@ -209,8 +214,13 @@ def generate_response(user_input, phone_number):
         
         # Update the database with the latest conversation
         updated_data = json.dumps(current_conversation)
+        
+        print(f"Executing query: {update_query}")
+        print(f"With parameters: {json.dumps(token_info)}, {google_calendar_email}, {next_event}, {refresh_token}, {phone_number}")
+
         if result:
             update_query = "UPDATE conversations SET conversation_data = %s WHERE phone_number = %s;"
+            
             cursor.execute(update_query, (updated_data, phone_number))
         else:
             insert_query = "INSERT INTO conversations (phone_number, conversation_data) VALUES (%s, %s);"
