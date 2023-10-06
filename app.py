@@ -166,7 +166,8 @@ def generate_response(user_input, phone_number):
     
     try:
         # Fetch existing conversation, email, and next_calendar_event from the database based on the phone_number
-        fetch_query = "SELECT conversation_data, email, next_calendar_event FROM conversations WHERE phone_number = %s;"
+        fetch_query = "SELECT conversation_data, google_calendar_email, next_google_calendar_event FROM conversations WHERE phone_number = %s"
+
         cursor.execute(fetch_query, (phone_number,))
         result = cursor.fetchone()
         
