@@ -6,6 +6,7 @@ import os
 from oauth2client import client
 from oauth2client.client import OAuth2WebServerFlow
 from google.oauth2.credentials import Credentials
+from google.auth.exceptions import RefreshError
 
 # Set up API credentials
 CALENDAR_CREDENTIALS_FILE = "client_secret.json"
@@ -53,7 +54,7 @@ def fetch_google_calendar_info(access_token, refresh_token):
         creds = Credentials.from_authorized_user_info({
             'client_id': GOOGLE_CLIENT_ID,
             'client_secret': GOOGLE_CLIENT_SECRET,
-            'refresh_token': 'YOUR_REFRESH_TOKEN',
+            'refresh_token': 'REFRESH_TOKEN',
             'access_token': access_token
         })
         service = build('calendar', 'v3', credentials=creds)
@@ -67,7 +68,7 @@ def fetch_google_calendar_info(access_token, refresh_token):
         next_event = events.get('items', [])[0]['summary'] if events.get('items', []) else None
         
         return google_calendar_email, next_event
-    except RefreshError:  # Replace with your actual exception for expired tokens
+    except RefreshError:
         new_access_token = get_new_access_token(refresh_token)
         return fetch_google_calendar_info(new_access_token, refresh_token)
 
@@ -93,7 +94,7 @@ def fetch_google_gmail_info(access_token):
 
         return google_calendar_email, subject
     
-    except RefreshError:  # Replace with your actual exception for expired tokens
+    except RefreshError: 
         new_access_token = get_new_access_token(refresh_token)
         return fetch_google_gmail_info(new_access_token, refresh_token)
 
