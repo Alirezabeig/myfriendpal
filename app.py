@@ -290,8 +290,8 @@ def send_message():
         logging.error(f"Failed to send message: {e}")
         return jsonify({'message': 'Failed to send message', 'error': str(e)})
     finally:
-    cursor.close()
-    connection.close()
+        cursor.close()
+        connection.close()
 
 
 def get_new_access_token(refresh_token):
