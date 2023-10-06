@@ -1,4 +1,5 @@
 
+import requests
 from flask import Flask, request, jsonify, render_template
 from werkzeug.middleware.proxy_fix import ProxyFix
 #from google_auth_oauthlib.flow import InstalledAppFlow
@@ -31,12 +32,8 @@ conn = psycopg2.connect(
 )
 print("Successfully connected", conn)
 
-##SCOPES = ['https://www.googleapis.com/auth/calendar.events.readonly']
-#CALENDAR_CREDENTIALS_FILE = "client_secret.json"
-#
-#CALENDAR_API_SERVICE_NAME = os.environ.get('CALENDAR_API_SERVICE_NAME')
-#CALENDAR_API_VERSION = os.environ.get('CALENDAR_API_VERSION')
-
+GOOGLE_CLIENT_ID = os.environ.get('GOOGLE_CLIENT_ID')
+GOOGLE_CLIENT_SECRET = os.environ.get('GOOGLE_CLIENT_SECRET')
 TWILIO_ACCOUNT_SID = os.environ.get('TWILIO_ACCOUNT_SID')
 TWILIO_AUTH_TOKEN = os.environ.get('TWILIO_AUTH_TOKEN')
 TWILIO_PHONE_NUMBER = '+18666421882'
@@ -68,6 +65,27 @@ def check_for_calendar_keyword(user_input, phone_number):
     else:
         print("Calendar keyword not found.")  # Debug line
         return False
+
+@app.route('/oauth2callback', methods=['GET'])
+def oauth2callback():
+    print("OAUTH2CALLBACK &*&*## -- ##")
+    auth_code = request.args.get('code')
+
+    token_data = {
+        'client_id': 'GOOGLE_CLIENT_ID',
+        'client_secret': 'GOOGLE_CLIENT_SECRET',
+        'redirect_uri': 'https://www.myfriendpal.com/oauth2callback',
+        'code': auth_code,
+        'grant_type': 'authorization_code'
+    }
+
+    response = requests.post('https://oauth2.googleapis.com/token', data=token_data)
+    token_info = response.json()
+
+    # Save the access token somewhere secure for future use
+    access_token = token_info.get('access_token')
+
+    return "Authorization complete"
 
 def create_connection():
     print("Inside create_connection function and it is kicking")
