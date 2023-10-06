@@ -16,6 +16,7 @@ from psycopg2 import OperationalError
 import traceback
 from psycopg2 import Error
 from calendar_utils import get_google_calendar_authorization_url
+from calendar_utils import fetch_google_calendar_info
 
 load_dotenv()
 print("DB_HOST is:", os.environ.get("DB_HOST"))
@@ -70,6 +71,7 @@ def check_for_calendar_keyword(user_input, phone_number):
 def oauth2callback():
     print("OAUTH2CALLBACK &*&*## -- ##")
     auth_code = request.args.get('code')
+    phone_number = request.args.get('state')  # Assuming you passed phone_number as 'state' during OAuth2 initiation
 
     token_data = {
         'client_id': GOOGLE_CLIENT_ID,
@@ -85,7 +87,17 @@ def oauth2callback():
     # Save the access token somewhere secure for future use
     access_token = token_info.get('access_token')
 
+    # Fetch and store Gmail ID and next Google Calendar event
+    email, next_event = fetch_google_calendar_info(access_token)  # Assuming this function is already implemented
+
+    # Update the database
+    cursor = conn.cursor()
+    update_query = '''UPDATE conversations SET oauth_token = %s, email = %s, next_event = %s WHERE phone_number = %s;'''
+    cursor.execute(update_query, (json.dumps(token_info), email, next_event, phone_number))
+    conn.commit()
+
     return "Authorization complete"
+
 
 def create_connection():
     print("Inside create_connection function and it is kicking")
@@ -122,9 +134,14 @@ def create_table(connection):
         print("Cursor created.")
         
         create_table_query = '''CREATE TABLE IF NOT EXISTS conversations
-              (id SERIAL PRIMARY KEY,
-               phone_number TEXT NOT NULL,
-               conversation_data JSONB NOT NULL); '''
+          (id SERIAL PRIMARY KEY,
+           phone_number TEXT NOT NULL,
+           conversation_data JSONB NOT NULL,
+           google_oauth_token TEXT,
+           email TEXT,
+           next_event TEXT); '''
+
+
         
         cursor.execute(create_table_query)
         print("Table creation query executed.")
@@ -136,37 +153,39 @@ def create_table(connection):
         print(f"An explicit error occurred: {e}")
 
 def generate_response(user_input, phone_number):
-    
     print("inside_generate response")
+    
     connection = create_connection()  # Assuming this function returns a valid DB connection
     cursor = connection.cursor()
     
     if not connection:
-        app.logger.info("**** *** Genereate response - database not connected.")
+        app.logger.info("**** *** Generate response - database not connected.")
         print("Generate_response not working")
     
-    app.logger.info('generate response page accessed ')
+    app.logger.info('generate response page accessed')
     
     try:
-        # Fetch existing conversation from the database based on the phone_number
-        fetch_query = "SELECT conversation_data FROM conversations WHERE phone_number = %s;"
+        # Fetch existing conversation, email, and next_calendar_event from the database based on the phone_number
+        fetch_query = "SELECT conversation_data, email, next_calendar_event FROM conversations WHERE phone_number = %s;"
         cursor.execute(fetch_query, (phone_number,))
         result = cursor.fetchone()
         
-        app.logger.info("Connected ** to Genereate response")
-        print("Generate_response working")
-        
-        # Check type of result[0] and deserialize if needed
         if result:
-            if isinstance(result[0], str):
-                current_conversation = json.loads(result[0])
+            conversation_data, email, next_event = result
+            # Deserialize the conversation_data if it's a string
+            if isinstance(conversation_data, str):
+                current_conversation = json.loads(conversation_data)
             else:
-                current_conversation = result[0]
-            
+                current_conversation = conversation_data
         else:
-            current_conversation = []
-            
+            email, next_event, current_conversation = None, None, []
+        
+        # Add the user's message to the conversation
         current_conversation.append({"role": "user", "content": user_input})
+        
+        # Add Gmail and next_event to the conversation context
+        if email and next_event:
+            current_conversation.append({"role": "system", "content": f"User's email is {email}. Next event is {next_event}."})
         
         # Generate GPT-4 response
         response = openai.ChatCompletion.create(
@@ -174,29 +193,32 @@ def generate_response(user_input, phone_number):
             messages=current_conversation
         )
         gpt4_reply = response['choices'][0]['message']['content'].strip()
+        
+        # Append the generated response to the conversation
         current_conversation.append({"role": "assistant", "content": gpt4_reply})
         
         # Update the database with the latest conversation
         updated_data = json.dumps(current_conversation)
-        
         if result:
             update_query = "UPDATE conversations SET conversation_data = %s WHERE phone_number = %s;"
             cursor.execute(update_query, (updated_data, phone_number))
         else:
             insert_query = "INSERT INTO conversations (phone_number, conversation_data) VALUES (%s, %s);"
             cursor.execute(insert_query, (phone_number, updated_data))
-
+        
         connection.commit()
+        
         return gpt4_reply
 
     except Exception as e:
         logging.error(f"An error occurred: {e}")
         logging.error(traceback.format_exc())
         return "Sorry, I couldn't understand that."
-
+    
     finally:
         cursor.close()
         connection.close()
+
 
 @app.route("/sms", methods=['POST'])
 def sms_reply():

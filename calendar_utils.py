@@ -1,14 +1,13 @@
-#calendar_utils
+#calendar_utils.py
 from google_auth_oauthlib.flow import InstalledAppFlow
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
 import os
 from oauth2client import client
 from oauth2client.client import OAuth2WebServerFlow
+from google.oauth2.credentials import Credentials
 
 # Set up API credentials
-
-
 CALENDAR_CREDENTIALS_FILE = "client_secret.json"
 CALENDAR_API_SERVICE_NAME = os.environ.get('CALENDAR_API_SERVICE_NAME')
 CALENDAR_API_VERSION = os.environ.get('CALENDAR_API_VERSION')
@@ -16,7 +15,9 @@ GOOGLE_CLIENT_ID = os.environ.get('GOOGLE_CLIENT_ID')
 GOOGLE_CLIENT_SECRET = os.environ.get('GOOGLE_CLIENT_SECRET')
 REDIRECT_URI = "https://www.myfriendpal.com/oauth2callback"
 
-CALENDAR_SCOPE = ['https://www.googleapis.com/auth/calendar']
+# Existing scopes for Google Calendar, add Gmail scope to it
+CALENDAR_SCOPE = ['https://www.googleapis.com/auth/calendar', 'https://www.googleapis.com/auth/gmail.readonly']
+
 
 def get_google_calendar_authorization_url():
     print("Generating Google Calendar authorization URL...")  # Debug line
@@ -36,7 +37,7 @@ def get_google_calendar_authorization_url():
     # For example, you may only need to pass one argument.
     try:
         print("right before authorization")
-        authorization_url = flow.step1_get_authorize_url()
+        authorization_url = flow.step1_get_authorize_url(state=phone_number)
 
     except Exception as e:
         print("Error while generating URL:", e)
@@ -46,8 +47,36 @@ def get_google_calendar_authorization_url():
     
     return authorization_url
 
-def fetch_calendar_events(credentials):
-    service = build("calendar", "v3", credentials=credentials)
-    events_result = service.events().list(calendarId='primary').execute()
-    events = events_result.get('items', [])
-    return events
+
+def fetch_google_calendar_info(access_token):
+    creds = Credentials.from_authorized_user_info({'access_token': access_token})
+    service = build('calendar', 'v3', credentials=creds)
+    
+    # Fetch the email
+    profile = service.calendarList().get(calendarId='primary').execute()
+    email = profile['id']
+    
+    # Fetch the next event
+    events = service.events().list(calendarId='primary', orderBy='startTime', singleEvents=True, maxResults=1).execute()
+    next_event = events.get('items', [])[0]['summary'] if events.get('items', []) else None
+    
+    return email, next_event
+    
+def fetch_google_gmail_info(access_token):
+    creds = Credentials.from_authorized_user_info({'access_token': access_token})
+    service = build('gmail', 'v1', credentials=creds)
+
+    # Fetch the user's email profile to get the email address
+    profile_info = service.users().getProfile(userId='me').execute()
+    email = profile_info['emailAddress']
+
+    # Fetch the most recent email subject (just as an example)
+    results = service.users().messages().list(userId='me', maxResults=1).execute()
+    message_id = results['messages'][0]['id']
+    message = service.users().messages().get(userId='me', id=message_id).execute()
+
+    # Decode the Base64 encoded Email subject
+    subject = next(header['value'] for header in message['payload']['headers'] if header['name'] == 'Subject')
+
+    return email, subject
+
