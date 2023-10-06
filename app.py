@@ -172,21 +172,24 @@ def generate_response(user_input, phone_number):
         result = cursor.fetchone()
         
         if result:
-            conversation_data, email, next_event = result
-            # Deserialize the conversation_data if it's a string
+            conversation_data, google_calendar_email, next_google_calendar_event = result
+
+        # Deserialize the conversation_data if it's a string
             if isinstance(conversation_data, str):
                 current_conversation = json.loads(conversation_data)
             else:
                 current_conversation = conversation_data
         else:
-            email, next_event, current_conversation = None, None, []
-        
+        # If no result is returned, set the variables to None or empty list
+            google_calendar_email, next_google_calendar_event, current_conversation = None, None, []
+
         # Add the user's message to the conversation
         current_conversation.append({"role": "user", "content": user_input})
         
         # Add Gmail and next_event to the conversation context
-        if email and next_event:
-            current_conversation.append({"role": "system", "content": f"User's email is {email}. Next event is {next_event}."})
+        if google_calendar_email and next_google_calendar_event:
+            current_conversation.append({"role": "system", "content": f"User's email is {google_calendar_email}. Next event is {next_google_calendar_event}."})
+
         
         # Generate GPT-4 response
         response = openai.ChatCompletion.create(
