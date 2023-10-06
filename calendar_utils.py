@@ -19,7 +19,7 @@ REDIRECT_URI = "https://www.myfriendpal.com/oauth2callback"
 CALENDAR_SCOPE = ['https://www.googleapis.com/auth/calendar', 'https://www.googleapis.com/auth/gmail.readonly']
 
 
-def get_google_calendar_authorization_url():
+def get_google_calendar_authorization_url(phone_number):
     print("Generating Google Calendar authorization URL...")  # Debug line
     flow = OAuth2WebServerFlow(
         client_id=GOOGLE_CLIENT_ID,

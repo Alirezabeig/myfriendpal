@@ -141,8 +141,6 @@ def create_table(connection):
            email TEXT,
            next_event TEXT); '''
 
-
-        
         cursor.execute(create_table_query)
         print("Table creation query executed.")
         
