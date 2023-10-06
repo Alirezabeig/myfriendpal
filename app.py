@@ -72,8 +72,8 @@ def oauth2callback():
     auth_code = request.args.get('code')
 
     token_data = {
-        'client_id': 'GOOGLE_CLIENT_ID',
-        'client_secret': 'GOOGLE_CLIENT_SECRET',
+        'client_id': GOOGLE_CLIENT_ID,
+        'client_secret': GOOGLE_CLIENT_SECRET,
         'redirect_uri': 'https://www.myfriendpal.com/oauth2callback',
         'code': auth_code,
         'grant_type': 'authorization_code'
@@ -164,7 +164,7 @@ def generate_response(user_input, phone_number):
                 current_conversation = result[0]
             
         else:
-            current_conversation.append({"role": "user", "content": user_input})
+            current_conversation = []
             
         current_conversation.append({"role": "user", "content": user_input})
         
