@@ -158,9 +158,6 @@ def create_table(connection):
         connection.rollback()
         logging.error(f"An error occurred: {e}")
 
-    finally:
-        cursor.close()
-        connection.close()
 
 
 def generate_response(user_input, phone_number):
