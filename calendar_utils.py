@@ -50,11 +50,16 @@ def get_google_calendar_authorization_url(phone_number):
 
 
 def fetch_google_calendar_info(access_token, refresh_token):
+    print(f"Client ID: {GOOGLE_CLIENT_ID}")
+    print(f"Client Secret: {GOOGLE_CLIENT_SECRET}")
+    print(f"Access Token: {access_token}")
+    print(f"Refresh Token: {refresh_token}")
+
     try:
         creds = Credentials.from_authorized_user_info({
             'client_id': GOOGLE_CLIENT_ID,
             'client_secret': GOOGLE_CLIENT_SECRET,
-            'refresh_token': 'REFRESH_TOKEN',
+            'refresh_token': refresh_token,
             'access_token': access_token
         })
         service = build('calendar', 'v3', credentials=creds)
@@ -94,7 +99,7 @@ def fetch_google_gmail_info(access_token):
 
         return google_calendar_email, subject
     
-    except RefreshError: 
+    except RefreshError:
         new_access_token = get_new_access_token(refresh_token)
         return fetch_google_gmail_info(new_access_token, refresh_token)
 
