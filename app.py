@@ -24,7 +24,6 @@ app = Flask(__name__)
 app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1)
 app.logger.setLevel(logging.INFO)
 
-
 conn = psycopg2.connect(
     host = os.environ.get("DB_HOST"),
     port = os.environ.get("DB_PORT"),
