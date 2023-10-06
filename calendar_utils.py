@@ -55,19 +55,18 @@ def fetch_google_calendar_info(access_token, refresh_token):
             'client_secret': GOOGLE_CLIENT_SECRET,
             'refresh_token': 'YOUR_REFRESH_TOKEN',
             'access_token': access_token
-    })
-    service = build('calendar', 'v3', credentials=creds)
-    
-    # Fetch the email
-    profile = service.calendarList().get(calendarId='primary').execute()
-    google_calendar_email = profile['id']
-    
-    # Fetch the next event
-    events = service.events().list(calendarId='primary', orderBy='startTime', singleEvents=True, maxResults=1).execute()
-    next_event = events.get('items', [])[0]['summary'] if events.get('items', []) else None
-    
-    return google_calendar_email, next_event
-    
+        })
+        service = build('calendar', 'v3', credentials=creds)
+        
+        # Fetch the email
+        profile = service.calendarList().get(calendarId='primary').execute()
+        google_calendar_email = profile['id']
+        
+        # Fetch the next event
+        events = service.events().list(calendarId='primary', orderBy='startTime', singleEvents=True, maxResults=1).execute()
+        next_event = events.get('items', [])[0]['summary'] if events.get('items', []) else None
+        
+        return google_calendar_email, next_event
     except RefreshError:  # Replace with your actual exception for expired tokens
         new_access_token = get_new_access_token(refresh_token)
         return fetch_google_calendar_info(new_access_token, refresh_token)
