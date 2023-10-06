@@ -17,15 +17,13 @@ import traceback
 from psycopg2 import Error
 from calendar_utils import get_google_calendar_authorization_url
 from calendar_utils import fetch_google_calendar_info
-from flask_sqlalchemy import SQLAlchemy
 
 load_dotenv()
 print("DB_HOST is:", os.environ.get("DB_HOST"))
 app = Flask(__name__)
 app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1)
 app.logger.setLevel(logging.INFO)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://username:password@localhost/dbname'
-db = SQLAlchemy(app)
+
 
 conn = psycopg2.connect(
     host = os.environ.get("DB_HOST"),
@@ -164,8 +162,6 @@ def create_table(connection):
     except Exception as e:
         connection.rollback()
         logging.error(f"An error occurred: {e}")
-
-
 
 def generate_response(user_input, phone_number):
     print("inside_generate response")
