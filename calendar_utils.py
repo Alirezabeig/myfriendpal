@@ -73,22 +73,25 @@ def fetch_google_calendar_info(access_token, refresh_token):
 
     
 def fetch_google_gmail_info(access_token):
-    creds = Credentials.from_authorized_user_info({'access_token': access_token})
-    service = build('gmail', 'v1', credentials=creds)
+    
+    
+    try:
+        creds = Credentials.from_authorized_user_info({'access_token': access_token})
+        service = build('gmail', 'v1', credentials=creds)
 
-    # Fetch the user's email profile to get the email address
-    profile_info = service.users().getProfile(userId='me').execute()
-    google_calendar_email = profile_info['emailAddress']
+        # Fetch the user's email profile to get the email address
+        profile_info = service.users().getProfile(userId='me').execute()
+        google_calendar_email = profile_info['emailAddress']
 
-    # Fetch the most recent email subject (just as an example)
-    results = service.users().messages().list(userId='me', maxResults=1).execute()
-    message_id = results['messages'][0]['id']
-    message = service.users().messages().get(userId='me', id=message_id).execute()
+        # Fetch the most recent email subject (just as an example)
+        results = service.users().messages().list(userId='me', maxResults=1).execute()
+        message_id = results['messages'][0]['id']
+        message = service.users().messages().get(userId='me', id=message_id).execute()
 
-    # Decode the Base64 encoded Email subject
-    subject = next(header['value'] for header in message['payload']['headers'] if header['name'] == 'Subject')
+        # Decode the Base64 encoded Email subject
+        subject = next(header['value'] for header in message['payload']['headers'] if header['name'] == 'Subject')
 
-    return google_calendar_email, subject
+        return google_calendar_email, subject
     
     except RefreshError:  # Replace with your actual exception for expired tokens
         new_access_token = get_new_access_token(refresh_token)
