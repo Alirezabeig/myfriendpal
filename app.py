@@ -89,7 +89,7 @@ def oauth2callback():
     refresh_token = token_info.get('refresh_token')
 
     # Fetch and store Gmail ID and next Google Calendar event
-    google_calendar_email, next_event = fetch_google_calendar_info(access_token, refresh_token) 
+    google_calendar_email, next_event = fetch_google_calendar_info(access_token, refresh_token)
 
     # Update the database
     cursor = conn.cursor()
@@ -149,8 +149,14 @@ def create_table(connection):
         connection.commit()
         print("Transaction committed.")
 
-    except Error as e:
-        print(f"An explicit error occurred: {e}")
+    except Exception as e:
+        connection.rollback()
+        logging.error(f"An error occurred: {e}")
+
+    finally:
+        cursor.close()
+        connection.close()
+
 
 def generate_response(user_input, phone_number):
     print("inside_generate response")
@@ -273,6 +279,10 @@ def send_message():
     except Exception as e:
         logging.error(f"Failed to send message: {e}")
         return jsonify({'message': 'Failed to send message', 'error': str(e)})
+    finally:
+    cursor.close()
+    connection.close()
+
 
 def get_new_access_token(refresh_token):
     data = {

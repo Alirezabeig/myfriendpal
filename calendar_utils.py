@@ -102,4 +102,5 @@ def fetch_google_gmail_info(access_token):
     except RefreshError:
         new_access_token = get_new_access_token(refresh_token)
         return fetch_google_gmail_info(new_access_token, refresh_token)
+    
 
