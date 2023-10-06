@@ -238,12 +238,7 @@ def generate_response(user_input, phone_number):
         logging.error(f"An error occurred: {e}")
         logging.error(traceback.format_exc())
         return "Sorry, I couldn't understand that."
-    
-    finally:
-        cursor.close()
-        connection.close()
-
-
+ 
 @app.route("/sms", methods=['POST'])
 def sms_reply():
     print("SMS reply triggered")
