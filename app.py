@@ -216,8 +216,8 @@ def generate_response(user_input, phone_number):
         # Update the database with the latest conversation
         updated_data = json.dumps(current_conversation)
         
-        print(f"Executing query: {update_query}")
-        print(f"With parameters: {json.dumps(token_info)}, {google_calendar_email}, {next_event}, {refresh_token}, {phone_number}")
+        ##print(f"Executing query: {update_query}")
+        ##print(f"With parameters: {json.dumps(token_info)}, {google_calendar_email}, {next_event}, {refresh_token}, {phone_number}")
 
         if result:
             update_query = "UPDATE conversations SET conversation_data = %s WHERE phone_number = %s;"
