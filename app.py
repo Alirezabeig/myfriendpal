@@ -95,8 +95,8 @@ def oauth2callback():
 
     print("Token Info:", token_info)
     credentials = Credentials.from_authorized_user_info(token_info)
-
     service = build('calendar', 'v3', credentials=credentials)
+    
     profile_info = service.calendarList().get(calendarId='primary').execute()
     google_calendar_email = profile_info['id']
 
