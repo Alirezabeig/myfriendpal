@@ -1,4 +1,3 @@
-
 import requests
 from flask import Flask, request, jsonify, render_template
 from werkzeug.middleware.proxy_fix import ProxyFix
@@ -164,7 +163,7 @@ def generate_response(user_input, phone_number):
                 current_conversation = result[0]
             
         else:
-            current_conversation = []
+            current_conversation = [{"role": "assistant", "content": "What is your name?"}]
             
         current_conversation.append({"role": "user", "content": user_input})
         
