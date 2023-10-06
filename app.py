@@ -17,12 +17,15 @@ import traceback
 from psycopg2 import Error
 from calendar_utils import get_google_calendar_authorization_url
 from calendar_utils import fetch_google_calendar_info
+from flask_sqlalchemy import SQLAlchemy
 
 load_dotenv()
 print("DB_HOST is:", os.environ.get("DB_HOST"))
 app = Flask(__name__)
 app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1)
 app.logger.setLevel(logging.INFO)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://username:password@localhost/dbname'
+db = SQLAlchemy(app)
 
 conn = psycopg2.connect(
     host = os.environ.get("DB_HOST"),
@@ -91,19 +94,23 @@ def oauth2callback():
     # Fetch and store Gmail ID and next Google Calendar event
     google_calendar_email, next_event = fetch_google_calendar_info(access_token, refresh_token)
 
-    # Update the database
-    cursor = conn.cursor()
-    update_query = '''UPDATE conversations SET oauth_token = %s, google_calendar_email = %s, next_event = %s, refresh_token = %s WHERE phone_number = %s;'''
+    # Check if connection is closed
+    if conn.closed:
+        print("Connection closed, re-opening...")
+        # Re-open your connection here
+        # conn = psycopg2.connect( ... )
     
-    try:
-        cursor.execute(update_query, (json.dumps(token_info), google_calendar_email, next_event, refresh_token, phone_number))
-        connection.commit()
-    except Exception as e:
-        print(f"Error occurred: {e}")
-        connection.rollback()
+    # Update the database
+    with conn.cursor() as cursor:  # Using 'with' ensures the cursor will be closed after use
+        update_query = '''UPDATE conversations SET oauth_token = %s, google_calendar_email = %s, next_event = %s, refresh_token = %s WHERE phone_number = %s;'''
+        try:
+            cursor.execute(update_query, (json.dumps(token_info), google_calendar_email, next_event, refresh_token, phone_number))
+            conn.commit()
+        except Exception as e:
+            print(f"Error occurred: {e}")
+            conn.rollback()
 
-    return "Authorization complete"
-
+    return "Authorization complete..."
 
 def create_connection():
     print("Inside create_connection function and it is kicking")
@@ -286,11 +293,7 @@ def send_message():
     except Exception as e:
         logging.error(f"Failed to send message: {e}")
         return jsonify({'message': 'Failed to send message', 'error': str(e)})
-    finally:
-        cursor.close()
-        connection.close()
-
-
+    
 def get_new_access_token(refresh_token):
     data = {
         'client_id': GOOGLE_CLIENT_ID,
@@ -298,11 +301,14 @@ def get_new_access_token(refresh_token):
         'refresh_token': refresh_token,
         'grant_type': 'refresh_token'
     }
-    response = requests.post('https://oauth2.googleapis.com/token', data=data)
-    token_info = response.json()
-    new_access_token = token_info.get('access_token')
-    return new_access_token
-    
+    try:
+        response = requests.post('https://oauth2.googleapis.com/token', data=data)
+        token_info = response.json()
+        new_access_token = token_info.get('access_token')
+        return new_access_token
+    except Exception as e:
+        logging.error(f"Failed to get new access token: {e}")
+        return None
 
 if __name__ == '__main__':
     print("Script is starting")
