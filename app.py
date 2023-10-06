@@ -177,6 +177,7 @@ def generate_response(user_input, phone_number):
     
     try:
         # Fetch existing conversation, email, and next_calendar_event from the database based on the phone_number
+        update_query =
         fetch_query = "SELECT conversation_data, google_calendar_email, next_google_calendar_event FROM conversations WHERE phone_number = %s"
 
         cursor.execute(fetch_query, (phone_number,))
@@ -220,8 +221,8 @@ def generate_response(user_input, phone_number):
 
         if result:
             update_query = "UPDATE conversations SET conversation_data = %s WHERE phone_number = %s;"
-            
             cursor.execute(update_query, (updated_data, phone_number))
+
         else:
             insert_query = "INSERT INTO conversations (phone_number, conversation_data) VALUES (%s, %s);"
             cursor.execute(insert_query, (phone_number, updated_data))
