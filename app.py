@@ -89,7 +89,7 @@ def oauth2callback():
     refresh_token = token_info.get('refresh_token')
 
     # Fetch and store Gmail ID and next Google Calendar event
-    google_calendar_email, next_event = fetch_google_calendar_info(access_token)  # Assuming this function is already implemented
+    google_calendar_email, next_event = fetch_google_calendar_info(access_token, refresh_token) 
 
     # Update the database
     cursor = conn.cursor()
