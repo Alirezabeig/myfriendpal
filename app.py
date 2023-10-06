@@ -1,8 +1,10 @@
+
 import requests
 from flask import Flask, request, jsonify, render_template
 from werkzeug.middleware.proxy_fix import ProxyFix
-from google.oauth2.credentials import Credentials
-from googleapiclient.discovery import build
+#from google_auth_oauthlib.flow import InstalledAppFlow
+#from google.oauth2 import service_account
+#from googleapiclient.discovery import build
 from twilio.rest import Client
 import os
 from dotenv import load_dotenv
@@ -44,24 +46,11 @@ conversations = {}
 
 logging.basicConfig(level=logging.ERROR)
 
-def fetch_next_google_calendar_event(credentials):
-    service = build('calendar', 'v3', credentials=credentials)
-    now = datetime.utcnow().isoformat() + 'Z'  # 'Z' indicates UTC time
-    events_result = service.events().list(calendarId='primary', timeMin=now,
-                                          maxResults=1, singleEvents=True,
-                                          orderBy='startTime').execute()
-    events = events_result.get('items', [])
-    if not events:
-        return "No upcoming events found."
-    else:
-        return events[0]['summary']
-
 def check_for_calendar_keyword(user_input, phone_number):
     print("Checking for calendar keyword...")  # Debug line
     if "calendar" in user_input.lower():
         print("Calendar keyword found. Generating authorization URL...")  # Debug line
-        authorization_url = get_google_calendar_authorization_url() + f"&state={phone_number}"
-
+        authorization_url = get_google_calendar_authorization_url()
         
         print(f"Sending authorization URL: {authorization_url}")  # Debug line
 
@@ -93,35 +82,10 @@ def oauth2callback():
     response = requests.post('https://oauth2.googleapis.com/token', data=token_data)
     token_info = response.json()
 
-    print("Token Info:", token_info)
-    credentials = Credentials.from_authorized_user_info(token_info)
-    service = build('calendar', 'v3', credentials=credentials)
-    
-    profile_info = service.calendarList().get(calendarId='primary').execute()
-    google_calendar_email = profile_info['id']
-
-    # Fetch next Google Calendar event
-    next_event = fetch_next_google_calendar_event(credentials)
-
-    # You would replace this with the phone number that was used during the OAuth2 flow
-    phone_number = "the_actual_phone_number"
-
-    # Update the database to include the google_calendar_email and next_google_calendar_event
-    try:
-        connection = create_connection()
-        cursor = connection.cursor()
-        update_query = '''UPDATE conversations SET google_calendar_email = %s, next_google_calendar_event = %s WHERE phone_number = %s;'''
-        cursor.execute(update_query, (google_calendar_email, next_event, phone_number))
-        connection.commit()
-    except Exception as e:
-        logging.error(f"An error occurred while updating the database: {e}")
-    finally:
-        if connection:
-            cursor.close()
-            connection.close()
+    # Save the access token somewhere secure for future use
+    access_token = token_info.get('access_token')
 
     return "Authorization complete"
-
 
 def create_connection():
     print("Inside create_connection function and it is kicking")
@@ -185,10 +149,10 @@ def generate_response(user_input, phone_number):
     
     try:
         # Fetch existing conversation from the database based on the phone_number
-        fetch_query = "SELECT conversation_data, google_calendar_email, next_google_calendar_event FROM conversations WHERE phone_number = %s;"
+        fetch_query = "SELECT conversation_data FROM conversations WHERE phone_number = %s;"
         cursor.execute(fetch_query, (phone_number,))
         result = cursor.fetchone()
-
+        
         app.logger.info("Connected ** to Genereate response")
         print("Generate_response working")
         
@@ -196,14 +160,11 @@ def generate_response(user_input, phone_number):
         if result:
             if isinstance(result[0], str):
                 current_conversation = json.loads(result[0])
-                conversation_data, google_calendar_email, next_google_calendar_event = result
-                current_conversation.append({"role": "assistant", "content": f"The Google Calendar email associated is {google_calendar_email}. Your next event is: {next_google_calendar_event}. What would you like to do next?"})
-
             else:
                 current_conversation = result[0]
             
         else:
-            current_conversation = [{"role": "assistant", "content": "What is your name?"}]
+            current_conversation = []
             
         current_conversation.append({"role": "user", "content": user_input})
         
