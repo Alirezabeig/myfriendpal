@@ -93,16 +93,9 @@ def oauth2callback():
     response = requests.post('https://oauth2.googleapis.com/token', data=token_data)
     token_info = response.json()
 
-    print("Token Info:", token_info)  # Debugging line
+    print("Token Info:", token_info)
+    credentials = Credentials.from_authorized_user_info(token_info)
 
-    # Create Google Credentials from the token information
-    credentials = Credentials.from_client_info(client_id=GOOGLE_CLIENT_ID, client_secret=GOOGLE_CLIENT_SECRET, **token_info)
-
-
-    # Create Google Credentials from the token information
-    ##credentials = Credentials.from_authorized_user_info(token_info)
-
-    # Fetch the Google Calendar email using the Google API
     service = build('calendar', 'v3', credentials=credentials)
     profile_info = service.calendarList().get(calendarId='primary').execute()
     google_calendar_email = profile_info['id']
