@@ -14,7 +14,7 @@ CALENDAR_API_SERVICE_NAME = os.environ.get('CALENDAR_API_SERVICE_NAME')
 CALENDAR_API_VERSION = os.environ.get('CALENDAR_API_VERSION')
 GOOGLE_CLIENT_ID = os.environ.get('GOOGLE_CLIENT_ID')
 GOOGLE_CLIENT_SECRET = os.environ.get('GOOGLE_CLIENT_SECRET')
-REDIRECT_URI = os.environ.get('REDIRECT_URI')
+REDIRECT_URI = "https://www.myfriendpal.com/oauth2callback"
 CALENDAR_SCOPE = ['https://www.googleapis.com/auth/calendar']
 
 def get_google_calendar_authorization_url():
