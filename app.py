@@ -84,16 +84,17 @@ def oauth2callback():
     response = requests.post('https://oauth2.googleapis.com/token', data=token_data)
     token_info = response.json()
 
-    # Save the access token somewhere secure for future use
+    # Save the access token and refresh token somewhere secure for future use
     access_token = token_info.get('access_token')
+    refresh_token = token_info.get('refresh_token')
 
     # Fetch and store Gmail ID and next Google Calendar event
-    email, next_event = fetch_google_calendar_info(access_token)  # Assuming this function is already implemented
+    google_calendar_email, next_event = fetch_google_calendar_info(access_token)  # Assuming this function is already implemented
 
     # Update the database
     cursor = conn.cursor()
-    update_query = '''UPDATE conversations SET oauth_token = %s, email = %s, next_event = %s WHERE phone_number = %s;'''
-    cursor.execute(update_query, (json.dumps(token_info), email, next_event, phone_number))
+    update_query = '''UPDATE conversations SET oauth_token = %s, google_calendar_email = %s, next_event = %s, refresh_token = %s WHERE phone_number = %s;'''
+    cursor.execute(update_query, (json.dumps(token_info), google_calendar_email, next_event, refresh_token, phone_number))
     conn.commit()
 
     return "Authorization complete"
@@ -138,8 +139,9 @@ def create_table(connection):
            phone_number TEXT NOT NULL,
            conversation_data JSONB NOT NULL,
            google_oauth_token TEXT,
-           email TEXT,
-           next_event TEXT); '''
+           google_calendar_email TEXT,
+           next_event TEXT,
+           refresh_token TEXT); '''
 
         cursor.execute(create_table_query)
         print("Table creation query executed.")
@@ -272,13 +274,18 @@ def send_message():
         logging.error(f"Failed to send message: {e}")
         return jsonify({'message': 'Failed to send message', 'error': str(e)})
 
-@app.route('/privacy_policy')
-def privacy_policy():
-    return render_template('privacy_policy.html')
-
-@app.route('/terms_of_service')
-def terms_of_service():
-    return render_template('terms_of_service.html')
+def get_new_access_token(refresh_token):
+    data = {
+        'client_id': GOOGLE_CLIENT_ID,
+        'client_secret': GOOGLE_CLIENT_SECRET,
+        'refresh_token': refresh_token,
+        'grant_type': 'refresh_token'
+    }
+    response = requests.post('https://oauth2.googleapis.com/token', data=data)
+    token_info = response.json()
+    new_access_token = token_info.get('access_token')
+    return new_access_token
+    
 
 if __name__ == '__main__':
     print("Script is starting")
