@@ -1,4 +1,5 @@
 body {
+  overflow-x: hidden;
   font-family: Arial, sans-serif;
   margin: 0;
   padding: 0;
@@ -61,3 +62,16 @@ body {
   font-size: 0.9em;
 }
 
+.footer a {
+  color: white;
+  text-decoration: none;
+}
+
+.footer a:hover {
+  text-decoration: underline;
+}
+.emoji-image {
+  width: 40px;  /* Width of the image, can adjust based on your needs */
+  height: 40px;  /* Height of the image, can adjust based on your needs */
+  vertical-align: middle;  /* Aligns the image with the adjacent text */
+}
