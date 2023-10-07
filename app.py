@@ -214,7 +214,7 @@ def send_message():
         data = request.json
         phone_number = data.get('phone_number')
   
-        greeting_message = f"Hi there, I am so excited to connect with you. What is your name? what city do you live in? Also read more about me here: https://www.myfriendpal.com/pal . I am getting insanely good!"
+        greeting_message = f"👋🏼 Hi there, I am so excited to connect with you. What is your name? what city do you live in? Also read more about me here: https://www.myfriendpal.com/pal . I am getting insanely good!"
 
         # Send the first message
         message = client.messages.create(
