@@ -211,7 +211,7 @@ def send_message():
         data = request.json
         phone_number = data.get('phone_number')
   
-        greeting_message = f"Hi there, I am so excited to connect with you. What is your name?"
+        greeting_message = f"Hi there, I am so excited to connect with you. What is your name? what city do you live in? Also read more about me here: https://www.myfriendpal.com/pal . I am getting insanely good!"
 
         # Send the first message
         message = client.messages.create(
@@ -240,6 +240,11 @@ def get_new_access_token(refresh_token):
     except Exception as e:
         logging.error(f"Failed to get new access token: {e}")
         return None
+        
+@app.route('/pal', methods=['GET'])
+def pal_page():
+    return render_template('pal.html')
+
 
 if __name__ == '__main__':
     print("Script is starting")
