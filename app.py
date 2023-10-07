@@ -134,6 +134,9 @@ def generate_response(user_input, phone_number):
         # If no result is returned, set the variables to None or empty list
             google_calendar_email, next_google_calendar_event, current_conversation = None, None, []
 
+        if not current_conversation:
+            current_conversation.append({"role": "system", "content": "Your name is pal. Your friendly and concise unless necessary. You are a good listener. No need to mention your qualities but share your name if asked."})
+
         # Add the user's message to the conversation
         current_conversation.append({"role": "user", "content": user_input})
         
