@@ -101,31 +101,6 @@ def oauth2callback():
 
     return "Authorization complete..."
 
-def create_table(connection):
-    print("Inside create_table()")
-    try:
-        cursor = connection.cursor()
-        print("Cursor created.")
-        
-        create_table_query = '''CREATE TABLE IF NOT EXISTS conversations
-          (id SERIAL PRIMARY KEY,
-           phone_number TEXT NOT NULL,
-           conversation_data JSONB NOT NULL,
-           google_oauth_token TEXT,
-           google_calendar_email TEXT,
-           next_event TEXT,
-           refresh_token TEXT); '''
-
-        cursor.execute(create_table_query)
-        print("Table creation query executed.")
-        
-        connection.commit()
-        print("Transaction committed.")
-
-    except Exception as e:
-        connection.rollback()
-        logging.error(f"An error occurred: {e}")
-
 def generate_response(user_input, phone_number):
     print("inside_generate response")
     
