@@ -17,8 +17,22 @@ import traceback
 from psycopg2 import Error
 from calendar_utils import get_google_calendar_authorization_url
 from calendar_utils import fetch_google_calendar_info
-from confic import load_configurations
 
+load_dotenv()
+print("DB_HOST is:", os.environ.get("DB_HOST"))
+app = Flask(__name__)
+app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1)
+app.logger.setLevel(logging.INFO)
+
+
+conn = psycopg2.connect(
+    host = os.environ.get("DB_HOST"),
+    port = os.environ.get("DB_PORT"),
+    user = os.environ.get("DB_USER"),
+    password = os.environ.get("DB_PASSWORD"),
+    database = os.environ.get("DB_NAME"),
+)
+print("Successfully connected", conn)
 
 GOOGLE_CLIENT_ID = os.environ.get('GOOGLE_CLIENT_ID')
 GOOGLE_CLIENT_SECRET = os.environ.get('GOOGLE_CLIENT_SECRET')
