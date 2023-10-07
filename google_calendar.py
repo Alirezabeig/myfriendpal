@@ -3,7 +3,8 @@
 from flask import request
 import requests
 import os
-from db import conn
+from db import conn, create_connection
+
 
 @app.route('/oauth2callback', methods=['GET'])
 def oauth2callback():
