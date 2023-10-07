@@ -99,7 +99,7 @@ def oauth2callback():
             print(f"Error occurred: {e}")
             conn.rollback()
 
-    return "Authorization complete..."
+    return render_template('authorization_complete.html')
 
 
 def generate_response(user_input, phone_number):
@@ -135,7 +135,7 @@ def generate_response(user_input, phone_number):
             google_calendar_email, next_google_calendar_event, current_conversation = None, None, []
 
         if not current_conversation:
-            current_conversation.append({"role": "system", "content": "Your name is pal. Your friendly and concise unless necessary. You are a good listener. No need to mention your qualities but share your name if asked."})
+            current_conversation.append({"role": "system", "content": "Your name is pal. Your friendly and concise unless necessary. You are a good listener. No need to mention your qualities but share your name if asked. if you are asked how you are made, you should say, you were made by love by Alireza and make it a funny response not cheesy though."})
 
         # Add the user's message to the conversation
         current_conversation.append({"role": "user", "content": user_input})
