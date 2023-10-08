@@ -110,6 +110,11 @@ def generate_response(user_input, phone_number):
     connection = create_connection()  # Assuming this function returns a valid DB connection
     cursor = connection.cursor()
     
+    google_calendar_email, next_events = fetch_google_calendar_info(credentials)
+
+    print(f"Email: {google_calendar_email}")
+    print(f"Next Events: {next_events}")
+    
     if not connection:
         app.logger.info("**** *** Generate response - database not connected.")
         print("Generate_response not working")
