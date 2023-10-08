@@ -16,6 +16,8 @@ from config import load_configurations
 from twilio_utils import sms_reply
 from google.oauth2.credentials import Credentials
 from calendar_utils import fetch_google_calendar_info, fetch_google_gmail_info
+from shared_utils import get_new_access_token
+
 
 
 import openai
@@ -28,6 +30,8 @@ from calendar_utils import fetch_google_calendar_info
 
 app, conn = load_configurations()
 conn = create_connection()
+
+   
 
 GOOGLE_CLIENT_ID = os.environ.get('GOOGLE_CLIENT_ID')
 GOOGLE_CLIENT_SECRET = os.environ.get('GOOGLE_CLIENT_SECRET')
