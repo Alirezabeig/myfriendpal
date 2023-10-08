@@ -105,8 +105,8 @@ def oauth2callback():
 
 
 def generate_response(user_input, phone_number):
-
     print("inside_generate response")
+
     connection = create_connection()  # Assuming this function returns a valid DB connection
     cursor = connection.cursor()
     
@@ -135,7 +135,7 @@ def generate_response(user_input, phone_number):
         else:
         # If no result is returned, set the variables to None or empty list
             google_calendar_email, next_google_calendar_event, current_conversation = None, None, []
-            
+
         # Add the user's message to the conversation
         current_conversation.append({"role": "user", "content": user_input})
         
