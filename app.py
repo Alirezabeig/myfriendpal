@@ -10,7 +10,7 @@ import os
 from dotenv import load_dotenv
 import logging
 import json
-from db import create_connection, fetch_tokens_from_db
+from db import create_connection, fetch_tokens_from_db, get_credentials_for_user
 
 from config import load_configurations
 from twilio_utils import sms_reply

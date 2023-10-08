@@ -81,3 +81,12 @@ def fetch_tokens_from_db(connection, phone_number):
     except Exception as e:
         logging.error(f"An error occurred while fetching tokens: {e}")
         return None, None
+
+def get_credentials_for_user(phone_number):
+    access_token, refresh_token = fetch_tokens_from_db(phone_number)
+    
+    if access_token is None or refresh_token is None:
+        print(f"No tokens found for phone number {phone_number}")
+        return None, None
+    
+    return access_token, refresh_token
