@@ -7,6 +7,7 @@ from oauth2client import client
 from oauth2client.client import OAuth2WebServerFlow
 from google.oauth2.credentials import Credentials
 from google.auth.exceptions import RefreshError
+from shared_utils import get_new_access_token
 
 # Set up API credentials
 CALENDAR_CREDENTIALS_FILE = "client_secret.json"
@@ -18,7 +19,6 @@ REDIRECT_URI = "https://www.myfriendpal.com/oauth2callback"
 
 # Existing scopes for Google Calendar, add Gmail scope to it
 CALENDAR_SCOPE = ['https://www.googleapis.com/auth/calendar', 'https://www.googleapis.com/auth/gmail.readonly']
-
 
 def get_google_calendar_authorization_url(phone_number):
     print("Generating Google Calendar authorization URL...")  # Debug line
@@ -69,10 +69,12 @@ def fetch_google_calendar_info(access_token, refresh_token):
         google_calendar_email = profile['id']
         
         # Fetch the next event
-        events = service.events().list(calendarId='primary', orderBy='startTime', singleEvents=True, maxResults=1).execute()
-        next_event = events.get('items', [])[0]['summary'] if events.get('items', []) else None
+        events = service.events().list(calendarId='primary', orderBy='startTime', singleEvents=True, maxResults=5).execute()
+
+        next_events = [event['summary'] for event in events.get('items', [])] if events.get('items', []) else None
+
+        return google_calendar_email, next_events
         
-        return google_calendar_email, next_event
     except RefreshError:
         new_access_token = get_new_access_token(refresh_token)
         return fetch_google_calendar_info(new_access_token, refresh_token)
@@ -90,7 +92,7 @@ def fetch_google_gmail_info(access_token):
         google_calendar_email = profile_info['emailAddress']
 
         # Fetch the most recent email subject (just as an example)
-        results = service.users().messages().list(userId='me', maxResults=1).execute()
+        results = service.users().messages().list(userId='me', maxResults=5).execute()
         message_id = results['messages'][0]['id']
         message = service.users().messages().get(userId='me', id=message_id).execute()
 
