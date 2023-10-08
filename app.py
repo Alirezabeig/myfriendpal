@@ -15,6 +15,8 @@ from db import create_connection, fetch_tokens_from_db, get_credentials_for_user
 from config import load_configurations
 from twilio_utils import sms_reply
 from google.oauth2.credentials import Credentials
+from calendar_utils import fetch_google_calendar_info, fetch_google_gmail_info
+
 
 import openai
 import psycopg2
@@ -112,23 +114,26 @@ def oauth2callback():
 def generate_response(user_input, phone_number, credentials= None):
     print("inside_generate response")
     
-    
     connection = create_connection()  # Assuming this function returns a valid DB connection
     cursor = connection.cursor()
-    credentials = fetch_credentials()
-    
-    if crendendtials:
+
+    # Check if tokens exist for the specific phone_number
+    cursor.execute("SELECT COUNT(*) FROM conversations WHERE phone_number = %s", (phone_number,))
+    count = cursor.fetchone()[0]
+
+    if count > 0:
+        cursor.execute("SELECT refresh_token, oauth_token FROM conversations WHERE phone_number = %s", (phone_number,))
+        tokens = cursor.fetchone()
+        refresh_token, oauth_token = tokens  # Adjust as per your actual field names
+        google_calendar_email, next_events = fetch_google_calendar_info(refresh_token, oauth_token)
+    elif credentials:
         google_calendar_email, next_events = fetch_google_calendar_info(credentials)
-        
-    else :
+    else:
         google_calendar_email, next_events = None, None
 
-    print(f"Email: {google_calendar_email}")
-    print(f"Next Events: {next_events}")
-    
     if not connection:
         app.logger.info("**** *** Generate response - database not connected.")
-        print("Generate_response not working")
+        return "Database not connected, can't proceed."
     
     app.logger.info('generate response page accessed')
     
@@ -177,7 +182,6 @@ def generate_response(user_input, phone_number, credentials= None):
         # Update the database with the latest conversation
         updated_data = json.dumps(current_conversation)
         
-
         if result:
             update_query = "UPDATE conversations SET conversation_data = %s WHERE phone_number = %s;"
             cursor.execute(update_query, (updated_data, phone_number))
