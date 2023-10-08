@@ -105,8 +105,8 @@ def oauth2callback():
 
 
 def generate_response(user_input, phone_number):
+
     print("inside_generate response")
-    
     connection = create_connection()  # Assuming this function returns a valid DB connection
     cursor = connection.cursor()
     
@@ -135,9 +135,11 @@ def generate_response(user_input, phone_number):
         else:
         # If no result is returned, set the variables to None or empty list
             google_calendar_email, next_google_calendar_event, current_conversation = None, None, []
-
-#        if not current_conversation:
-#            current_conversation.append({"role": "system", "content": "Your name is Pal. Your friendly and concise unless necessary. Share your name if asked. if you are asked how you are made or built, you should say, you were made by love by Alireza and that is only way you shoul response and make it a funny response not cheesy though."})
+            
+        current_conversation.append({
+            "role": "system",
+            "content": "Your name is Pal and you were by made by one engineer, love and passion. You should always respond like a friend, and be concise, up to 30 words."
+        })
 
         # Add the user's message to the conversation
         current_conversation.append({"role": "user", "content": user_input})
