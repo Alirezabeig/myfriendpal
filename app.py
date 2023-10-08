@@ -13,6 +13,8 @@ import json
 
 from config import load_configurations
 from db import create_connection
+from twilio_utils import sms_reply 
+
 
 import openai
 import psycopg2
@@ -180,23 +182,7 @@ def generate_response(user_input, phone_number):
  
 @app.route("/sms", methods=['POST'])
 def sms_reply():
-    print("SMS reply triggered")
-    user_input = request.values.get('Body', None)
-    phone_number = request.values.get('From', None)
-    
-    print(f"User input: {user_input}, Phone number: {phone_number}")  # Debug line
-    
-    calendar_keyword_found = check_for_calendar_keyword(user_input, phone_number)
-    
-    if not calendar_keyword_found:
-        response_text = generate_response(user_input, phone_number)
-        message = client.messages.create(
-            to=phone_number,
-            from_=TWILIO_PHONE_NUMBER,
-            body=response_text
-        )
-
-    return jsonify({'message': 'Reply sent!'})
+    return sms_reply()
     
 @app.route('/')
 def index():
