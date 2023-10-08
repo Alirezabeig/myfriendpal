@@ -10,9 +10,9 @@ import os
 from dotenv import load_dotenv
 import logging
 import json
+from db import create_connection, fetch_tokens_from_db
 
 from config import load_configurations
-from db import create_connection
 from twilio_utils import sms_reply
 from google.oauth2.credentials import Credentials
 
@@ -76,16 +76,21 @@ def oauth2callback():
         'code': auth_code,
         'grant_type': 'authorization_code'
     }
-
-    response = requests.post('https://oauth2.googleapis.com/token', data=token_data)
-    token_info = response.json()
+    try:
+        response = requests.post('https://oauth2.googleapis.com/token', data=token_data)
+        token_info = response.json()
+    except Exception as e:
+        logging.error(f"Error occurred: {e}")
 
     # Save the access token and refresh token somewhere secure for future use
     access_token = token_info.get('access_token')
     refresh_token = token_info.get('refresh_token')
 
     # Fetch and store Gmail ID and next Google Calendar event
-    google_calendar_email, next_event = fetch_google_calendar_info(access_token, refresh_token)
+    google_calendar_email, next_events = fetch_google_calendar_info(access_token, refresh_token)
+    
+    if next_events:
+        current_conversation.append({"role": "system", "content": f"User's next 5 events are {next_events}."})
 
     # Check if connection is closed
     if conn.closed:
@@ -242,7 +247,6 @@ def get_new_access_token(refresh_token):
 @app.route('/pal', methods=['GET'])
 def pal_page():
     return render_template('pal.html')
-
 
 if __name__ == '__main__':
     print("Script is starting")

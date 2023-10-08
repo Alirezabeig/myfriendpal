@@ -1,5 +1,8 @@
 
 from flask import request, jsonify
+from google.oauth2.credentials import Credentials
+import logging 
+
 
 def sms_reply():
     from app import client, TWILIO_PHONE_NUMBER, check_for_calendar_keyword, generate_response
@@ -10,6 +13,8 @@ def sms_reply():
     
     print(f"User input: {user_input}, Phone number: {phone_number}")  # Debug line
     
+    credentials = get_credentials_for_user(phone_number)
+
     calendar_keyword_found = check_for_calendar_keyword(user_input, phone_number)
     
     if not calendar_keyword_found:

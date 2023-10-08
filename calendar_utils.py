@@ -19,7 +19,6 @@ REDIRECT_URI = "https://www.myfriendpal.com/oauth2callback"
 # Existing scopes for Google Calendar, add Gmail scope to it
 CALENDAR_SCOPE = ['https://www.googleapis.com/auth/calendar', 'https://www.googleapis.com/auth/gmail.readonly']
 
-
 def get_google_calendar_authorization_url(phone_number):
     print("Generating Google Calendar authorization URL...")  # Debug line
     flow = OAuth2WebServerFlow(
@@ -73,7 +72,7 @@ def fetch_google_calendar_info(access_token, refresh_token):
 
         next_events = [event['summary'] for event in events.get('items', [])] if events.get('items', []) else None
 
-        return google_calendar_email, next_event
+        return google_calendar_email, next_events
         
     except RefreshError:
         new_access_token = get_new_access_token(refresh_token)

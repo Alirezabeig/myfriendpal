@@ -56,3 +56,28 @@ def create_table(connection):
         connection.rollback()
         logging.error(f"An error occurred: {e}")
 
+def fetch_tokens_from_db(connection, phone_number):
+    try:
+        cursor = connection.cursor()
+        
+        # SQL query to fetch the access and refresh tokens based on phone number
+        query = "SELECT google_oauth_token, refresh_token FROM conversations WHERE phone_number = %s;"
+        
+        # Execute the query
+        cursor.execute(query, (phone_number,))
+        
+        # Fetch the result
+        result = cursor.fetchone()
+        
+        # Close the cursor
+        cursor.close()
+        
+        if result is None:
+            return None, None
+        
+        access_token, refresh_token = result
+        return access_token, refresh_token
+        
+    except Exception as e:
+        logging.error(f"An error occurred while fetching tokens: {e}")
+        return None, None
