@@ -1,8 +1,9 @@
 
 from flask import request, jsonify
-from app import client, TWILIO_PHONE_NUMBER, check_for_calendar_keyword, generate_response
 
 def sms_reply():
+    from app import client, TWILIO_PHONE_NUMBER, check_for_calendar_keyword, generate_response
+
     print("SMS reply triggered")
     user_input = request.values.get('Body', None)
     phone_number = request.values.get('From', None)

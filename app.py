@@ -13,7 +13,7 @@ import json
 
 from config import load_configurations
 from db import create_connection
-from twilio_utils import sms_reply 
+from twilio_utils import sms_reply
 
 
 import openai
@@ -181,8 +181,9 @@ def generate_response(user_input, phone_number):
         return "Sorry, I couldn't understand that."
  
 @app.route("/sms", methods=['POST'])
-def sms_reply():
+def handle_sms():
     return sms_reply()
+
     
 @app.route('/')
 def index():
