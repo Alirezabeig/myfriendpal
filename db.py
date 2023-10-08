@@ -45,7 +45,7 @@ def create_table(connection):
            conversation_data JSONB NOT NULL,
            oauth_token JSONB,
            google_calendar_email TEXT,
-           next_event TEXT,
+           next_google_calendar_event TEXT,
            refresh_token TEXT); '''
         
         cursor.execute(create_table_query)

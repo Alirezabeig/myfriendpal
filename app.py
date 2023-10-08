@@ -13,6 +13,7 @@ import json
 from config import load_configurations
 from db import create_connection
 from twilio_utils import sms_reply
+from google_calendar import oauth2callback
 
 
 import openai
@@ -60,47 +61,6 @@ def check_for_calendar_keyword(user_input, phone_number):
         print("Calendar keyword not found.")  # Debug line
         return False
 
-@app.route('/oauth2callback', methods=['GET'])
-def oauth2callback():
-    print("OAUTH2CALLBACK &*&*## -- ##")
-    auth_code = request.args.get('code')
-    phone_number = request.args.get('state')  # Assuming you passed phone_number as 'state' during OAuth2 initiation
-
-    token_data = {
-        'client_id': GOOGLE_CLIENT_ID,
-        'client_secret': GOOGLE_CLIENT_SECRET,
-        'redirect_uri': 'https://www.myfriendpal.com/oauth2callback',
-        'code': auth_code,
-        'grant_type': 'authorization_code'
-    }
-
-    response = requests.post('https://oauth2.googleapis.com/token', data=token_data)
-    token_info = response.json()
-
-    # Save the access token and refresh token somewhere secure for future use
-    access_token = token_info.get('access_token')
-    refresh_token = token_info.get('refresh_token')
-
-    # Fetch and store Gmail ID and next Google Calendar event
-    google_calendar_email, next_event = fetch_google_calendar_info(access_token, refresh_token)
-
-    # Check if connection is closed
-    if conn.closed:
-        print("Connection closed, re-opening...")
-        # Re-open your connection here
-        # conn = psycopg2.connect( ... )
-    
-    # Update the database
-    with conn.cursor() as cursor:  # Using 'with' ensures the cursor will be closed after use
-        update_query = '''UPDATE conversations SET oauth_token = %s, google_calendar_email = %s, next_event = %s, refresh_token = %s WHERE phone_number = %s;'''
-        try:
-            cursor.execute(update_query, (json.dumps(token_info), google_calendar_email, next_event, refresh_token, phone_number))
-            conn.commit()
-        except Exception as e:
-            print(f"Error occurred: {e}")
-            conn.rollback()
-
-    return render_template('authorization_complete.html')
 
 
 def generate_response(user_input, phone_number):
@@ -142,7 +102,7 @@ def generate_response(user_input, phone_number):
         # Add the user's message to the conversation
         current_conversation.append({"role": "user", "content": user_input})
         
-        # Add Gmail and next_event to the conversation context
+        # Add Gmail and next_google_calendar_event to the conversation context
         if google_calendar_email and next_google_calendar_event:
             current_conversation.append({"role": "system", "content": f"User's email is {google_calendar_email}. Next event is {next_google_calendar_event}."})
 
@@ -161,7 +121,7 @@ def generate_response(user_input, phone_number):
         updated_data = json.dumps(current_conversation)
         
         ##print(f"Executing query: {update_query}")
-        ##print(f"With parameters: {json.dumps(token_info)}, {google_calendar_email}, {next_event}, {refresh_token}, {phone_number}")
+        ##print(f"With parameters: {json.dumps(token_info)}, {google_calendar_email}, {next_google_calendar_event}, {refresh_token}, {phone_number}")
 
         if result:
             update_query = "UPDATE conversations SET conversation_data = %s WHERE phone_number = %s;"
