@@ -14,6 +14,8 @@ import json
 from config import load_configurations
 from db import create_connection
 from twilio_utils import sms_reply
+from google.oauth2.credentials import Credentials
+
 
 
 import openai

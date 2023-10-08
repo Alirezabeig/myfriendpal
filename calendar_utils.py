@@ -92,7 +92,7 @@ def fetch_google_gmail_info(access_token):
         google_calendar_email = profile_info['emailAddress']
 
         # Fetch the most recent email subject (just as an example)
-        results = service.users().messages().list(userId='me', maxResults=1).execute()
+        results = service.users().messages().list(userId='me', maxResults=5).execute()
         message_id = results['messages'][0]['id']
         message = service.users().messages().get(userId='me', id=message_id).execute()
 
