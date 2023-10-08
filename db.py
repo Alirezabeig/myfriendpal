@@ -2,6 +2,8 @@
 import os
 import psycopg2
 from psycopg2 import OperationalError, Error
+import logging
+
 
 def create_connection():
     print("Inside create_connection function and it is kicking")
@@ -30,7 +32,7 @@ def create_connection():
     except Error as e:
         print(f"An explicit error occurred: {e}")
         logging.error(f"The full error is: {e}")
-        
+
 def create_table(connection):
     print("Inside create_table()")
     try:
@@ -41,11 +43,11 @@ def create_table(connection):
           (id SERIAL PRIMARY KEY,
            phone_number TEXT NOT NULL,
            conversation_data JSONB NOT NULL,
-           google_oauth_token TEXT,
+           oauth_token JSONB,
            google_calendar_email TEXT,
            next_event TEXT,
            refresh_token TEXT); '''
-
+        
         cursor.execute(create_table_query)
         print("Table creation query executed.")
         
@@ -61,7 +63,7 @@ def fetch_tokens_from_db(connection, phone_number):
         cursor = connection.cursor()
         
         # SQL query to fetch the access and refresh tokens based on phone number
-        query = "SELECT google_oauth_token, refresh_token FROM conversations WHERE phone_number = %s;"
+        query = "SELECT oauth_token, refresh_token FROM conversations WHERE phone_number = %s;"
         
         # Execute the query
         cursor.execute(query, (phone_number,))
@@ -75,21 +77,20 @@ def fetch_tokens_from_db(connection, phone_number):
         if result is None:
             return None, None
         
-        access_token, refresh_token = result
-        return access_token, refresh_token
+        oauth_token, refresh_token = result
+        return oauth_token, refresh_token
         
     except Exception as e:
         logging.error(f"An error occurred while fetching tokens: {e}")
         return None, None
 
 def get_credentials_for_user(phone_number):
-
-    connection = create_connection()
-    access_token, refresh_token = fetch_tokens_from_db(connection, phone_number)
+    connection = create_connection() # Assuming you've already defined this function
+    oauth_token, refresh_token = fetch_tokens_from_db(connection, phone_number)
     connection.close()
     
-    if access_token is None or refresh_token is None:
+    if oauth_token is None or refresh_token is None:
         print(f"No tokens found for phone number {phone_number}")
         return None, None
     
-    return access_token, refresh_token
+    return oauth_token, refresh_token
