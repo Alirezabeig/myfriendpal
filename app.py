@@ -116,6 +116,7 @@ def oauth2callback():
 
 
 def generate_response(user_input, phone_number, credentials= None):
+
     print("inside_generate response")
     
     connection = create_connection()  # Assuming this function returns a valid DB connection
@@ -124,16 +125,16 @@ def generate_response(user_input, phone_number, credentials= None):
     # Check if tokens exist for the specific phone_number
     cursor.execute("SELECT COUNT(*) FROM conversations WHERE phone_number = %s", (phone_number,))
     count = cursor.fetchone()[0]
+    google_calendar_email, next_events = None, None  # Initialize to None
 
     if count > 0:
         cursor.execute("SELECT refresh_token, oauth_token FROM conversations WHERE phone_number = %s", (phone_number,))
         tokens = cursor.fetchone()
-        refresh_token, oauth_token = tokens  # Adjust as per your actual field names
-        google_calendar_email, next_events = fetch_google_calendar_info(refresh_token, oauth_token)
+        if tokens:
+            refresh_token, oauth_token = tokens  # Adjust as per your actual field names
+            google_calendar_email, next_events = fetch_google_calendar_info(refresh_token, oauth_token)
     elif credentials:
         google_calendar_email, next_events = fetch_google_calendar_info(credentials)
-    else:
-        google_calendar_email, next_events = None, None
 
     if not connection:
         app.logger.info("**** *** Generate response - database not connected.")
