@@ -1,4 +1,3 @@
-
 import requests
 from flask import Flask, request, jsonify, render_template
 from werkzeug.middleware.proxy_fix import ProxyFix
@@ -10,14 +9,10 @@ import os
 from dotenv import load_dotenv
 import logging
 import json
-from db import create_connection, fetch_tokens_from_db, get_credentials_for_user
 
 from config import load_configurations
+from db import create_connection
 from twilio_utils import sms_reply
-from google.oauth2.credentials import Credentials
-from calendar_utils import fetch_google_calendar_info, fetch_google_gmail_info
-from shared_utils import get_new_access_token
-
 
 
 import openai
@@ -30,8 +25,6 @@ from calendar_utils import fetch_google_calendar_info
 
 app, conn = load_configurations()
 conn = create_connection()
-
-   
 
 GOOGLE_CLIENT_ID = os.environ.get('GOOGLE_CLIENT_ID')
 GOOGLE_CLIENT_SECRET = os.environ.get('GOOGLE_CLIENT_SECRET')
@@ -80,21 +73,16 @@ def oauth2callback():
         'code': auth_code,
         'grant_type': 'authorization_code'
     }
-    try:
-        response = requests.post('https://oauth2.googleapis.com/token', data=token_data)
-        token_info = response.json()
-    except Exception as e:
-        logging.error(f"Error occurred: {e}")
+
+    response = requests.post('https://oauth2.googleapis.com/token', data=token_data)
+    token_info = response.json()
 
     # Save the access token and refresh token somewhere secure for future use
     access_token = token_info.get('access_token')
     refresh_token = token_info.get('refresh_token')
 
     # Fetch and store Gmail ID and next Google Calendar event
-    google_calendar_email, next_events = fetch_google_calendar_info(access_token, refresh_token)
-    
-    if next_events:
-        current_conversation.append({"role": "system", "content": f"User's next 5 events are {next_events}."})
+    google_calendar_email, next_event = fetch_google_calendar_info(access_token, refresh_token)
 
     # Check if connection is closed
     if conn.closed:
@@ -115,42 +103,20 @@ def oauth2callback():
     return render_template('authorization_complete.html')
 
 
-def generate_response(user_input, phone_number, credentials= None):
-
+def generate_response(user_input, phone_number):
     print("inside_generate response")
     
     connection = create_connection()  # Assuming this function returns a valid DB connection
     cursor = connection.cursor()
-
-    # Check if tokens exist for the specific phone_number
-    cursor.execute("SELECT COUNT(*) FROM conversations WHERE phone_number = %s", (phone_number,))
-    count = cursor.fetchone()[0]
-    google_calendar_email, next_events = None, None  # Initialize to None
-
-    if count > 0:
-    cursor.execute("SELECT refresh_token, oauth_token FROM conversations WHERE phone_number = %s", (phone_number,))
-    tokens = cursor.fetchone()
-    if tokens:
-        refresh_token, oauth_token = tokens  # Adjust as per your actual field names
-
-        # Add this check to see if tokens are available
-        if refresh_token and oauth_token:
-            google_calendar_email, next_events = fetch_google_calendar_info(refresh_token, oauth_token)
-        else:
-            print("Tokens are not available.")
-
-
-    elif credentials:
-        google_calendar_email, next_events = fetch_google_calendar_info(credentials)
-
+    
     if not connection:
         app.logger.info("**** *** Generate response - database not connected.")
-        return "Database not connected, can't proceed."
+        print("Generate_response not working")
     
     app.logger.info('generate response page accessed')
     
     try:
-
+        # Fetch existing conversation, email, and next_calendar_event from the database based on the phone_number
         update_query = ''
         fetch_query = "SELECT conversation_data, google_calendar_email, next_google_calendar_event FROM conversations WHERE phone_number = %s"
 
@@ -194,6 +160,9 @@ def generate_response(user_input, phone_number, credentials= None):
         # Update the database with the latest conversation
         updated_data = json.dumps(current_conversation)
         
+        ##print(f"Executing query: {update_query}")
+        ##print(f"With parameters: {json.dumps(token_info)}, {google_calendar_email}, {next_event}, {refresh_token}, {phone_number}")
+
         if result:
             update_query = "UPDATE conversations SET conversation_data = %s WHERE phone_number = %s;"
             cursor.execute(update_query, (updated_data, phone_number))
@@ -245,10 +214,27 @@ def send_message():
     except Exception as e:
         logging.error(f"Failed to send message: {e}")
         return jsonify({'message': 'Failed to send message', 'error': str(e)})
-            
+    
+def get_new_access_token(refresh_token):
+    data = {
+        'client_id': GOOGLE_CLIENT_ID,
+        'client_secret': GOOGLE_CLIENT_SECRET,
+        'refresh_token': refresh_token,
+        'grant_type': 'refresh_token'
+    }
+    try:
+        response = requests.post('https://oauth2.googleapis.com/token', data=data)
+        token_info = response.json()
+        new_access_token = token_info.get('access_token')
+        return new_access_token
+    except Exception as e:
+        logging.error(f"Failed to get new access token: {e}")
+        return None
+        
 @app.route('/pal', methods=['GET'])
 def pal_page():
     return render_template('pal.html')
+
 
 if __name__ == '__main__':
     print("Script is starting")
