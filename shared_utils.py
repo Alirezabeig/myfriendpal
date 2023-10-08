@@ -1,5 +1,11 @@
-
 #shared_utils.py
+import os
+import requests
+import logging
+
+GOOGLE_CLIENT_ID = os.environ.get('GOOGLE_CLIENT_ID')
+GOOGLE_CLIENT_SECRET = os.environ.get('GOOGLE_CLIENT_SECRET')
+
 def get_new_access_token(refresh_token):
     data = {
         'client_id': GOOGLE_CLIENT_ID,
