@@ -7,6 +7,7 @@ from oauth2client import client
 from oauth2client.client import OAuth2WebServerFlow
 from google.oauth2.credentials import Credentials
 from google.auth.exceptions import RefreshError
+from app import get_new_access_token
 
 # Set up API credentials
 CALENDAR_CREDENTIALS_FILE = "client_secret.json"

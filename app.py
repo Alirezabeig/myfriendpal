@@ -138,7 +138,7 @@ def generate_response(user_input, phone_number, credentials= None):
     app.logger.info('generate response page accessed')
     
     try:
-        # Fetch existing conversation, email, and next_calendar_event from the database based on the phone_number
+
         update_query = ''
         fetch_query = "SELECT conversation_data, google_calendar_email, next_google_calendar_event FROM conversations WHERE phone_number = %s"
 
