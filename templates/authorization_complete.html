@@ -1,8 +1,8 @@
-<!-- authorization_complete.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- Added for responsive design -->
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -15,6 +15,29 @@
             margin-top: 20px;
             color: #333;
         }
+        /* Media Queries */
+        @media (max-width: 768px) {
+            .title {
+                font-size: 20px;
+            }
+            h2 {
+                font-size: 18px;
+            }
+            p {
+                font-size: 16px;
+            }
+        }
+        @media (max-width: 480px) {
+            .title {
+                font-size: 18px;
+            }
+            h2 {
+                font-size: 16px;
+            }
+            p {
+                font-size: 14px;
+            }
+        }
     </style>
     <title>Authorization Complete 🎉</title>
 </head>
@@ -22,6 +45,6 @@
     <div class="title">🎉 You've Granted Pal Access to Your Calendar!</div>
     <h2>Authorization Complete</h2>
     <p>Now I can serve you even better. I'll be able to reach out to you before your important events, and offer advice or help whenever you ask about your calendar. You can continue chatting with me on your phone now.</p>
-
 </body>
 </html>
+
