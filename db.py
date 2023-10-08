@@ -83,7 +83,10 @@ def fetch_tokens_from_db(connection, phone_number):
         return None, None
 
 def get_credentials_for_user(phone_number):
-    access_token, refresh_token = fetch_tokens_from_db(phone_number)
+
+    connection = create_connection()
+    access_token, refresh_token = fetch_tokens_from_db(connection, phone_number)
+    connection.close()
     
     if access_token is None or refresh_token is None:
         print(f"No tokens found for phone number {phone_number}")
