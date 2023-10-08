@@ -109,13 +109,19 @@ def oauth2callback():
     return render_template('authorization_complete.html')
 
 
-def generate_response(user_input, phone_number,credentials):
+def generate_response(user_input, phone_number, credentials= None):
     print("inside_generate response")
+    
     
     connection = create_connection()  # Assuming this function returns a valid DB connection
     cursor = connection.cursor()
+    credentials = fetch_credentials()
     
-    google_calendar_email, next_events = fetch_google_calendar_info(credentials)
+    if crendendtials:
+        google_calendar_email, next_events = fetch_google_calendar_info(credentials)
+        
+    else :
+        google_calendar_email, next_events = None, None
 
     print(f"Email: {google_calendar_email}")
     print(f"Next Events: {next_events}")
