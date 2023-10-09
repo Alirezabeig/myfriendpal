@@ -1,6 +1,9 @@
 
 # truncate_conv.py
 from itertools import chain
+import json
+import logging
+import openai
 
 def truncate_to_last_n_words(conversation, max_words=500):
     # Convert the list of dicts to a list of strings, considering only 'content'.
