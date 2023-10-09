@@ -16,7 +16,6 @@ from db import create_connection
 from twilio_utils import sms_reply
 from google_calendar import oauth2callback
 
-
 import openai
 import psycopg2
 from psycopg2 import OperationalError

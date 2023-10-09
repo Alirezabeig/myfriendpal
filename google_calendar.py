@@ -5,6 +5,9 @@ import requests
 import os
 from db import conn, create_connection
 from calendar_utils import fetch_google_calendar_info
+from flask import render_template
+import json
+
 
 GOOGLE_CLIENT_ID = os.environ.get('GOOGLE_CLIENT_ID')
 GOOGLE_CLIENT_SECRET = os.environ.get('GOOGLE_CLIENT_SECRET')
@@ -55,7 +58,7 @@ def oauth2callback():
     else:
         print("Failed to get access_token or refresh_token")
 
-    return "Authorization complete..."
+    return render_template('authorization_complete.html')
 
     
 def get_new_access_token(refresh_token):
