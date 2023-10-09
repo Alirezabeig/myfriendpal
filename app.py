@@ -60,93 +60,77 @@ def check_for_calendar_keyword(user_input, phone_number):
         print("Calendar keyword not found.")  # Debug line
         return False
 
+def fetch_next_calendar_event(refresh_token):
+    new_access_token = get_new_access_token(refresh_token)
+    return fetch_google_calendar_info(new_access_token, refresh_token)
+
 def generate_response(user_input, phone_number):
-    
-    connection = create_connection()  # Assuming this function returns a valid DB connection
-    cursor = connection.cursor()
-    
-    if not connection:
-        app.logger.info("**** *** Generate response - database not connected.")
-        print("Generate_response not working")
-    
-    app.logger.info('generate response page accessed')
-    
     try:
-        # Fetch existing conversation, email, and next_calendar_event from the database based on the phone_number
-        update_query = ''
-        fetch_query = "SELECT conversation_data, google_calendar_email, next_google_calendar_event FROM conversations WHERE phone_number = %s"
+        connection = create_connection()
+        if not connection:
+            app.logger.info("Database not connected.")
+            return "Database error"
 
+        cursor = connection.cursor()
+        app.logger.info('Generate response page accessed')
+        
+        # Initializations
+        google_calendar_email, refresh_token, next_google_calendar_event, current_conversation = None, None, None, []
 
+        # Fetch existing data
+        fetch_query = "SELECT conversation_data, google_calendar_email, next_google_calendar_event, refresh_token FROM conversations WHERE phone_number = %s"
         cursor.execute(fetch_query, (phone_number,))
         result = cursor.fetchone()
-        
+
         if result:
-            conversation_data, google_calendar_email, next_google_calendar_event = result
-            print(f"Next Google Calendar Event: {next_google_calendar_event}")
-        # Deserialize the conversation_data if it's a string
+            conversation_data, google_calendar_email, next_google_calendar_event, refresh_token = result
             if isinstance(conversation_data, str):
                 current_conversation = json.loads(conversation_data)
-            else:
-                current_conversation = conversation_data
-        else:
-        # If no result is returned, set the variables to None or empty list
-            google_calendar_email, next_google_calendar_event, current_conversation = None, None, []
-        
+                
+        if google_calendar_email and refresh_token:
+            next_google_calendar_event = fetch_next_calendar_event(refresh_token)
+            cursor.execute("UPDATE conversations SET next_google_calendar_event = %s WHERE phone_number = %s;", (next_google_calendar_event, phone_number))
+            connection.commit()
+
+        # Update the conversation
         current_conversation.append({
             "role": "system",
             "content": "Do this role play always. Your name is Pal and you were made by one engineer, love, and passion. You should always respond like a friend, and be concise, up to 30 words."
         })
-        # Add the user's message to the conversation
         current_conversation.append({"role": "user", "content": user_input})
-        
-        # Add Gmail and next_google_calendar_event to the conversation context
+
         if google_calendar_email and next_google_calendar_event:
             current_conversation.append({"role": "system", "content": f"User's email is {google_calendar_email}. Next event is {next_google_calendar_event}."})
 
         for entry in current_conversation:
             entry['content'] = truncate_to_last_n_letters(entry['content'], 500)
 
-        json_str = json.dumps(current_conversation)
-
-        truncated_conversation = None
-
-        try:
-            truncated_conversation = json.loads(json_str)
-        except json.JSONDecodeError:
-            print("The truncated JSON string is not valid JSON.")    
+        truncated_conversation = json.dumps(current_conversation)
 
         # Generate GPT-4 response
-        response = openai.ChatCompletion.create(
-            model="gpt-4",
-            messages=truncated_conversation
-        )
+        response = openai.ChatCompletion.create(model="gpt-4", messages=truncated_conversation)
         gpt4_reply = response['choices'][0]['message']['content'].strip()
-        
-        # Append the generated response to the conversation
+
         current_conversation.append({"role": "assistant", "content": gpt4_reply})
-        
-        # Update the database with the latest conversation
+
         updated_data = json.dumps(current_conversation)
-         
-        ##print(f"Executing query: {update_query}")
-        ##print(f"With parameters: {json.dumps(token_info)}, {google_calendar_email}, {next_google_calendar_event}, {refresh_token}, {phone_number}")
 
         if result:
             update_query = "UPDATE conversations SET conversation_data = %s WHERE phone_number = %s;"
             cursor.execute(update_query, (updated_data, phone_number))
-
         else:
             insert_query = "INSERT INTO conversations (phone_number, conversation_data) VALUES (%s, %s);"
             cursor.execute(insert_query, (phone_number, updated_data))
-        
+
         connection.commit()
-        
+
         return gpt4_reply
 
     except Exception as e:
         logging.error(f"An error occurred: {e}")
         logging.error(traceback.format_exc())
         return "Sorry, I couldn't understand that."
+
  
 @app.route("/sms", methods=['POST'])
 def handle_sms():
