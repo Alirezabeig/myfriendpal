@@ -76,12 +76,13 @@ def generate_response(user_input, phone_number):
         update_query = ''
         fetch_query = "SELECT conversation_data, google_calendar_email, next_google_calendar_event FROM conversations WHERE phone_number = %s"
 
+
         cursor.execute(fetch_query, (phone_number,))
         result = cursor.fetchone()
         
         if result:
             conversation_data, google_calendar_email, next_google_calendar_event = result
-
+            print(f"Next Google Calendar Event: {next_google_calendar_event}")
         # Deserialize the conversation_data if it's a string
             if isinstance(conversation_data, str):
                 current_conversation = json.loads(conversation_data)
@@ -113,7 +114,6 @@ def generate_response(user_input, phone_number):
             truncated_conversation = json.loads(json_str)
         except json.JSONDecodeError:
             print("The truncated JSON string is not valid JSON.")    
-        print("truncated:", truncated_conversation)
 
         # Generate GPT-4 response
         response = openai.ChatCompletion.create(
