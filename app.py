@@ -15,11 +15,9 @@ from config import load_configurations
 from db import create_connection
 from twilio_utils import sms_reply
 from google_calendar import oauth2callback
-from itertools import chain
 from truncate_conv import truncate_to_last_n_words
 
 import openai
-import psycopg2
 from psycopg2 import OperationalError, Error
 import traceback
 
@@ -121,7 +119,7 @@ def generate_response(user_input, phone_number):
         
         # Update the database with the latest conversation
         updated_data = json.dumps(current_conversation)
-        
+         
         ##print(f"Executing query: {update_query}")
         ##print(f"With parameters: {json.dumps(token_info)}, {google_calendar_email}, {next_google_calendar_event}, {refresh_token}, {phone_number}")
 
@@ -145,7 +143,6 @@ def generate_response(user_input, phone_number):
 @app.route("/sms", methods=['POST'])
 def handle_sms():
     return sms_reply()
-
     
 @app.route('/')
 def index():

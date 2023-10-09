@@ -1,6 +1,10 @@
 
 #twilio_utils.py
 from flask import request, jsonify
+from twilio.rest import Client
+
+client = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
+
 
 def sms_reply():
     from app import client, TWILIO_PHONE_NUMBER, check_for_calendar_keyword, generate_response

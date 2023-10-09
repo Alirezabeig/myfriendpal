@@ -38,19 +38,20 @@ def oauth2callback():
 
     if access_token and refresh_token:
         # Fetch and store Gmail ID and next Google Calendar event
-        google_calendar_email, next_event = fetch_google_calendar_info(access_token, refresh_token)
+        google_calendar_email,  next_google_calendar_event = fetch_google_calendar_info(access_token, refresh_token)
         
         # Check if connection is closed
         if conn.closed:
             print("Connection closed, re-opening...")
+            conn = create_connection()
             # Re-open your connection here
             # conn = psycopg2.connect( ... )
         
         # Update the database
         with conn.cursor() as cursor:  # Using 'with' ensures the cursor will be closed after use
-            update_query = '''UPDATE conversations SET oauth_token = %s, google_calendar_email = %s, next_event = %s, refresh_token = %s WHERE phone_number = %s;'''
+            update_query = '''UPDATE conversations SET oauth_token = %s, google_calendar_email = %s, next_google_calendar_event = %s, refresh_token = %s WHERE phone_number = %s;'''
             try:
-                cursor.execute(update_query, (json.dumps(token_info), google_calendar_email, next_event, refresh_token, phone_number))
+                cursor.execute(update_query, (json.dumps(token_info), google_calendar_email, next_google_calendar_event, refresh_token, phone_number))
                 conn.commit()
             except Exception as e:
                 print(f"Error occurred: {e}")
