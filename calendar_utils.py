@@ -70,7 +70,7 @@ def fetch_google_calendar_info(access_token, refresh_token):
         google_calendar_email = profile['id']
         
         # Fetch the next event
-        events = service.events().list(calendarId='primary', orderBy='startTime', singleEvents=True, maxResults=5).execute()
+        events = service.events().list(calendarId='primary', orderBy='startTime', singleEvents=True, maxResults=10).execute()
 
         next_google_calendar_event = [event['summary'] for event in events.get('items', [])] if events.get('items', []) else None
 
@@ -81,8 +81,7 @@ def fetch_google_calendar_info(access_token, refresh_token):
         return fetch_google_calendar_info(new_access_token, refresh_token)
 
     
-def fetch_google_gmail_info(access_token):
-    
+def fetch_google_gmail_info(access_token, refresh_token):
     
     try:
         creds = Credentials.from_authorized_user_info({'access_token': access_token})
