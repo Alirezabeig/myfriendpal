@@ -12,7 +12,7 @@ from config import load_configurations
 from db import create_connection
 from twilio_utils import sms_reply
 from google_calendar import oauth2callback
-from truncate_conv import truncate_to_last_n_words
+from truncate_conv import truncate_to_last_n_letters
 
 import openai
 from psycopg2 import OperationalError, Error
@@ -102,7 +102,7 @@ def generate_response(user_input, phone_number):
             current_conversation.append({"role": "system", "content": f"User's email is {google_calendar_email}. Next event is {next_google_calendar_event}."})
 
         print("current_conversation", current_conversation)
-        truncated_conversation = truncate_to_last_n_words(current_conversation, 500)
+        truncated_conversation = truncate_to_last_n_letters(current_conversation, 500)
         print("truncated:", truncated_conversation)
         # Generate GPT-4 response
         response = openai.ChatCompletion.create(
