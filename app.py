@@ -90,10 +90,11 @@ def generate_response(user_input, phone_number):
                 current_conversation = json.loads(conversation_data)
 
         # Fetch next Google Calendar event
-        if google_calendar_email and refresh_token:
+        if google_calendar_email:
             next_google_calendar_event = fetch_next_calendar_event(refresh_token)
             cursor.execute("UPDATE conversations SET next_google_calendar_event = %s WHERE phone_number = %s;", (next_google_calendar_event, phone_number))
             connection.commit()
+            print("next_google*****", next_google_calendar_event)
 
         # Update the conversation with system and user messages
         current_conversation.append({
@@ -105,7 +106,8 @@ def generate_response(user_input, phone_number):
         # If Google Calendar info exists, add it to the system messages
         if google_calendar_email and next_google_calendar_event:
             current_conversation.append({"role": "system", "content": f"User's email is {google_calendar_email}. Next event is {next_google_calendar_event}."})
-        print("next_google_calendar_event:",next_google_calendar_event)
+            
+            print("next_google_calendar_event:",next_google_calendar_event)
         # Generate a response using GPT-4
         response = openai.ChatCompletion.create(model="gpt-4", messages=current_conversation)
         gpt4_reply = response['choices'][0]['message']['content'].strip()
