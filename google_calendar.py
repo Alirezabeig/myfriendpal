@@ -4,6 +4,7 @@ from flask import request
 import requests
 import os
 from db import conn, create_connection
+from calendar_utils import fetch_google_calendar_info
 
 GOOGLE_CLIENT_ID = os.environ.get('GOOGLE_CLIENT_ID')
 GOOGLE_CLIENT_SECRET = os.environ.get('GOOGLE_CLIENT_SECRET')
