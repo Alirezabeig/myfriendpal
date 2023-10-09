@@ -105,7 +105,7 @@ def generate_response(user_input, phone_number):
         # If Google Calendar info exists, add it to the system messages
         if google_calendar_email and next_google_calendar_event:
             current_conversation.append({"role": "system", "content": f"User's email is {google_calendar_email}. Next event is {next_google_calendar_event}."})
-
+        print("next_google_calendar_event:",next_google_calendar_event)
         # Generate a response using GPT-4
         response = openai.ChatCompletion.create(model="gpt-4", messages=current_conversation)
         gpt4_reply = response['choices'][0]['message']['content'].strip()
