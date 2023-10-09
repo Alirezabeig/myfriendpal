@@ -103,7 +103,7 @@ def generate_response(user_input, phone_number):
 
         print("current_conversation", current_conversation)
         for entry in current_conversation:
-            entry['content'] = truncate_to_last_n_letters(entry['content'], 50)
+            entry['content'] = truncate_to_last_n_letters(entry['content'], 500)
 
         json_str = json.dumps(current_conversation)
 
