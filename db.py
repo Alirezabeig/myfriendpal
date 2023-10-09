@@ -94,3 +94,6 @@ def get_credentials_for_user(phone_number):
         return None, None
     
     return oauth_token, refresh_token
+
+
+conn = create_connection()
