@@ -13,6 +13,8 @@ from db import create_connection
 from twilio_utils import sms_reply
 from google_calendar import oauth2callback
 from truncate_conv import truncate_to_last_n_letters
+from shared_utils import get_new_access_token
+
 
 import openai
 from psycopg2 import OperationalError, Error
@@ -59,7 +61,6 @@ def check_for_calendar_keyword(user_input, phone_number):
         return False
 
 def generate_response(user_input, phone_number):
-    print("inside_generate response")
     
     connection = create_connection()  # Assuming this function returns a valid DB connection
     cursor = connection.cursor()
@@ -101,7 +102,6 @@ def generate_response(user_input, phone_number):
         if google_calendar_email and next_google_calendar_event:
             current_conversation.append({"role": "system", "content": f"User's email is {google_calendar_email}. Next event is {next_google_calendar_event}."})
 
-        print("current_conversation", current_conversation)
         for entry in current_conversation:
             entry['content'] = truncate_to_last_n_letters(entry['content'], 500)
 
@@ -181,22 +181,6 @@ def send_message():
     except Exception as e:
         logging.error(f"Failed to send message: {e}")
         return jsonify({'message': 'Failed to send message', 'error': str(e)})
-    
-def get_new_access_token(refresh_token):
-    data = {
-        'client_id': GOOGLE_CLIENT_ID,
-        'client_secret': GOOGLE_CLIENT_SECRET,
-        'refresh_token': refresh_token,
-        'grant_type': 'refresh_token'
-    }
-    try:
-        response = requests.post('https://oauth2.googleapis.com/token', data=data)
-        token_info = response.json()
-        new_access_token = token_info.get('access_token')
-        return new_access_token
-    except Exception as e:
-        logging.error(f"Failed to get new access token: {e}")
-        return None
         
 @app.route('/oauth2callback', methods=['GET'])
 def handle_oauth2callback():
