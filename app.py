@@ -15,14 +15,16 @@ from config import load_configurations
 from db import create_connection
 from twilio_utils import sms_reply
 from google_calendar import oauth2callback
+from itertools import chain
 from truncate_conv import truncate_to_last_n_words
+
 
 
 import openai
 import psycopg2
-from psycopg2 import OperationalError
+from psycopg2 import OperationalError, Error
 import traceback
-from psycopg2 import Error
+
 from calendar_utils import get_google_calendar_authorization_url
 from calendar_utils import fetch_google_calendar_info
 
@@ -108,13 +110,6 @@ def generate_response(user_input, phone_number):
 
         
         truncated_conversation = truncate_to_last_n_words(current_conversation, 500)
-        # Convert the truncated conversation to a list of words
-        text_list = [item['content'] for item in truncated_conversation]
-        all_words = list(chain.from_iterable([text.split() for text in text_list]))
-
-        # Extract and print the last 100 words
-        last_100_words = ' '.join(all_words[-100:])
-        print("Last 100 words:", last_100_words)
         
         # Generate GPT-4 response
         response = openai.ChatCompletion.create(
