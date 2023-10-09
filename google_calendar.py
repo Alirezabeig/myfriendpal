@@ -43,7 +43,6 @@ def oauth2callback():
         # Check if connection is closed
         if conn.closed:
             print("Connection closed, re-opening...")
-            conn = create_connection()
             # Re-open your connection here
             # conn = psycopg2.connect( ... )
         
