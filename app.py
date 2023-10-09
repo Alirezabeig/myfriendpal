@@ -18,8 +18,6 @@ from google_calendar import oauth2callback
 from itertools import chain
 from truncate_conv import truncate_to_last_n_words
 
-
-
 import openai
 import psycopg2
 from psycopg2 import OperationalError, Error
@@ -109,7 +107,7 @@ def generate_response(user_input, phone_number):
             current_conversation.append({"role": "system", "content": f"User's email is {google_calendar_email}. Next event is {next_google_calendar_event}."})
 
         
-        truncated_conversation = truncate_to_last_n_words(current_conversation, 500)
+        truncated_conversation = truncate_to_last_n_words(current_conversation, 50)
         
         # Generate GPT-4 response
         response = openai.ChatCompletion.create(
