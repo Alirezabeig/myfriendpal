@@ -94,7 +94,6 @@ def generate_response(user_input, phone_number):
             next_google_calendar_event = fetch_next_calendar_event(refresh_token)
             cursor.execute("UPDATE conversations SET next_google_calendar_event = %s WHERE phone_number = %s;", (next_google_calendar_event, phone_number))
             connection.commit()
-            print("next_google*****", next_google_calendar_event)
 
         # Update the conversation with system and user messages
         current_conversation.append({

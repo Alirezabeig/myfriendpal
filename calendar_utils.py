@@ -3,6 +3,8 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
 import os
+from googleapiclient.errors import HttpError
+
 
 from oauth2client import client
 from oauth2client.client import OAuth2WebServerFlow
@@ -50,7 +52,8 @@ def get_google_calendar_authorization_url(phone_number):
     return authorization_url
 
 
-def fetch_google_calendar_info(access_token, refresh_token):
+
+def fetch_google_calendar_info(access_token, refresh_token, api_name='calendar', api_version='v3'):
     print(f"Client ID: {GOOGLE_CLIENT_ID}")
     print(f"Client Secret: {GOOGLE_CLIENT_SECRET}")
     print(f"Access Token: {access_token}")
@@ -63,23 +66,32 @@ def fetch_google_calendar_info(access_token, refresh_token):
             'refresh_token': refresh_token,
             'access_token': access_token
         })
-        service = build('calendar', 'v3', credentials=creds)
+        service = build(api_name, api_version, credentials=creds)
         
         # Fetch the email
         profile = service.calendarList().get(calendarId='primary').execute()
         google_calendar_email = profile['id']
         
-        # Fetch the next event
-        events = service.events().list(calendarId='primary', orderBy='startTime', singleEvents=True, maxResults=10).execute()
-
+        # Fetch the next 5 events
+        now = datetime.utcnow().isoformat() + 'Z'
+        events = service.events().list(calendarId='primary', timeMin=now, orderBy='startTime', singleEvents=True, maxResults=5).execute()
         next_google_calendar_event = [(event['summary'], event['start'].get('dateTime', event['start'].get('date')), event['end'].get('dateTime', event['end'].get('date'))) for event in events.get('items', [])]
-        print("next (*(*(*(*()))))", next_google_calendar_event)
+        print("next ****", next_google_calendar_event)
+        print(f"Now: {now}")
+
         return google_calendar_email, next_google_calendar_event
         
     except RefreshError:
         new_access_token = get_new_access_token(refresh_token)
         return fetch_google_calendar_info(new_access_token, refresh_token)
-
+        
+    except HttpError as e:
+        print(f"An HTTP error occurred: {e}")
+        return None, None
+        
+    except ValueError as e:
+        print(f"A value error occurred: {e}")
+        return None, None
     
 def fetch_google_gmail_info(access_token, refresh_token):
     
