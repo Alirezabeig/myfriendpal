@@ -2,9 +2,6 @@
 import requests
 from flask import Flask, request, jsonify, render_template
 from werkzeug.middleware.proxy_fix import ProxyFix
-#from google_auth_oauthlib.flow import InstalledAppFlow
-#from google.oauth2 import service_account
-#from googleapiclient.discovery import build
 from twilio.rest import Client
 import os
 from dotenv import load_dotenv
@@ -105,12 +102,12 @@ def generate_response(user_input, phone_number):
             current_conversation.append({"role": "system", "content": f"User's email is {google_calendar_email}. Next event is {next_google_calendar_event}."})
 
         
-        ##truncated_conversation = truncate_to_last_n_words(current_conversation, 50)
-        
+        truncated_conversation = truncate_to_last_n_words(current_conversation, 50)
+        print("truncated:", truncated_conversation)
         # Generate GPT-4 response
         response = openai.ChatCompletion.create(
             model="gpt-4",
-            messages=current_conversation
+            messages=truncated_conversation
         )
         gpt4_reply = response['choices'][0]['message']['content'].strip()
         
