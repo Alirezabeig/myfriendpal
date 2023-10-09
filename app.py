@@ -102,7 +102,14 @@ def generate_response(user_input, phone_number):
             current_conversation.append({"role": "system", "content": f"User's email is {google_calendar_email}. Next event is {next_google_calendar_event}."})
 
         print("current_conversation", current_conversation)
-        truncated_conversation = truncate_to_last_n_letters(current_conversation, 500)
+        json_str = json.dumps(current_conversation)
+
+        truncated_json_str = truncate_to_last_n_letters(json_str, 100)
+        try:
+            truncated_conversation = json.loads(truncated_json_str)
+        except json.JSONDecodeError:
+            print("The truncated JSON string is not valid JSON.")
+            
         print("truncated:", truncated_conversation)
         # Generate GPT-4 response
         response = openai.ChatCompletion.create(
