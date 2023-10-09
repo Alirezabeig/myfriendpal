@@ -66,6 +66,7 @@ def fetch_next_calendar_event(refresh_token):
 
 def generate_response(user_input, phone_number):
     try:
+        # Establish database connection
         connection = create_connection()
         if not connection:
             app.logger.info("Database not connected.")
@@ -73,48 +74,47 @@ def generate_response(user_input, phone_number):
 
         cursor = connection.cursor()
         app.logger.info('Generate response page accessed')
-        
-        # Initializations
+
+        # Initialize variables
         google_calendar_email, refresh_token, next_google_calendar_event, current_conversation = None, None, None, []
 
-        # Fetch existing data
+        # Fetch existing data from database
         fetch_query = "SELECT conversation_data, google_calendar_email, next_google_calendar_event, refresh_token FROM conversations WHERE phone_number = %s"
         cursor.execute(fetch_query, (phone_number,))
         result = cursor.fetchone()
 
+        # Load existing conversation from database
         if result:
             conversation_data, google_calendar_email, next_google_calendar_event, refresh_token = result
             if isinstance(conversation_data, str):
                 current_conversation = json.loads(conversation_data)
-                
+
+        # Fetch next Google Calendar event
         if google_calendar_email and refresh_token:
             next_google_calendar_event = fetch_next_calendar_event(refresh_token)
             cursor.execute("UPDATE conversations SET next_google_calendar_event = %s WHERE phone_number = %s;", (next_google_calendar_event, phone_number))
             connection.commit()
 
-        # Update the conversation
+        # Update the conversation with system and user messages
         current_conversation.append({
             "role": "system",
             "content": "Do this role play always. Your name is Pal and you were made by one engineer, love, and passion. You should always respond like a friend, and be concise, up to 30 words."
         })
         current_conversation.append({"role": "user", "content": user_input})
 
+        # If Google Calendar info exists, add it to the system messages
         if google_calendar_email and next_google_calendar_event:
             current_conversation.append({"role": "system", "content": f"User's email is {google_calendar_email}. Next event is {next_google_calendar_event}."})
 
-        for entry in current_conversation:
-            entry['content'] = truncate_to_last_n_letters(entry['content'], 500)
-
-        truncated_conversation = json.dumps(current_conversation)
-
-        # Generate GPT-4 response
-        response = openai.ChatCompletion.create(model="gpt-4", messages=truncated_conversation)
+        # Generate a response using GPT-4
+        response = openai.ChatCompletion.create(model="gpt-4", messages=current_conversation)
         gpt4_reply = response['choices'][0]['message']['content'].strip()
 
+        # Append the assistant's reply to the current conversation
         current_conversation.append({"role": "assistant", "content": gpt4_reply})
 
+        # Update the database with the new conversation
         updated_data = json.dumps(current_conversation)
-
         if result:
             update_query = "UPDATE conversations SET conversation_data = %s WHERE phone_number = %s;"
             cursor.execute(update_query, (updated_data, phone_number))
