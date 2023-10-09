@@ -192,6 +192,12 @@ def get_new_access_token(refresh_token):
         logging.error(f"Failed to get new access token: {e}")
         return None
         
+@app.route('/oauth2callback', methods=['GET'])
+def handle_oauth2callback():
+    print("Entered handle_oauth2callback in app.py")
+    return oauth2callback()
+
+
 @app.route('/pal', methods=['GET'])
 def pal_page():
     return render_template('pal.html')

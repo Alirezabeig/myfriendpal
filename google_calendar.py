@@ -5,10 +5,15 @@ import requests
 import os
 from db import conn, create_connection
 
+GOOGLE_CLIENT_ID = os.environ.get('GOOGLE_CLIENT_ID')
+GOOGLE_CLIENT_SECRET = os.environ.get('GOOGLE_CLIENT_SECRET')
+TWILIO_ACCOUNT_SID = os.environ.get('TWILIO_ACCOUNT_SID')
+TWILIO_AUTH_TOKEN = os.environ.get('TWILIO_AUTH_TOKEN')
+TWILIO_PHONE_NUMBER = '+18666421882'
 conn = create_connection()
 
 def oauth2callback():
-    print("OAUTH2CALLBACK &*&*## -- ##")
+    print("Entered oauth2callback")
     auth_code = request.args.get('code')
     phone_number = request.args.get('state')  # Assuming you passed phone_number as 'state' during OAuth2 initiation
 
