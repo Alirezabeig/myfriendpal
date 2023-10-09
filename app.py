@@ -105,12 +105,12 @@ def generate_response(user_input, phone_number):
             current_conversation.append({"role": "system", "content": f"User's email is {google_calendar_email}. Next event is {next_google_calendar_event}."})
 
         
-        truncated_conversation = truncate_to_last_n_words(current_conversation, 50)
+        ##truncated_conversation = truncate_to_last_n_words(current_conversation, 50)
         
         # Generate GPT-4 response
         response = openai.ChatCompletion.create(
             model="gpt-4",
-            messages=truncated_conversation
+            messages=current_conversation
         )
         gpt4_reply = response['choices'][0]['message']['content'].strip()
         
@@ -206,5 +206,5 @@ if __name__ == '__main__':
     app.debug = True
     port = int(os.environ.get("PORT", 5002))
     app.run(host="0.0.0.0", port=port)
-    
+
 ## Oct 8 
