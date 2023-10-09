@@ -101,7 +101,7 @@ def generate_response(user_input, phone_number):
         if google_calendar_email and next_google_calendar_event:
             current_conversation.append({"role": "system", "content": f"User's email is {google_calendar_email}. Next event is {next_google_calendar_event}."})
 
-        
+        print("current_conversation", current_conversation)
         truncated_conversation = truncate_to_last_n_words(current_conversation, 50)
         print("truncated:", truncated_conversation)
         # Generate GPT-4 response
