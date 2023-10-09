@@ -4,9 +4,12 @@ from flask import request
 import requests
 import os
 from db import create_connection
+import json
+import logging
 
 
-@app.route('/oauth2callback', methods=['GET'])
+conn = create_connection()
+
 def oauth2callback():
     print("OAUTH2CALLBACK &*&*## -- ##")
     auth_code = request.args.get('code')
