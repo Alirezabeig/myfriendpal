@@ -95,6 +95,8 @@ def generate_response(user_input, phone_number):
             print("****results printed")
 
         # Load existing conversation from database
+        current_conversation = []
+
         if result:
             conversation_data, google_calendar_email, next_google_calendar_event, refresh_token = result
             if isinstance(conversation_data, str):
@@ -107,11 +109,11 @@ def generate_response(user_input, phone_number):
             cursor.execute("UPDATE conversations SET next_google_calendar_event = %s WHERE phone_number = %s;", (next_google_calendar_event, phone_number))
             connection.commit()
 
-        # Update the conversation with system and user messages
-        current_conversation.append({
+        new_conversation = { 
             "role": "system",
             "content": "Do this role play always. Your name is Pal and you were made by one engineer, love, and passion and lot of coding experience. You should always respond like a friend, and be concise, up to 30 words. Offer help and support."
-        })
+        }
+        current_conversation.append(new_conversation)  # Append to the old conversation
         current_conversation.append({"role": "user", "content": user_input})
 
         # If Google Calendar info exists, add it to the system messages
@@ -127,13 +129,9 @@ def generate_response(user_input, phone_number):
         current_conversation.append({"role": "assistant", "content": gpt4_reply})
 
         # Update the database with the new conversation
-        updated_data = json.dumps(current_conversation)
-        if result:
-            update_query = "UPDATE conversations SET conversation_data = %s WHERE phone_number = %s;"
-            cursor.execute(update_query, (updated_data, phone_number))
-        else:
-            insert_query = "INSERT INTO conversations (phone_number, conversation_data) VALUES (%s, %s);"
-            cursor.execute(insert_query, (phone_number, updated_data))
+        updated_data = json.dumps(current_conversation)  # Convert the updated list to JSON string
+        update_query = "UPDATE conversations SET conversation_data = %s WHERE phone_number = %s;"
+        cursor.execute(update_query, (updated_data, phone_number))
 
         connection.commit()
 
