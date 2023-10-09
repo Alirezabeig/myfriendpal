@@ -72,9 +72,9 @@ def fetch_google_calendar_info(access_token, refresh_token):
         # Fetch the next event
         events = service.events().list(calendarId='primary', orderBy='startTime', singleEvents=True, maxResults=5).execute()
 
-        next_events = [event['summary'] for event in events.get('items', [])] if events.get('items', []) else None
+        next_google_calendar_event = [event['summary'] for event in events.get('items', [])] if events.get('items', []) else None
 
-        return google_calendar_email, next_events
+        return google_calendar_email, next_google_calendar_event
         
     except RefreshError:
         new_access_token = get_new_access_token(refresh_token)
