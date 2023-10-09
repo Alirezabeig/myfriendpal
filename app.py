@@ -72,6 +72,8 @@ def generate_response(user_input, phone_number):
             app.logger.info("Database not connected.")
             return "Database error"
 
+        print("Connection:", connection)
+        
         cursor = connection.cursor()
         app.logger.info('Generate response page accessed')
 
@@ -82,6 +84,13 @@ def generate_response(user_input, phone_number):
         fetch_query = "SELECT conversation_data, google_calendar_email, next_google_calendar_event, refresh_token FROM conversations WHERE phone_number = %s"
         cursor.execute(fetch_query, (phone_number,))
         result = cursor.fetchone()
+
+        try:
+            cursor.execute(fetch_query, (phone_number,))
+            print("Cursor:", cursor.fetchall())  # Debugging line
+        except Exception as query_exc:
+            print(f"Query Error: {query_exc}")
+
         if result:
             print("****results printed")
 
