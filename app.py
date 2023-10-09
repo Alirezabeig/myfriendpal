@@ -98,7 +98,7 @@ def generate_response(user_input, phone_number):
         # Update the conversation with system and user messages
         current_conversation.append({
             "role": "system",
-            "content": "Do this role play always. Your name is Pal and you were made by one engineer, love, and passion. You should always respond like a friend, and be concise, up to 30 words."
+            "content": "Do this role play always. Your name is Pal and you were made by one engineer, love, and passion and lot of coding experience. You should always respond like a friend, and be concise, up to 30 words. Offer help and support."
         })
         current_conversation.append({"role": "user", "content": user_input})
 
@@ -106,7 +106,7 @@ def generate_response(user_input, phone_number):
         if google_calendar_email and next_google_calendar_event:
             current_conversation.append({"role": "system", "content": f"User's email is {google_calendar_email}. Next event is {next_google_calendar_event}."})
             
-            print("next_google_calendar_event:",next_google_calendar_event)
+            print("current_conversation:",current_conversation)
         # Generate a response using GPT-4
         response = openai.ChatCompletion.create(model="gpt-4", messages=current_conversation)
         gpt4_reply = response['choices'][0]['message']['content'].strip()
