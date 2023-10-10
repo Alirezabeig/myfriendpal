@@ -75,6 +75,7 @@ body {
   width: 40px;  /* Width of the image, can adjust based on your needs */
   height: 40px;  /* Height of the image, can adjust based on your needs */
   vertical-align: middle;  /* Aligns the image with the adjacent text */
+  padding-bottom: 15px;
 }
 *, *::before, *::after {
   box-sizing: border-box;
