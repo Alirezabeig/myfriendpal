@@ -3,7 +3,7 @@
 from itertools import chain
 
 
-def truncate_to_last_n_words(conversation, max_words=100):
+def truncate_to_last_n_words(conversation, max_words=500):
     # Convert the list of dicts to a list of strings, considering only 'content'.
     text_list = [item['content'] for item in conversation]
     
