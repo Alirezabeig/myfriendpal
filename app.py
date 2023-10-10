@@ -137,7 +137,8 @@ def generate_response(user_input, phone_number):
 
             logging.info(f"current_conversation: {current_conversation}")
 
-        response = openai.ChatCompletion.create(model="gpt-4", messages=current_conversation)
+        truncate_convo = truncate_to_last_n_letters(current_conversation, 1000)
+        response = openai.ChatCompletion.create(model="gpt-4", messages=truncate_convo)
         gpt4_reply = response['choices'][0]['message']['content'].strip()
 
         new_conversation_assistant = {
