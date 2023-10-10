@@ -129,7 +129,6 @@ def generate_response(user_input, phone_number):
         updated_data = json.dumps(current_conversation)  # Convert the updated list to JSON string
         update_query = "UPDATE conversations SET conversation_data = %s WHERE phone_number = %s;"
         cursor.execute(update_query, (updated_data, phone_number))
-
         connection.commit()
 
         return gpt4_reply
