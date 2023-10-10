@@ -112,7 +112,7 @@ def generate_response(user_input, phone_number):
         # Append new data to existing conversation
         new_conversation_system = { 
             "role": "system",
-            "content": "Do this role play always..."
+            "content": "Do this role play always. Your name is Pal, your were made by one engineer with love and passion and tons of coding skills. You are concise up to 30 words max. Always friendly, no need to list calendar events but learn about them tune your conversation sometimes based on them"
         }
         new_conversation_user = {
             "role": "user",
