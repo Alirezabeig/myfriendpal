@@ -87,15 +87,16 @@ def generate_response(user_input, phone_number):
         logging.info(f"Fetched result: {result}")
         logging.info(f"Phone number being queried: {phone_number}")
 
+
         if result:
             conversation_data, google_calendar_email, next_google_calendar_event, refresh_token = result
             logging.info(f"Type of conversation_data: {type(conversation_data)}")
-            logging.info(f"Value of conversation_data: {conversation_data}")
+            logging.info(f"Vaxing of conversation_data before if-statement: {conversation_data}")
 
             # Deserialize JSON string into Python list
             if isinstance(conversation_data, str):
                 current_conversation = json.loads(conversation_data)
-                logging.info(f"Old Conversations Loaded: {current_conversation}")
+                logging.info(f"Oldix Conversations Loaded: {current_conversation}")
 
         else: 
             current_conversation = []
