@@ -92,6 +92,7 @@ def generate_response(user_input, phone_number):
         
         if result:
             conversation_data, google_calendar_email, next_google_calendar_event, refresh_token = result
+            print("conversation data",conversation_data)
             if isinstance(conversation_data, str):
                 current_conversation = json.loads(conversation_data)
                 print("current_convo **__", current_conversation)
