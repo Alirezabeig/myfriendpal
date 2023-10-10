@@ -85,23 +85,19 @@ def generate_response(user_input, phone_number):
         cursor.execute(fetch_query, (phone_number,))
         result = cursor.fetchone()
 
-        try:
-            cursor.execute(fetch_query, (phone_number,))
-            print("Cursor:", cursor.fetchall())  # Debugging line
-        except Exception as query_exc:
-            print(f"Query Error: {query_exc}")
-
         if result:
             print("****results printed")
 
         # Load existing conversation from database
-        current_conversation = []
-
+        
         if result:
             conversation_data, google_calendar_email, next_google_calendar_event, refresh_token = result
             if isinstance(conversation_data, str):
                 current_conversation = json.loads(conversation_data)
                 print("current_convo__", current_conversation)
+
+        else: 
+            current_conversation = []
 
         # Fetch next Google Calendar event
         if google_calendar_email:
