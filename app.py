@@ -88,17 +88,20 @@ def generate_response(user_input, phone_number):
         print("Phone number being queried: ", phone_number)
 
         # Load existing conversation from database
-        
         if result:
             conversation_data, google_calendar_email, next_google_calendar_event, refresh_token = result
-            print("conversation data",conversation_data)
+            print("Type of conversation_data:", type(conversation_data))  # Debugging
+            print("Value of conversation_data:", conversation_data)  # Debugging
+
+            # Deserialize JSON string into Python list
             if isinstance(conversation_data, str):
                 current_conversation = json.loads(conversation_data)
-                print("current_convo **__", current_conversation)
+                print("Old Conversations Loaded:", current_conversation)  # Debugging
 
+        # If there's no past conversation, initialize an empty list
         else: 
             current_conversation = []
-            print("current_converstion *** ", current_conversation)
+            print("No past conversations found.")  # Debugging
 
         # Fetch next Google Calendar event
         if google_calendar_email:
@@ -106,27 +109,40 @@ def generate_response(user_input, phone_number):
             cursor.execute("UPDATE conversations SET next_google_calendar_event = %s WHERE phone_number = %s;", (next_google_calendar_event, phone_number))
             connection.commit()
 
-        new_conversation = { 
+        # Append new data to existing conversation
+        new_conversation_system = { 
             "role": "system",
-            "content": "Do this role play always. Your name is Pal and you were made by one engineer, love, and passion and lot of coding experience. You should always respond like a friend, and be concise, up to 30 words. Offer help and support."
+            "content": "Do this role play always..."
         }
-        current_conversation.append(new_conversation)  # Append to the old conversation
-        current_conversation.append({"role": "user", "content": user_input})
+        new_conversation_user = {
+            "role": "user",
+            "content": user_input
+        }
+        current_conversation.extend([new_conversation_system, new_conversation_user])
 
         # If Google Calendar info exists, add it to the system messages
         if google_calendar_email and next_google_calendar_event:
-            current_conversation.append({"role": "system", "content": f"User's email is {google_calendar_email}. Next event is {next_google_calendar_event}."})
-            
+            new_conversation_calendar = {
+                "role": "system",
+                "content": f"User's email is {google_calendar_email}. Next event is {next_google_calendar_event}."
+            }
+            current_conversation.append(new_conversation_calendar)
+
             print("current_conversation:",current_conversation)
         # Generate a response using GPT-4
         response = openai.ChatCompletion.create(model="gpt-4", messages=current_conversation)
         gpt4_reply = response['choices'][0]['message']['content'].strip()
 
-        # Append the assistant's reply to the current conversation
-        current_conversation.append({"role": "assistant", "content": gpt4_reply})
+        new_conversation_assistant = {
+            "role": "assistant",
+            "content": gpt4_reply
+        }
+        current_conversation.append(new_conversation_assistant)
 
         # Update the database with the new conversation
-        updated_data = json.dumps(current_conversation)  # Convert the updated list to JSON string
+        updated_data = json.dumps(current_conversation)
+
+        # Update the database with the new conversation
         update_query = "UPDATE conversations SET conversation_data = %s WHERE phone_number = %s;"
         cursor.execute(update_query, (updated_data, phone_number))
         connection.commit()
