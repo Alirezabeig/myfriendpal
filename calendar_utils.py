@@ -6,8 +6,6 @@ import os
 from googleapiclient.errors import HttpError
 from datetime import datetime
 
-
-
 from oauth2client import client
 from oauth2client.client import OAuth2WebServerFlow
 from google.oauth2.credentials import Credentials
