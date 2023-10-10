@@ -93,10 +93,20 @@ def generate_response(user_input, phone_number):
             logging.info(f"Type of conversation_data: {type(conversation_data)}")
             logging.info(f"Vaxing of conversation_data before if-statement: {conversation_data}")
 
+            # Ensure conversation_data is a JSON-formatted string
+            if not isinstance(conversation_data, str):
+                try:
+                    conversation_data = json.dumps(conversation_data)
+                except (TypeError, ValueError) as e:
+                    logging.error(f"Anxing error occurred while serializing: {e}")
+
             # Deserialize JSON string into Python list
             if isinstance(conversation_data, str):
-                current_conversation = json.loads(conversation_data)
-                logging.info(f"Oldix Conversations Loaded: {current_conversation}")
+                try:
+                    current_conversation = json.loads(conversation_data)
+                    logging.info(f"Oldix Conversations Loaded: {current_conversation}")
+                except json.JSONDecodeError as e:
+                    logging.error(f"An error occurred while deserializing: {e}")
 
         else: 
             current_conversation = []
