@@ -79,3 +79,28 @@ body {
 *, *::before, *::after {
   box-sizing: border-box;
 }
+
+.chat {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.message {
+  padding: 15px;
+  border-radius: 20px;
+  color: white;
+  display: inline-block;
+  max-width: 80%;
+  font-size: 1.1em;
+  margin-bottom: 10px;  /* Adds a gap between the bubbles */
+}
+
+.message-blue {
+  background-color: #00bfff;
+}
+
+.message-android {
+  background-color: #34b7f1;
+  border-bottom-right-radius: 5px;  /* Reduce curvature on one corner for Android style */
+}
