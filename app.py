@@ -118,6 +118,7 @@ def generate_response(user_input, phone_number):
             cursor.execute("UPDATE conversations SET next_google_calendar_event = %s WHERE phone_number = %s;", (next_google_calendar_event, phone_number))
             connection.commit()
 
+        current_conversation = truncate_to_last_n_words(current_conversation, 500)
         new_conversation_system = { 
             "role": "system",
             "content": "Do this role play always. Your name is Pal, your were made by one engineer with love and passion and tons of coding skills. You are concise up to 30 words max. Always friendly, no need to list calendar events unless you are asked, learn about them"
@@ -126,6 +127,7 @@ def generate_response(user_input, phone_number):
             "role": "user",
             "content": user_input
         }
+        
         current_conversation.extend([new_conversation_system, new_conversation_user])
 
         if google_calendar_email and next_google_calendar_event:
@@ -137,9 +139,9 @@ def generate_response(user_input, phone_number):
 
             logging.info(f"current_conversation: {current_conversation}")
 
-        truncate_words = truncate_to_last_n_words(current_conversation, 500)
-        print("truncate convo", truncate_words)
-        response = openai.ChatCompletion.create(model="gpt-4", messages=truncate_words)
+        
+        
+        response = openai.ChatCompletion.create(model="gpt-4", messages=current_conversation)
         gpt4_reply = response['choices'][0]['message']['content'].strip()
 
         new_conversation_assistant = {
