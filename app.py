@@ -84,9 +84,8 @@ def generate_response(user_input, phone_number):
         fetch_query = "SELECT conversation_data, google_calendar_email, next_google_calendar_event, refresh_token FROM conversations WHERE phone_number = %s"
         cursor.execute(fetch_query, (phone_number,))
         result = cursor.fetchone()
-
-        if result:
-            print("****results printed")
+        print("Fetched result: ", result)
+        print("Phone number being queried: ", phone_number)
 
         # Load existing conversation from database
         
