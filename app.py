@@ -94,10 +94,11 @@ def generate_response(user_input, phone_number):
             conversation_data, google_calendar_email, next_google_calendar_event, refresh_token = result
             if isinstance(conversation_data, str):
                 current_conversation = json.loads(conversation_data)
-                print("current_convo__", current_conversation)
+                print("current_convo **__", current_conversation)
 
         else: 
             current_conversation = []
+            print("current_converstion *** ", current_conversation)
 
         # Fetch next Google Calendar event
         if google_calendar_email:
