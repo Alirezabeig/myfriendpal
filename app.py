@@ -138,7 +138,7 @@ def generate_response(user_input, phone_number):
             logging.info(f"current_conversation: {current_conversation}")
 
         truncate_words = truncate_to_last_n_words(current_conversation, 100)
-        print("truncate convo", truncate_to_last_n_words)
+        print("truncate convo", truncate_words)
         response = openai.ChatCompletion.create(model="gpt-4", messages=truncate_words)
         gpt4_reply = response['choices'][0]['message']['content'].strip()
 
