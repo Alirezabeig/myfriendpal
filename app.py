@@ -81,6 +81,7 @@ def generate_response(user_input, phone_number):
         google_calendar_email, refresh_token, next_google_calendar_event, current_conversation = None, None, None, []
 
         # Fetch existing data from database
+        update_query = ''
         fetch_query = "SELECT conversation_data, google_calendar_email, next_google_calendar_event, refresh_token FROM conversations WHERE phone_number = %s"
         cursor.execute(fetch_query, (phone_number,))
         result = cursor.fetchone()
@@ -109,7 +110,7 @@ def generate_response(user_input, phone_number):
                     logging.error(f"An error occurred while deserializing: {e}")
 
         else: 
-            current_conversation = []
+            current_conversation = conversation_data
             logging.info("No past conversations found.")
 
         if google_calendar_email:
