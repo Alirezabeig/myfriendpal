@@ -3,6 +3,10 @@
 from flask import request, jsonify
 from twilio.rest import Client
 import os
+import openai
+
+gpt4_api_key = os.environ.get('GPT4_API_KEY')
+openai.api_key = gpt4_api_key
 
 TWILIO_ACCOUNT_SID = os.environ.get('TWILIO_ACCOUNT_SID')
 TWILIO_AUTH_TOKEN = os.environ.get('TWILIO_AUTH_TOKEN')
@@ -30,3 +34,23 @@ def sms_reply():
         )
 
     return jsonify({'message': 'Reply sent!'})
+
+
+def send_proactive_message(phone_number, event):
+    openai.api_key = gpt4_api_key
+    prompt = f"This event {event['summary']} is very important. reach out with to me based on the event to offer help, support, fun activities and etc so the user can feel you are thinking of them."
+    response = openai.ChatCompletion.create(
+        model="gpt-4",
+        prompt=prompt,
+        max_tokens=50
+    )
+    suggestions = response['choices'][0]['text'].strip()
+
+    # Prepare and send the proactive message
+    proactive_msg = f"I noticed your ucoming event {event['summary']} is important. {suggestions}"
+    
+    message = client.messages.create(
+        to=phone_number,
+        from_=TWILIO_PHONE_NUMBER,
+        body=proactive_msg
+    )

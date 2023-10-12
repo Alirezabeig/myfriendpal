@@ -76,4 +76,3 @@ def get_new_access_token(refresh_token):
         logging.error(f"Failed to get new access token: {e}")
         return None
 
-## Oct 8 

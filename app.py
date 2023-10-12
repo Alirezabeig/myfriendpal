@@ -10,11 +10,11 @@ import json
 
 from config import load_configurations
 from db import create_connection
-from twilio_utils import sms_reply
+from twilio_utils import sms_reply, send_proactive_message
 from google_calendar import oauth2callback
 from truncate_conv import truncate_to_last_n_words
 from shared_utils import get_new_access_token
-
+from event_utils import fetch_for_prompt_next_calendar, is_important_event
 
 import openai
 from psycopg2 import OperationalError, Error
@@ -114,7 +114,11 @@ def generate_response(user_input, phone_number):
             logging.info("No past conversations found.")
 
         if google_calendar_email:
-            next_google_calendar_event = fetch_next_calendar_event(refresh_token)
+            next_google_calendar_event = fetch_for_prompt_next_calendar(refresh_token)
+            if is_important_event(next_google_calendar_event):  # Checks if the event is important
+                print("Important event detected. Sending proactive message.")  # Debug print statement
+                send_proactive_message(phone_number, next_google_calendar_event)  # Sends proactive message if event is important
+ 
             cursor.execute("UPDATE conversations SET next_google_calendar_event = %s WHERE phone_number = %s;", (next_google_calendar_event, phone_number))
             connection.commit()
 
@@ -139,7 +143,6 @@ def generate_response(user_input, phone_number):
 
             logging.info(f"current_conversation: {current_conversation}")
 
-        
         
         response = openai.ChatCompletion.create(model="gpt-4", messages=current_conversation)
         gpt4_reply = response['choices'][0]['message']['content'].strip()
