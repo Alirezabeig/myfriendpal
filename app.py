@@ -24,7 +24,7 @@ import traceback
 from calendar_utils import get_google_calendar_authorization_url
 from calendar_utils import fetch_google_calendar_info
 
-load_dotenv()
+load_dotenv(dotenv_path='./.env')
 app, conn = load_configurations()
 conn = create_connection()
 

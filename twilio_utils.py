@@ -4,6 +4,9 @@ from flask import request, jsonify
 from twilio.rest import Client
 import os
 import openai
+from dotenv import load_dotenv
+load_dotenv()
+
 
 gpt4_api_key = os.environ.get('GPT4_API_KEY')
 openai.api_key = gpt4_api_key
