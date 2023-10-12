@@ -13,8 +13,8 @@ def create_connection():
         db_user = os.environ.get("DB_USER")
         db_password = os.environ.get("DB_PASSWORD")
         db_name = os.environ.get("DB_NAME")
-        print("Attempting to connect to: host={db_host} port={db_port} user={db_user} dbname={db_name}")
-        
+        print(f"Attempting to connect to: host={db_host} port={db_port} user={db_user} dbname={db_name}")
+
         connection = psycopg2.connect(
             host=db_host,
             port=db_port,
@@ -85,7 +85,7 @@ def fetch_tokens_from_db(connection, phone_number):
         return None, None
 
 def get_credentials_for_user(phone_number):
-    connection = create_connection() # Assuming you've already defined this function
+    connection = create_connection() 
     oauth_token, refresh_token = fetch_tokens_from_db(connection, phone_number)
     connection.close()
     

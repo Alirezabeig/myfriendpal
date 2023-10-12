@@ -16,6 +16,7 @@ from truncate_conv import truncate_to_last_n_words
 from shared_utils import get_new_access_token
 from event_utils import fetch_for_prompt_next_calendar, is_important_event
 
+
 import openai
 from psycopg2 import OperationalError, Error
 import traceback
@@ -32,6 +33,7 @@ TWILIO_ACCOUNT_SID = os.environ.get('TWILIO_ACCOUNT_SID')
 TWILIO_AUTH_TOKEN = os.environ.get('TWILIO_AUTH_TOKEN')
 TWILIO_PHONE_NUMBER = '+18666421882'
 
+print("Debug in twilio_utils.py: Twilio credentials", os.environ.get('TWILIO_ACCOUNT_SID'), os.environ.get('TWILIO_AUTH_TOKEN'))
 client = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
 
 gpt4_api_key = os.environ.get('GPT4_API_KEY')
