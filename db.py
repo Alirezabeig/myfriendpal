@@ -7,6 +7,8 @@ import logging
 from dotenv import load_dotenv
 load_dotenv()
 
+is_loaded = load_dotenv()
+print(f"Is .env loaded: {is_loaded}")
 
 
 def create_connection():
