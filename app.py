@@ -75,6 +75,10 @@ def fetch_next_calendar_event(refresh_token):
 def generate_response(user_input, phone_number):
     try:
         connection = create_connection()
+        if not connection:
+            logging.info("Database not connected.")
+            return "Database error"
+        
         cursor = connection.cursor()
         
         existing_data = fetch_conversation_data(cursor, phone_number)
@@ -84,8 +88,20 @@ def generate_response(user_input, phone_number):
         
         if existing_data['google_calendar_email']:
             update_calendar_info(cursor, connection, phone_number, existing_data['refresh_token'])
-            
-        # Generate OpenAI GPT-4 response here...
+
+        # Here is the OpenAI GPT-4 response generation
+        response = openai.ChatCompletion.create(
+            model="gpt-4", 
+            messages=[{
+                'role': msg['role'], 
+                'content': msg['content']} for msg in prepared_conversation]
+        )
+
+        gpt4_reply = response['choices'][0]['message']['content'].strip()
+        gpt4_reply = ' '.join(gpt4_reply.split()[:30])  # Truncate to 30 words
+        
+        new_conversation_assistant = {"role": "assistant", "content": gpt4_reply}
+        prepared_conversation.append(new_conversation_assistant)
         
         update_conversation_data(cursor, connection, prepared_conversation, phone_number)
         
