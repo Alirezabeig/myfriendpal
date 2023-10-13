@@ -4,6 +4,10 @@ import psycopg2
 from psycopg2 import OperationalError, Error
 import logging
 
+from dotenv import load_dotenv
+load_dotenv()
+
+
 
 def create_connection():
     print("Inside create_connection function and it is kicking")

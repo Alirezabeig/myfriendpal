@@ -7,6 +7,10 @@ from calendar_utils import fetch_google_calendar_info
 from flask import render_template
 import json
 
+from dotenv import load_dotenv
+load_dotenv()
+
+# Rest of your code
 
 GOOGLE_CLIENT_ID = os.environ.get('GOOGLE_CLIENT_ID')
 GOOGLE_CLIENT_SECRET = os.environ.get('GOOGLE_CLIENT_SECRET')

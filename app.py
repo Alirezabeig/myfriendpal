@@ -28,6 +28,9 @@ load_dotenv(dotenv_path='./.env')
 app, conn = load_configurations()
 conn = create_connection()
 
+is_loaded = load_dotenv()
+print(f"Is .env loaded: {is_loaded}")
+
 
 GOOGLE_CLIENT_ID = os.environ.get('GOOGLE_CLIENT_ID')
 GOOGLE_CLIENT_SECRET = os.environ.get('GOOGLE_CLIENT_SECRET')
