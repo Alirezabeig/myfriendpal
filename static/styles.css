@@ -34,10 +34,14 @@ body {
 }
 
 .activate-button {
-    font-family: 'Avenir-Heavy', Helvetica, sans-serif;
-    background-color: black;
-    color: white;
+    background-color: black !important;
+    color: white !important;
+    border-radius: 10px !important;
+    width: 250px !important;
+    height: 50px !important;
+    font-size: 18px !important;
 }
+
 
 #inputContainer {
     display: flex;
