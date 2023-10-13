@@ -15,14 +15,13 @@ from google_calendar import oauth2callback
 from truncate_conv import truncate_to_last_n_words
 from shared_utils import get_new_access_token
 from event_utils import fetch_for_prompt_next_calendar, is_important_event
+from calendar_utils import get_google_calendar_authorization_url, update_calendar_info, fetch_google_calendar_info
 
 
 import openai
 from psycopg2 import OperationalError, Error
 import traceback
 
-from calendar_utils import get_google_calendar_authorization_url, update_calendar_info
-from calendar_utils import fetch_google_calendar_info
 
 
 load_dotenv(dotenv_path='./.env')
