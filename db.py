@@ -103,21 +103,5 @@ def get_credentials_for_user(phone_number):
     return oauth_token, refresh_token
 
 
-def fetch_conversation_data(cursor, phone_number):
-    try:
-        query = "SELECT conversation_data, google_calendar_email, next_google_calendar_event, refresh_token FROM conversations WHERE phone_number = %s"
-        cursor.execute(query, (phone_number,))
-        return cursor.fetchone()
-    except Exception as e:
-        logging.error(f"Database fetch error: {e}")
-        return None
-
-def update_conversation_data(cursor, connection, updated_data, phone_number):
-    try:
-        query = "UPDATE conversations SET conversation_data = %s WHERE phone_number = %s;"
-        cursor.execute(query, (json.dumps(updated_data), phone_number))
-        connection.commit()
-    except Exception as e:
-        logging.error(f"Database update error: {e}")
 
 conn = create_connection()

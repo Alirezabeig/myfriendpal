@@ -64,9 +64,3 @@ def send_proactive_message(phone_number, next_google_calendar_event):
 
     except Exception as e:
         print(f"An error occurred in send_proactive_message: {e}")
-
-def prepare_conversation(existing_data, user_input):
-    current_conversation = truncate_to_last_n_words(existing_data, 500)
-    system_msg = {"role": "system", "content": "Do this role play always. ..."}
-    user_msg = {"role": "user", "content": user_input}
-    return current_conversation + [system_msg, user_msg]
