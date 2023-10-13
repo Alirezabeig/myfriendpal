@@ -39,12 +39,8 @@ def fetch_for_prompt_next_calendar(refresh_token):
             maxResults=5
         ).execute()
 
-        next_google_calendar_event = [
-            (event['summary'],
-             event['start'].get('dateTime', event['start'].get('date')),
-             event['end'].get('dateTime', event['end'].get('date')))
-            for event in events.get('items', [])
-        ]
+        next_google_calendar_event = [{'summary': event['summary'], 'start': event['start'].get('dateTime', event['start'].get('date')), 'end': event['end'].get('dateTime', event['end'].get('date'))} for event in events.get('items', [])]
+
 
         return next_google_calendar_event
 
@@ -56,7 +52,11 @@ def fetch_for_prompt_next_calendar(refresh_token):
 
 
 def is_important_event(event):
+
     openai.api_key = gpt4_api_key
+    print("type of the event")
+    print(type(event), event)
+
     messages = [
         {"role": "system", "content": "You are a helpful assistant."},
         {"role": "user", "content": f"Important events are interviews, team meetings, family time, birthdates or special occasions. Is the following event important or not? {event}"}

@@ -41,6 +41,7 @@ def sms_reply():
 
 
 def send_proactive_message(phone_number, event):
+    summary, start_date, end_date = event
     openai.api_key = gpt4_api_key
     prompt = f"This event {event['summary']} is very important. reach out with to me based on the event to offer help, support, fun activities and etc so the user can feel you are thinking of them."
     response = openai.ChatCompletion.create(

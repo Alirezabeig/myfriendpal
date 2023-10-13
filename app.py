@@ -126,8 +126,7 @@ def generate_response(user_input, phone_number):
             next_google_calendar_event = fetch_for_prompt_next_calendar(refresh_token)
             if is_important_event(next_google_calendar_event):  # Checks if the event is important
                 print("Important event detected. Sending proactive message.")  # Debug print statement
-                send_proactive_message(phone_number, next_google_calendar_event)  # Sends proactive message if event is important
- 
+                send_proactive_message(phone_number, next_google_calendar_event[0])  
             cursor.execute("UPDATE conversations SET next_google_calendar_event = %s WHERE phone_number = %s;", (next_google_calendar_event, phone_number))
             connection.commit()
 
