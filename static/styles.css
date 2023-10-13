@@ -32,6 +32,18 @@ body {
     margin-right: 16px;
     padding-left: 5px;
 }
+#phoneInput {
+    margin-left: 20px;  /* Add this line */
+    width: 250px;
+    height: 50px;
+    box-sizing: border-box;
+    border-radius: 10px;
+    margin-bottom: 8px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    border: 1px solid rgba(0,0,0,0.2);
+    font-size: 18px;
+}
+
 
 .activate-button {
     background-color: black !important;
