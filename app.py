@@ -98,7 +98,16 @@ def generate_response(user_input, phone_number):
 
         if result:
             conversation_data, google_calendar_email, next_google_calendar_event, refresh_token = result
-            next_google_calendar_event = json.loads(next_google_calendar_event) if next_google_calendar_event else None
+
+            try:
+                if next_google_calendar_event:
+                    next_google_calendar_event = json.loads(next_google_calendar_event)
+                else:
+                    next_google_calendar_event = None
+            except json.JSONDecodeError as e:
+                logging.error(f"An error occurred while deserializing next_google_calendar_event: {e}")
+                next_google_calendar_event = None
+
             logging.info(f"Type of conversation_data: {type(conversation_data)}")
             logging.info(f"Vaxing of conversation_data before if-statement: {conversation_data}")
 
