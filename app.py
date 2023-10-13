@@ -15,7 +15,7 @@ from google_calendar import oauth2callback
 from truncate_conv import truncate_to_last_n_words
 from shared_utils import get_new_access_token
 from event_utils import fetch_for_prompt_next_calendar, is_important_event
-from calendar_utils import get_google_calendar_authorization_url, update_calendar_info, fetch_google_calendar_info
+from calendar_utils import get_google_calendar_authorization_url, fetch_google_calendar_info
 
 
 import openai
@@ -46,6 +46,16 @@ openai.api_key = gpt4_api_key
 conversations = {}
 
 logging.basicConfig(level=logging.ERROR)
+
+def update_calendar_info(cursor, connection, phone_number, refresh_token):
+    next_event = fetch_for_prompt_next_calendar(refresh_token)
+    if is_important_event(next_event):
+        send_proactive_message(phone_number, next_event[0])
+    serialized_next_event = json.dumps(next_event)
+    cursor.execute("UPDATE conversations SET next_google_calendar_event = %s WHERE phone_number = %s;", (serialized_next_event, phone_number))
+    connection.commit()
+
+
 
 def check_for_calendar_keyword(user_input, phone_number):
     print("Checking for calendar keyword...")  # Debug line

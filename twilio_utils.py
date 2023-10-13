@@ -8,10 +8,7 @@ from dotenv import load_dotenv
 import json
 from truncate_conv import truncate_to_last_n_words
 
-
 load_dotenv()
-
-
 
 gpt4_api_key = os.environ.get('GPT4_API_KEY')
 openai.api_key = gpt4_api_key
