@@ -164,7 +164,13 @@ def generate_response(user_input, phone_number):
             logging.info(f"current_conversation: {current_conversation}")
 
         
-        response = openai.ChatCompletion.create(model="gpt-4", messages=current_conversation)
+        response = openai.ChatCompletion.create(
+            model="gpt-4", 
+            messages=[{
+                'role': msg['role'], 
+                'content': msg['content']} for msg in current_conversation]
+        )
+
         gpt4_reply = response['choices'][0]['message']['content'].strip()
 
         # Truncate or otherwise modify gpt4_reply to be 30 words max.
