@@ -41,7 +41,12 @@ body {
 
 #inputContainer {
     display: flex;
-    align-items: center;
+    flex-direction: column;  /* Stack children vertically */
+    align-items: center;     /* Center-align children horizontally */
+}
+
+#productHuntLink {
+    margin-top: 20px;  /* Add some top margin for spacing */
 }
 
 .container {
