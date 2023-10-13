@@ -57,11 +57,15 @@ def fetch_for_prompt_next_calendar(refresh_token):
 
 def is_important_event(event):
     openai.api_key = gpt4_api_key
-    prompt = f"Important events are interviews, team meetings, family time, birthdates or special occasions. Is the following event important or not? {event}"
+    messages = [
+        {"role": "system", "content": "You are a helpful assistant."},
+        {"role": "user", "content": f"Important events are interviews, team meetings, family time, birthdates or special occasions. Is the following event important or not? {event}"}
+    ]
     response = openai.ChatCompletion.create(
         model="gpt-4",
-        prompt=prompt,
+        messages=messages,
         max_tokens=20  # Reduced tokens as we're looking for a simple Yes or No.
     )
-    importance_level = response['choices'][0]['text'].strip().lower()
-    return "yes" in importance_level or "important" in importance_level
+    # Extracting the assistant's reply from the message list
+    assistant_reply = response['choices'][0]['message']['content'].strip().lower()
+    return "yes" in assistant_reply or "important" in assistant_reply

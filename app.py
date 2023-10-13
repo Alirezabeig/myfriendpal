@@ -86,6 +86,7 @@ def generate_response(user_input, phone_number):
 
         # Initialize variables
         google_calendar_email, refresh_token, next_google_calendar_event, current_conversation = None, None, None, []
+        print("Debug10: current_conversation: ", current_conversation)
 
         # Fetch existing data from database
         update_query = ''
@@ -94,7 +95,6 @@ def generate_response(user_input, phone_number):
         result = cursor.fetchone()
         logging.info(f"Fetched result: {result}")
         logging.info(f"Phone number being queried: {phone_number}")
-
 
         if result:
             conversation_data, google_calendar_email, next_google_calendar_event, refresh_token = result
@@ -117,6 +117,8 @@ def generate_response(user_input, phone_number):
                     logging.error(f"An error occurred while deserializing: {e}")
 
         else: 
+            print("Debug: current_conversation: ", current_conversation)
+
             current_conversation = conversation_data
             logging.info("No past conversations found.")
 
