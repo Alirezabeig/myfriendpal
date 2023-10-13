@@ -10,7 +10,7 @@ import json
 
 from config import load_configurations
 from db import create_connection
-from twilio_utils import sms_reply, send_proactive_message, prepare_conversation
+from twilio_utils import sms_reply, send_proactive_message
 from google_calendar import oauth2callback
 from truncate_conv import truncate_to_last_n_words
 from shared_utils import get_new_access_token
