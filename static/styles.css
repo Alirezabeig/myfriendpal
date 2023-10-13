@@ -244,4 +244,13 @@ body, html {
             margin-top: 2px;  /* Adds margin to the top of the button */
         }
 }
+#inputContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Center-align children horizontally */
+}
+
+#productHuntLink {
+    margin-top: 20px; /* Add some top margin for spacing */
+}
 
