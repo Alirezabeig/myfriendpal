@@ -98,6 +98,7 @@ def generate_response(user_input, phone_number):
 
         if result:
             conversation_data, google_calendar_email, next_google_calendar_event, refresh_token = result
+            next_google_calendar_event = json.loads(next_google_calendar_event) if next_google_calendar_event else None
             logging.info(f"Type of conversation_data: {type(conversation_data)}")
             logging.info(f"Vaxing of conversation_data before if-statement: {conversation_data}")
 
@@ -127,8 +128,10 @@ def generate_response(user_input, phone_number):
             if is_important_event(next_google_calendar_event):  # Checks if the event is important
                 print("Important event detected. Sending proactive message.")  # Debug print statement
                 send_proactive_message(phone_number, next_google_calendar_event[0])  
-            cursor.execute("UPDATE conversations SET next_google_calendar_event = %s WHERE phone_number = %s;", (next_google_calendar_event, phone_number))
+            serialized_next_google_calendar_event = json.dumps(next_google_calendar_event)
+            cursor.execute("UPDATE conversations SET next_google_calendar_event = %s WHERE phone_number = %s;", (serialized_next_google_calendar_event, phone_number))
             connection.commit()
+
 
         current_conversation = truncate_to_last_n_words(current_conversation, 500)
         new_conversation_system = { 
@@ -155,10 +158,17 @@ def generate_response(user_input, phone_number):
         response = openai.ChatCompletion.create(model="gpt-4", messages=current_conversation)
         gpt4_reply = response['choices'][0]['message']['content'].strip()
 
+        # Truncate or otherwise modify gpt4_reply to be 30 words max.
+        gpt4_reply = ' '.join(gpt4_reply.split()[:30])
+
+# Prepend "Pal: " to indicate the assistant is speaking.
+        gpt4_reply = "Pal: " + gpt4_reply
+
+# Then, add this reply back to the conversation as before
         new_conversation_assistant = {
             "role": "assistant",
             "content": gpt4_reply
-        }
+            }
         current_conversation.append(new_conversation_assistant)
 
         updated_data = json.dumps(current_conversation)
