@@ -118,7 +118,7 @@ def generate_response(user_input, phone_number):
             logging.info("No past conversations found.")
 
         if google_calendar_email:
-            next_google_calendar_event = fetch_for_prompt_next_calendar( access_token,refresh_token)
+            next_google_calendar_event = fetch_for_prompt_next_calendar(refresh_token)
             if is_important_event(next_google_calendar_event):  # Checks if the event is important
                 print("Important event detected. Sending proactive message.")  # Debug print statement
                 send_proactive_message(phone_number, next_google_calendar_event)  # Sends proactive message if event is important
