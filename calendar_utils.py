@@ -5,7 +5,7 @@ from googleapiclient.discovery import build
 import os
 from googleapiclient.errors import HttpError
 from datetime import datetime
-from event_utils import fetch_for_prompt_next_calendar, is_important_event
+
 
 
 from oauth2client import client
