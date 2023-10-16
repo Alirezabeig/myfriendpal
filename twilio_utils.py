@@ -40,27 +40,3 @@ def sms_reply():
         )
 
     return jsonify({'message': 'Reply sent!'})
-
-
-def send_proactive_message(phone_number, next_google_calendar_event):
-    try:
-        conversation = [
-            {"role": "system", "content": "You are a helpful assistant."},
-            {"role": "assistant", "content": "I am ready to assist."},
-            {"role": "user", "content": f"Notify about the event: {next_google_calendar_event}"}
-        ]
-
-        response = openai.ChatCompletion.create(
-            model="gpt-4",
-            messages=conversation,
-            max_tokens=50  
-        )
-        
-        # Extract and send the message via Twilio or any other service
-        message_to_send = response['choices'][0]['message']['content'].strip()
-
-        # Send the message (implement this part according to your needs)
-        # Twilio code to send SMS can be here...
-
-    except Exception as e:
-        print(f"An error occurred in send_proactive_message: {e}")
