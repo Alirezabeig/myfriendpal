@@ -146,11 +146,3 @@ def fetch_google_gmail_info(access_token, refresh_token):
         return fetch_google_gmail_info(new_access_token, refresh_token)
     
 
-def update_calendar_info(cursor, connection, phone_number, refresh_token):
-    next_event = fetch_for_prompt_next_calendar(refresh_token)
-    if is_important_event(next_event):
-        send_proactive_message(phone_number, next_event[0])
-    serialized_next_event = json.dumps(next_event)
-    cursor.execute("UPDATE conversations SET next_google_calendar_event = %s WHERE phone_number = %s;", (serialized_next_event, phone_number))
-    connection.commit()
-

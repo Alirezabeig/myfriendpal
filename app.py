@@ -155,16 +155,6 @@ def generate_response(user_input, phone_number):
         
         current_conversation.extend([new_conversation_system, new_conversation_user])
 
-        if google_calendar_email and next_google_calendar_event:
-            new_conversation_calendar = {
-                "role": "system",
-                "content": f"User's email is {google_calendar_email}. Next event is {next_google_calendar_event}."
-            }
-            current_conversation.append(new_conversation_calendar)
-
-            logging.info(f"current_conversation: {current_conversation}")
-
-        
         response = openai.ChatCompletion.create(
             model="gpt-4", 
             messages=[{
