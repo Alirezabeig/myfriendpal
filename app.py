@@ -72,64 +72,125 @@ def fetch_next_calendar_event(refresh_token):
     new_access_token = get_new_access_token(refresh_token)
     return fetch_google_calendar_info(new_access_token, refresh_token)
 
-# Existing imports remain the same
-
-def execute_query(query, cursor, params=None):
-    cursor.execute(query, params)
-    return cursor.fetchone()
-
-def update_db(query, cursor, connection, params=None):
-    cursor.execute(query, params)
-    connection.commit()
-    
-# add this function somewhere in your code
-def fetch_gpt4_reply(conv_data):
-    response = openai.ChatCompletion.create(
-        model="gpt-4", 
-        messages=[
-            {'role': msg['role'], 'content': msg['content']} for msg in conv_data
-        ]
-    )
-    return response['choices'][0]['message']['content'].strip()
-
-
 def generate_response(user_input, phone_number):
     try:
-        conn = create_connection()
-        if not conn:
+        # Establish database connection
+        connection = create_connection()
+        if not connection:
+            logging.info("Database not connected.")
             return "Database error"
+
+        print("Connection:", connection)
         
-        cur = conn.cursor()
+        cursor = connection.cursor()
+        logging.info('Generate response page accessed')
+
+        # Initialize variables
+        google_calendar_email, refresh_token, next_google_calendar_event, current_conversation = None, None, None, []
+        print("Debug10: current_conversation: ", current_conversation)
+
+        # Fetch existing data from database
+        update_query = ''
         fetch_query = "SELECT conversation_data, google_calendar_email, next_google_calendar_event, refresh_token FROM conversations WHERE phone_number = %s"
-        result = execute_query(fetch_query, cur, (phone_number,))
+        cursor.execute(fetch_query, (phone_number,))
+        result = cursor.fetchone()
+        logging.info(f"Fetched result: {result}")
+        logging.info(f"Phone number being queried: {phone_number}")
 
-        conv_data, gc_email, next_event, refresh_token = result if result else ([], None, None, None)
-        print(f"Conversation **: {conv_data}")
+        if result:
+            conversation_data, google_calendar_email, next_google_calendar_event, refresh_token = result
 
-        if gc_email:
-            next_event = fetch_for_prompt_next_calendar(refresh_token)
-            update_db("UPDATE conversations SET next_google_calendar_event = %s WHERE phone_number = %s;", cur, conn, (json.dumps(next_event), phone_number))
+            try:
+                if next_google_calendar_event:
+                    next_google_calendar_event = json.loads(next_google_calendar_event)
+                else:
+                    next_google_calendar_event = None
+            except json.JSONDecodeError as e:
+                logging.error(f"An error occurred while deserializing next_google_calendar_event: {e}")
+                next_google_calendar_event = None
 
-        conv_data = truncate_to_last_n_words(conv_data, 500)
-        new_sys_msg = {"role": "system", "content": "Your name is Pal, you are friendly. When asked who built you, you say an engineer with love and passion. Always be concise, maximum 50 words in your responses ."}  # You can modify this as per your requirement
+            logging.info(f"Type of conversation_data: {type(conversation_data)}")
+            logging.info(f"Vaxing of conversation_data before if-statement: {conversation_data}")
 
-        new_usr_msg = {"role": "user", "content": user_input}
+            # Ensure conversation_data is a JSON-formatted string
+            if not isinstance(conversation_data, str):
+                try:
+                    conversation_data = json.dumps(conversation_data)
+                except (TypeError, ValueError) as e:
+                    logging.error(f"Anxing error occurred while serializing: {e}")
 
-        conv_data.extend([new_sys_msg, new_usr_msg])
+            # Deserialize JSON string into Python list
+            if isinstance(conversation_data, str):
+                try:
+                    current_conversation = json.loads(conversation_data)
+                    logging.info(f"Oldix Conversations Loaded: {current_conversation}")
+                except json.JSONDecodeError as e:
+                    logging.error(f"An error occurred while deserializing: {e}")
+
+        else: 
+            print("Debug: current_conversation: ", current_conversation)
+
+            current_conversation = conversation_data
+            logging.info("No past conversations found.")
+
+        if google_calendar_email:
+            next_google_calendar_event = fetch_for_prompt_next_calendar(refresh_token)  
+            serialized_next_google_calendar_event = json.dumps(next_google_calendar_event)
+            cursor.execute("UPDATE conversations SET next_google_calendar_event = %s WHERE phone_number = %s;", (serialized_next_google_calendar_event, phone_number))
+            connection.commit()
 
 
-        gpt4_reply = fetch_gpt4_reply(conv_data)
-        gpt4_reply = gpt4_reply
-        conv_data.append({"role": "assistant", "content": gpt4_reply})
+        current_conversation = truncate_to_last_n_words(current_conversation, 500)
+        new_conversation_system = { 
+            "role": "system",
+            "content": "Do this role play always. Your name is Pal, your were made by one engineer with love and passion and tons of coding skills. You are concise up to 30 words max. Always friendly, no need to list calendar events unless you are asked, learn about them"
+        }
+        new_conversation_user = {
+            "role": "user",
+            "content": user_input
+        }
+        
+        current_conversation.extend([new_conversation_system, new_conversation_user])
 
-        update_db("UPDATE conversations SET conversation_data = %s WHERE phone_number = %s;", cur, conn, (json.dumps(conv_data), phone_number))
+        response = openai.ChatCompletion.create(
+            model="gpt-4", 
+            messages=[{
+                'role': msg['role'], 
+                'content': msg['content']} for msg in current_conversation]
+        )
+
+        gpt4_reply = response['choices'][0]['message']['content'].strip()
+
+        # Truncate or otherwise modify gpt4_reply to be 30 words max.
+        gpt4_reply = ' '.join(gpt4_reply.split()[:30])
+
+# Prepend "Pal: " to indicate the assistant is speaking.
+        gpt4_reply = "Pal: " + gpt4_reply
+
+# Then, add this reply back to the conversation as before
+        new_conversation_assistant = {
+            "role": "assistant",
+            "content": gpt4_reply
+            }
+        current_conversation.append(new_conversation_assistant)
+
+        updated_data = json.dumps(current_conversation)
+
+        update_query = "UPDATE conversations SET conversation_data = %s WHERE phone_number = %s;"
+        cursor.execute(update_query, (updated_data, phone_number))
+        connection.commit()
+
+        # Fetch data immediately after updating, for debugging purposes
+        cursor.execute(fetch_query, (phone_number,))
+        post_update_result = cursor.fetchone()
+        logging.info(f"Post-update fetched result: {post_update_result}")
 
         return gpt4_reply
 
     except Exception as e:
         logging.error(f"An error occurred: {e}")
+        logging.error(traceback.format_exc())
         return "Sorry, I couldn't understand that."
-
 
 @app.route("/sms", methods=['POST'])
 def handle_sms():
