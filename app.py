@@ -86,17 +86,25 @@ def update_conversation_data(cursor, connection, phone_number, updated_data):
 def deserialize_conversation(conversation_data):
     if isinstance(conversation_data, str):
         try:
-            return json.loads(conversation_data)
+            conversation_list = json.loads(conversation_data)
+            if isinstance(conversation_list, list):
+                # Ensure each item in the list is a dictionary with 'role' and 'content' keys
+                for item in conversation_list:
+                    if not isinstance(item, dict) or 'role' not in item or 'content' not in item:
+                        return []  # Invalid conversation format
+                return conversation_list
+            else:
+                return []  # Invalid conversation format
         except json.JSONDecodeError:
             return []
     elif isinstance(conversation_data, list):
-        # If it's a list, convert it to a JSON string
-        try:
-            return json.dumps(conversation_data)
-        except (TypeError, ValueError):
-            return []
+        # If it's already a list, check its format
+        for item in conversation_data:
+            if not isinstance(item, dict) or 'role' not in item or 'content' not in item:
+                return []  # Invalid conversation format
+        return conversation_data
     else:
-        return []
+        return []  # Invalid conversation format
 
 
 def truncate_conversation(conversation, max_words):
