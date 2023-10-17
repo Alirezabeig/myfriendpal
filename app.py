@@ -84,10 +84,20 @@ def update_conversation_data(cursor, connection, phone_number, updated_data):
     connection.commit()
 
 def deserialize_conversation(conversation_data):
-    try:
-        return json.loads(conversation_data)
-    except json.JSONDecodeError:
+    if isinstance(conversation_data, str):
+        try:
+            return json.loads(conversation_data)
+        except json.JSONDecodeError:
+            return []
+    elif isinstance(conversation_data, list):
+        # If it's a list, convert it to a JSON string
+        try:
+            return json.dumps(conversation_data)
+        except (TypeError, ValueError):
+            return []
+    else:
         return []
+
 
 def truncate_conversation(conversation, max_words):
     # Implement your truncate logic here
