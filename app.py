@@ -152,6 +152,9 @@ def generate_response(user_input, phone_number):
 
         # ... (other parts of your code)
 
+        # Serialize the updated conversation back to JSON
+        updated_data = json.dumps(current_conversation)
+
         # Update conversation data in the database
         update_conversation_data(cursor, connection, phone_number, updated_data)
 
@@ -163,6 +166,7 @@ def generate_response(user_input, phone_number):
         logging.error(f"An error occurred: {e}")
         logging.error(traceback.format_exc())
         return "Sorry, I couldn't understand that."
+
 
 
 @app.route("/sms", methods=['POST'])
