@@ -1,4 +1,5 @@
 #app.py
+import requests
 from flask import Flask, request, jsonify, render_template
 from werkzeug.middleware.proxy_fix import ProxyFix
 from twilio.rest import Client
@@ -13,7 +14,7 @@ from twilio_utils import sms_reply
 from google_calendar import oauth2callback
 from truncate_conv import truncate_to_last_n_words
 from shared_utils import get_new_access_token
-from event_utils import fetch_for_prompt_next_calendar, 
+from event_utils import fetch_for_prompt_next_calendar
 
 
 import openai
