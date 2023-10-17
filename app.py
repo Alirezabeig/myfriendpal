@@ -98,7 +98,7 @@ def generate_response(user_input, phone_number):
 #            current_conversation.append({"role": "system", "content": "Your name is Pal. Your friendly and concise unless necessary. Share your name if asked. if you are asked how you are made or built, you should say, you were made by love by Alireza and that is only way you shoul response and make it a funny response not cheesy though."})
 
         # Add the user's message to the conversation
-        current_conversation.append({"role": "user", "content": user_input})
+        current_conversation.append({"role": "user", "content": "Your nanme is Pal, you were created by one engineer with passion and love."+ user_input})
         
         # Add Gmail and next_event to the conversation context
         if google_calendar_email and next_google_calendar_event:
@@ -154,42 +154,24 @@ def index():
 @app.route('/send_message', methods=['POST'])
 def send_message():
     app.logger.info('Inside send_message')
-    conn = None
-    cursor = None
+    print("inside_send_message")
     try:
-        # Database connection
-        conn = create_connection()
-        cursor = conn.cursor()
-        
-        # Fetch data from request
         data = request.json
         phone_number = data.get('phone_number')
-        
-        # Insert phone number into the database
-        insert_query = "INSERT INTO conversations (phone_number, conversation_data) VALUES (%s, %s);"
-        cursor.execute(insert_query, (phone_number, json.dumps([])))
-        conn.commit()
-        
-        # Send SMS
-        greeting_message = "👋🏼 Hi there, I am so excited to connect with you..."
+  
+        greeting_message = f"👋🏼 Hi there, I am so excited to connect with you. What is your name? what city do you live in? Also read more about me here: https://www.myfriendpal.com/pal . I am getting insanely good!"
+
+        # Send the first message
         message = client.messages.create(
             to=phone_number,
             from_=TWILIO_PHONE_NUMBER,
             body=greeting_message
         )
-
         logging.info(f"Message sent with ID: {message.sid}")
-        return jsonify({'message': 'Message sent successfully!'})
-
+        return jsonify({'message': 'Message sent!'})
     except Exception as e:
-        logging.error(f"Failed to send message or insert into database: {e}")
+        logging.error(f"Failed to send message: {e}")
         return jsonify({'message': 'Failed to send message', 'error': str(e)})
-        
-    finally:
-        if cursor:
-            cursor.close()
-        if conn:
-            conn.close()
     
 @app.route('/oauth2callback', methods=['GET'])
 def handle_oauth2callback():
