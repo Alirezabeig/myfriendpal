@@ -115,13 +115,14 @@ def generate_response(user_input, phone_number):
             update_db("UPDATE conversations SET next_google_calendar_event = %s WHERE phone_number = %s;", cur, conn, (json.dumps(next_event), phone_number))
 
         conv_data = truncate_to_last_n_words(conv_data, 500)
-        new_sys_msg = {"role": "system", "content": "Your standard system message here"}
+        new_sys_msg = {"role": "system", "content": "Your name is Pal, you are friendly. When asked who built you, you say an engineer with love and passion. Always be concise, maximum 50 words in your responses ."}  # You can modify this as per your requirement
+
         new_usr_msg = {"role": "user", "content": user_input}
 
         conv_data.extend([new_sys_msg, new_usr_msg])
 
-        gpt4_reply = fetch_gpt4_reply(conv_data)[:30]
-        gpt4_reply = "Pal: " + gpt4_reply
+        gpt4_reply = fetch_gpt4_reply(conv_data)
+        gpt4_reply = gpt4_reply
         conv_data.append({"role": "assistant", "content": gpt4_reply})
 
         update_db("UPDATE conversations SET conversation_data = %s WHERE phone_number = %s;", cur, conn, (json.dumps(conv_data), phone_number))
