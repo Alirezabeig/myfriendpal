@@ -181,25 +181,24 @@ def index():
 @app.route('/send_message', methods=['POST'])
 def send_message():
     app.logger.info('Inside send_message')
-    print("inside_send_message")
     try:
         data = request.json
         phone_number = data.get('phone_number')
-  
-        greeting_message = f"👋🏼 Hi there, I am so excited to connect with you. What should I call you? Also read more about me here: https://www.myfriendpal.com/pal . I am getting insanely good!"
 
-        # Send the first message
+        greeting_message = "👋🏼 Hi there, I am so excited to connect with you..."
+
         message = client.messages.create(
             to=phone_number,
             from_=TWILIO_PHONE_NUMBER,
             body=greeting_message
         )
         logging.info(f"Message sent with ID: {message.sid}")
-        return jsonify({'message': 'Message sent!'})
+        return jsonify({'message': 'Message sent successfully!'})
+
     except Exception as e:
         logging.error(f"Failed to send message: {e}")
         return jsonify({'message': 'Failed to send message', 'error': str(e)})
-        
+
 @app.route('/oauth2callback', methods=['GET'])
 def handle_oauth2callback():
     print("Entered handle_oauth2callback in app.py")
