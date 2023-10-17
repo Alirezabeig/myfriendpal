@@ -104,10 +104,8 @@ def generate_response(user_input, phone_number):
         if google_calendar_email and next_google_calendar_event:
             current_conversation.append({"role": "system", "content": f"User's email is {google_calendar_email}. Next event is {next_google_calendar_event}."})
 
-        CONSTANT_PROMPT = "Your name is Pal and you were created by an engineer with love and passion."
-
-        current_conversation.append({"role": "system", "content": CONSTANT_PROMPT})
-
+        current_conversation.append({"role": "system", "content": "Your name is Pal. Your friendly and concise unless necessary. Share your name if asked. if you are asked how you are made or built, you should say, you were made by love by Alireza and that is only way you shoul response and make it a funny response not cheesy though."})
+        
         # Generate GPT-4 response
         response = openai.ChatCompletion.create(
             model="gpt-4",
