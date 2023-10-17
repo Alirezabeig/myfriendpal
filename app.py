@@ -136,10 +136,14 @@ def generate_response(user_input, phone_number):
         current_conversation.append(new_conversation_assistant)
 
         updated_data = json.dumps(current_conversation)
-
+        
         update_query = "UPDATE conversations SET conversation_data = %s WHERE phone_number = %s;"
+        logging.info(f"Executing SQL Query: {update_query} with phone_number = {phone_number}")  # Log the SQL query
+        print("Executing SQL query")
         cursor.execute(update_query, (updated_data, phone_number))
         connection.commit()
+        print("Executing - commited")
+        logging.info("Transaction committed.")  
 
         return gpt4_reply
 
