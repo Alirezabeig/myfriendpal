@@ -3,10 +3,20 @@
 from flask import request, jsonify
 from twilio.rest import Client
 import os
+import openai
+from dotenv import load_dotenv
+import json
+from truncate_conv import truncate_to_last_n_words
+
+load_dotenv()
+
+gpt4_api_key = os.environ.get('GPT4_API_KEY')
+openai.api_key = gpt4_api_key
 
 TWILIO_ACCOUNT_SID = os.environ.get('TWILIO_ACCOUNT_SID')
 TWILIO_AUTH_TOKEN = os.environ.get('TWILIO_AUTH_TOKEN')
 TWILIO_PHONE_NUMBER = '+18666421882'
+print("Debug in twilio_utils.py: Twilio credentials", os.environ.get('TWILIO_ACCOUNT_SID'), os.environ.get('TWILIO_AUTH_TOKEN'))
 client = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
 
 

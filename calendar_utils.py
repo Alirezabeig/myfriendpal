@@ -6,11 +6,16 @@ import os
 from googleapiclient.errors import HttpError
 from datetime import datetime
 
+
+
 from oauth2client import client
 from oauth2client.client import OAuth2WebServerFlow
 from google.oauth2.credentials import Credentials
 from google.auth.exceptions import RefreshError
 from shared_utils import get_new_access_token
+from dotenv import load_dotenv
+load_dotenv()
+
 
 # Set up API credentials
 CALENDAR_CREDENTIALS_FILE = "client_secret.json"
@@ -22,6 +27,7 @@ REDIRECT_URI = "https://www.myfriendpal.com/oauth2callback"
 
 # Existing scopes for Google Calendar, add Gmail scope to it
 CALENDAR_SCOPE = ['https://www.googleapis.com/auth/calendar', 'https://www.googleapis.com/auth/gmail.readonly']
+
 
 def get_google_calendar_authorization_url(phone_number):
     print("Generating Google Calendar authorization URL...")  # Debug line

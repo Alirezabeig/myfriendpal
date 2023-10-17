@@ -3,7 +3,13 @@ import os
 import psycopg2
 from psycopg2 import OperationalError, Error
 import logging
+import json
 
+from dotenv import load_dotenv
+load_dotenv()
+
+is_loaded = load_dotenv()
+print(f"Is .env loaded: {is_loaded}")
 
 def create_connection():
     print("Inside create_connection function and it is kicking")
@@ -13,8 +19,8 @@ def create_connection():
         db_user = os.environ.get("DB_USER")
         db_password = os.environ.get("DB_PASSWORD")
         db_name = os.environ.get("DB_NAME")
-        print("Attempting to connect to: host={db_host} port={db_port} user={db_user} dbname={db_name}")
-        
+        print(f"Attempting to connect to: host={db_host} port={db_port} user={db_user} dbname={db_name}")
+
         connection = psycopg2.connect(
             host=db_host,
             port=db_port,
@@ -85,7 +91,7 @@ def fetch_tokens_from_db(connection, phone_number):
         return None, None
 
 def get_credentials_for_user(phone_number):
-    connection = create_connection() # Assuming you've already defined this function
+    connection = create_connection() 
     oauth_token, refresh_token = fetch_tokens_from_db(connection, phone_number)
     connection.close()
     
@@ -94,6 +100,7 @@ def get_credentials_for_user(phone_number):
         return None, None
     
     return oauth_token, refresh_token
+
 
 
 conn = create_connection()

@@ -1,5 +1,4 @@
 #app.py
-import requests
 from flask import Flask, request, jsonify, render_template
 from werkzeug.middleware.proxy_fix import ProxyFix
 from twilio.rest import Client
@@ -17,7 +16,6 @@ from shared_utils import get_new_access_token
 
 
 import openai
-from psycopg2 import OperationalError, Error
 import traceback
 
 from calendar_utils import get_google_calendar_authorization_url
@@ -183,25 +181,43 @@ def index():
 @app.route('/send_message', methods=['POST'])
 def send_message():
     app.logger.info('Inside send_message')
-    print("inside_send_message")
+    conn = None
+    cursor = None
     try:
+        # Database connection
+        conn = create_connection()
+        cursor = conn.cursor()
+        
+        # Fetch data from request
         data = request.json
         phone_number = data.get('phone_number')
-  
-        greeting_message = f"👋🏼 Hi there, I am so excited to connect with you. What should I call you? Also read more about me here: https://www.myfriendpal.com/pal . I am getting insanely good!"
-
-        # Send the first message
+        
+        # Insert phone number into the database
+        insert_query = "INSERT INTO conversations (phone_number, conversation_data) VALUES (%s, %s);"
+        cursor.execute(insert_query, (phone_number, json.dumps([])))
+        conn.commit()
+        
+        # Send SMS
+        greeting_message = "👋🏼 Hi there, I am so excited to connect with you..."
         message = client.messages.create(
             to=phone_number,
             from_=TWILIO_PHONE_NUMBER,
             body=greeting_message
         )
+
         logging.info(f"Message sent with ID: {message.sid}")
-        return jsonify({'message': 'Message sent!'})
+        return jsonify({'message': 'Message sent successfully!'})
+
     except Exception as e:
-        logging.error(f"Failed to send message: {e}")
+        logging.error(f"Failed to send message or insert into database: {e}")
         return jsonify({'message': 'Failed to send message', 'error': str(e)})
         
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
+    
 @app.route('/oauth2callback', methods=['GET'])
 def handle_oauth2callback():
     print("Entered handle_oauth2callback in app.py")
@@ -212,10 +228,8 @@ def handle_oauth2callback():
 def pal_page():
     return render_template('pal.html')
 
-
 if __name__ == '__main__':
     print("Script is starting")
     app.debug = True
     port = int(os.environ.get("PORT", 5002))
     app.run(host="0.0.0.0", port=port)
-

@@ -1,2 +1,3 @@
 venv/ # Add venv/ folder to .gitignore
 venv/
+.DS_Store

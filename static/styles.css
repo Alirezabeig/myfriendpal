@@ -32,16 +32,46 @@ body {
     margin-right: 16px;
     padding-left: 5px;
 }
-
-#activatePal button {
-    font-family: 'Avenir-Heavy', Helvetica, sans-serif;
-    background-color: black;
-    color: white;
+#phoneInput {
+    margin-left: 19px;  /* Add this line */
+    width: 250px;
+    height: 50px;
+    box-sizing: border-box;
+    border-radius: 10px;
+    margin-bottom: 8px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    border: 1px solid rgba(0,0,0,0.2);
+    font-size: 18px;
 }
+#activateForm button.activate-button {
+    background-color: black !important;
+    color: white !important;
+    border-radius: 10px !important;
+    width: 250px !important;
+    height: 50px !important;
+    font-size: 18px !important;
+}
+
+
+
+.activate-button {
+    background-color: black !important;
+    color: white !important;
+    border-radius: 10px !important;
+    width: 250px !important;
+    height: 50px !important;
+    font-size: 18px !important;
+}
+
 
 #inputContainer {
     display: flex;
-    align-items: center;
+    flex-direction: column;  /* Stack children vertically */
+    align-items: center;     /* Center-align children horizontally */
+}
+
+#productHuntLink {
+    margin-top: 20px;  /* Add some top margin for spacing */
 }
 
 .container {
@@ -243,5 +273,14 @@ body, html {
         #activatePal button {
             margin-top: 2px;  /* Adds margin to the top of the button */
         }
+}
+#inputContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Center-align children horizontally */
+}
+
+#productHuntLink {
+    margin-top: 20px; /* Add some top margin for spacing */
 }
 
