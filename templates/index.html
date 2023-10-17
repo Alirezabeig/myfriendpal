@@ -30,7 +30,11 @@
           <img src="{{ url_for('static', filename='cong.jpg') }}" alt="congratulations" class="modal-image">
           <span id="modalText">Modal text</span>
         </div>
-     
+        <ul id="modalBulletPoints">
+          <li>Pal is still training and becoming better.</li>
+          <li>Pal will learn from you & about you.</li>
+          <li>Pal hopes to become your bff.</li>
+        </ul>
       </div>
     </div>
 
@@ -38,7 +42,6 @@
     <div class="wrapper">
         <div class="container">
             <h1 class="title">Pal is the AI Friend. It Helps You Become a Better Version of Yourself!</h1>
-            
             <form id="activateForm">
                 <div id="inputContainer"> <!-- New container -->
                     <input type="text" id="phoneInput" placeholder="Enter your phone number" required>
@@ -47,17 +50,6 @@
                     </div>
                 </div>
             </form>
-
-                    
-                    <div id="productHuntLink">
-                        <a href="https://www.producthunt.com/posts/pal-2?utm_source=badge-featured&utm_medium=badge&utm_souce=badge-pal&#0045;2" target="_blank">
-                            <img src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=419224&theme=neutral" alt="Pal - AI&#0032;therapist&#0032;and&#0032;friend&#0044;&#0032;organizing&#0032;emotional&#0032;well&#0045;being | Product Hunt" style="width: 250px; height: 54px;" width="250" height="54" />
-                        </a>
-                    </div>
-                    
-
-                </div>
-            
             
             <div class="phrases" >
                 
@@ -94,7 +86,7 @@
                     <span>Real Connection.</span>
                     <img src="{{ url_for('static', filename='pic5.jpg') }}" alt="Image 1">
                         <span class="tooltip"></span>
-                        
+
                 </div>
             </div>
 

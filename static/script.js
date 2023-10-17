@@ -70,15 +70,7 @@ document.addEventListener('DOMContentLoaded', function () {
         },
         body: JSON.stringify({ phone_number: phoneNumber })
       })
-      
-      .then(response => {
-        if (response.ok) {
-          return response.json();
-        } else {
-          throw new Error("Failed to send message");
-        }
-      })
-      
+      .then(response => response.json())
       .then(data => {
         modalText.innerText = "Great! Pal is now going to message you on your phone to pick up the conversation.";  // Update modal text
         modalBulletPoints.innerHTML = `
