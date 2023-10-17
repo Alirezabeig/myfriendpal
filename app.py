@@ -74,11 +74,6 @@ def fetch_next_calendar_event(refresh_token):
 
 # Existing imports remain the same
 
-# All your previous setup, constants and function definitions remain the same
-
-# New functions to break out logic
-# Existing imports and setup remain the same
-
 def execute_query(query, cursor, params=None):
     cursor.execute(query, params)
     return cursor.fetchone()
@@ -109,7 +104,8 @@ def generate_response(user_input, phone_number):
         result = execute_query(fetch_query, cur, (phone_number,))
 
         conv_data, gc_email, next_event, refresh_token = result if result else ([], None, None, None)
-        
+        print(f"Conversation data after truncation: {conv_data}")
+
         if gc_email:
             next_event = fetch_for_prompt_next_calendar(refresh_token)
             update_db("UPDATE conversations SET next_google_calendar_event = %s WHERE phone_number = %s;", cur, conn, (json.dumps(next_event), phone_number))
@@ -120,7 +116,9 @@ def generate_response(user_input, phone_number):
         new_usr_msg = {"role": "user", "content": user_input}
 
         conv_data.extend([new_sys_msg, new_usr_msg])
+        print(f"Conversation data after truncation: {conv_data}")
 
+        
         gpt4_reply = fetch_gpt4_reply(conv_data)
         gpt4_reply = gpt4_reply
         conv_data.append({"role": "assistant", "content": gpt4_reply})
