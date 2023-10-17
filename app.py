@@ -86,6 +86,17 @@ def execute_query(query, cursor, params=None):
 def update_db(query, cursor, connection, params=None):
     cursor.execute(query, params)
     connection.commit()
+    
+# add this function somewhere in your code
+def fetch_gpt4_reply(conv_data):
+    response = openai.ChatCompletion.create(
+        model="gpt-4", 
+        messages=[
+            {'role': msg['role'], 'content': msg['content']} for msg in conv_data
+        ]
+    )
+    return response['choices'][0]['message']['content'].strip()
+
 
 def generate_response(user_input, phone_number):
     try:
