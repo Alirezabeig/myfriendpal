@@ -88,6 +88,7 @@ def generate_response(user_input, phone_number):
         fetch_query = "SELECT conversation_data, google_calendar_email, next_google_calendar_event, refresh_token FROM conversations WHERE phone_number = %s"
         cursor.execute(fetch_query, (phone_number,))
         result = cursor.fetchone()
+        print("Fetching result", result)
 
         if result is None:
             # Insert a new row if no conversation exists for this phone number
@@ -110,7 +111,7 @@ def generate_response(user_input, phone_number):
 
         new_conversation_system = {
             "role": "system",
-            "content": "Do this role play always. Your name is Pal, your were made by one engineer with love and passion and tons of coding skills. You are concise up to 30 words max. Always friendly, no need to list calendar events unless you are asked, learn about them"
+            "content": "Do this role play always. Your name is Pal, your were made by one engineer with love and passion and tons of coding skills. You are concise up to 50 words max. Always friendly, no need to list calendar events unless you are asked, learn about them"
         }
         new_conversation_user = {
             "role": "user",
@@ -139,10 +140,8 @@ def generate_response(user_input, phone_number):
         
         update_query = "UPDATE conversations SET conversation_data = %s WHERE phone_number = %s;"
         logging.info(f"Executing SQL Query: {update_query} with phone_number = {phone_number}")  # Log the SQL query
-        print("Executing SQL query")
         cursor.execute(update_query, (updated_data, phone_number))
         connection.commit()
-        print("Executing - commited")
         logging.info("Transaction committed.")  
 
         return gpt4_reply
