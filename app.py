@@ -193,10 +193,12 @@ def send_message():
             body=greeting_message
         )
         logging.info(f"Message sent with ID: {message.sid}")
+        print("successdully sent messsage")
         return jsonify({'message': 'Message sent successfully!'})
 
     except Exception as e:
         logging.error(f"Failed to send message: {e}")
+        print("failed to send message")
         return jsonify({'message': 'Failed to send message', 'error': str(e)})
 
 @app.route('/oauth2callback', methods=['GET'])
@@ -208,7 +210,6 @@ def handle_oauth2callback():
 @app.route('/pal', methods=['GET'])
 def pal_page():
     return render_template('pal.html')
-
 
 if __name__ == '__main__':
     print("Script is starting")
