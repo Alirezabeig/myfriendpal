@@ -11,7 +11,6 @@ load_dotenv()
 is_loaded = load_dotenv()
 print(f"Is .env loaded: {is_loaded}")
 
-
 def create_connection():
     print("Inside create_connection function and it is kicking")
     try:
