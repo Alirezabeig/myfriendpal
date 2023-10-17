@@ -104,7 +104,7 @@ def generate_response(user_input, phone_number):
         result = execute_query(fetch_query, cur, (phone_number,))
 
         conv_data, gc_email, next_event, refresh_token = result if result else ([], None, None, None)
-        print(f"Conversation data after truncation: {conv_data}")
+        print(f"Conversation **: {conv_data}")
 
         if gc_email:
             next_event = fetch_for_prompt_next_calendar(refresh_token)
@@ -116,9 +116,8 @@ def generate_response(user_input, phone_number):
         new_usr_msg = {"role": "user", "content": user_input}
 
         conv_data.extend([new_sys_msg, new_usr_msg])
-        print(f"Conversation data after truncation: {conv_data}")
 
-        
+
         gpt4_reply = fetch_gpt4_reply(conv_data)
         gpt4_reply = gpt4_reply
         conv_data.append({"role": "assistant", "content": gpt4_reply})
