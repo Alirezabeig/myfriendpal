@@ -110,7 +110,7 @@ def generate_response(user_input, phone_number):
                     logging.error(f"An error occurred while deserializing: {e}")
 
         else: 
-            current_conversation = conversation_data
+            current_conversation = []
             logging.info("No past conversations found.")
 
         if google_calendar_email:
