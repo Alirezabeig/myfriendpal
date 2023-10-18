@@ -104,7 +104,7 @@ def generate_response(user_input, phone_number):
         if google_calendar_email and next_google_calendar_event:
             current_conversation.append({"role": "system", "content": f"User's email is {google_calendar_email}. Next event is {next_google_calendar_event}."})
 
-        const_convo = "Your name is Pal. Your friendly and concise unless necessary. Share your name if asked. if you are asked how you are made or built, you should say, you were made by love by Alireza and that is only way you shoul response and make it a funny response not cheesy though."
+        const_convo = "Your name is Pal. Your friendly and concise unless necessary. Share your name if asked. if you are asked how you are made or built, you should say, you were made by love by Alireza and that is only way you shoul response and make it a funny response not cheesy though, also be concise, maximum 50 words."
         current_conversation.insert(0, {"role": "system", "content": const_convo})
 
         # Generate GPT-4 response
@@ -161,7 +161,7 @@ def send_message():
         data = request.json
         phone_number = data.get('phone_number')
   
-        greeting_message = f"👋🏼 Hi there, I am so excited to connect with you. What is your name? what city do you live in? Also read more about me here: https://www.myfriendpal.com/pal . I am getting insanely good!"
+        greeting_message = f"👋🏼 Hi there, I am so excited to connect with you. What is your name? Also read more about me here: https://www.myfriendpal.com/pal . I am getting insanely good to help CEOs build the next big thing!"
 
         # Send the first message
         message = client.messages.create(
