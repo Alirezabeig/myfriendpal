@@ -173,7 +173,8 @@ body, html {
     color: gray;
     width: 100%;
     padding: 2px 0;
-    margin-top: 10px;
+    margin-top: 0px;
+    
 }
 
 .modal {
