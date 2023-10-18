@@ -174,7 +174,14 @@ body, html {
     width: 100%;
     padding: 2px 0;
     margin-top: 0px;
-    
+}
+#bottom {
+    text-align: center;
+    font-size: 24px;
+    color: gray;
+    width: 100%;
+    padding: 2px 0;
+    margin-top: 20px;
 }
 
 .modal {
