@@ -80,13 +80,13 @@ def generate_response(user_input, phone_number):
     try:
         # Fetch existing conversation, email, and next_calendar_event from the database based on the phone_number
         update_query = ''
-        fetch_query = "SELECT conversation_data, google_calendar_email, next_google_calendar_event, oauth_token FROM conversations WHERE phone_number = %s"
+        fetch_query = "SELECT conversation_data, google_calendar_email, next_google_calendar_event, oauth_token, refresh_token FROM conversations WHERE phone_number = %s"
 
         cursor.execute(fetch_query, (phone_number,))
         result = cursor.fetchone()
         
         if result:
-            conversation_data, google_calendar_email, next_google_calendar_event, oauth_token = result
+            conversation_data, google_calendar_email, next_google_calendar_event, oauth_token, refresh_token = result
             access_token = oauth_token.get('access_token', None)  # Safely fetch access_token from the oauth_token dictionary
 
 
