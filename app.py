@@ -80,14 +80,13 @@ def generate_response(user_input, phone_number):
     try:
         # Fetch existing conversation, email, and next_calendar_event from the database based on the phone_number
         update_query = ''
-        fetch_query = "SELECT conversation_data, google_calendar_email, next_google_calendar_event FROM conversations WHERE phone_number = %s"
+        fetch_query = "SELECT conversation_data, google_calendar_email, next_google_calendar_event, access_token, refresh_token FROM conversations WHERE phone_number = %s"
 
         cursor.execute(fetch_query, (phone_number,))
         result = cursor.fetchone()
         
         if result:
-            conversation_data, google_calendar_email, next_google_calendar_event = result
-
+            conversation_data, google_calendar_email, next_google_calendar_event, access_token, refresh_token = result
         # Deserialize the conversation_data if it's a string
             if isinstance(conversation_data, str):
                 current_conversation = json.loads(conversation_data)
