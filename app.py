@@ -13,6 +13,8 @@ from twilio_utils import sms_reply
 from google_calendar import oauth2callback
 from truncate_conv import truncate_to_last_n_words
 from shared_utils import get_new_access_token
+from datetime import datetime
+from pytz import timezone
 
 
 import openai
@@ -37,6 +39,7 @@ openai.api_key = gpt4_api_key
 conversations = {}
 
 logging.basicConfig(level=logging.ERROR)
+
 
 def check_for_calendar_keyword(user_input, phone_number):
     print("Checking for calendar keyword...")  # Debug line
@@ -103,6 +106,16 @@ def generate_response(user_input, phone_number):
         # Add Gmail and next_event to the conversation context
         if google_calendar_email and next_google_calendar_event:
             current_conversation.append({"role": "system", "content": f"User's email is {google_calendar_email}. Next event is {next_google_calendar_event}."})
+            _, _, calendar_time_zone = fetch_google_calendar_info(access_token, refresh_token)  # Replace 'access_token' and 'refresh_token' with actual values
+
+            # Convert UTC to local time (new)
+            if calendar_time_zone:
+                local_tz = timezone(calendar_time_zone)
+                local_dt = datetime.now(local_tz)
+                user_local_time = local_dt.strftime('%Y-%m-%d %H:%M:%S %Z%z')
+
+                # Add local time to conversation context (new)
+                current_conversation.append({"role": "system", "content": f"User's local time is {user_local_time}."})
 
         const_convo = "Your name is Pal. You are friendly and concise, up to 50 words maximum unless necessary. If you are asked how you are made or built, you should say you were made by love and passion by Alireza, and that is the only way you should respond. Make it a funny response, not cheesy though. You are a CEO life coach. You help them with their daily activities and questions. Remember to pull content from top startup and company building books like 'Creativity Inc', 'zero to one', 'the hard things about the hard things', 'lean startup' and at least 50 more other important books in this cateogy to remind the CEO of how other CEOs treated different situations. Teach them become the greatest CEO."
         current_conversation.insert(0, {"role": "system", "content": const_convo})
