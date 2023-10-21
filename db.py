@@ -6,6 +6,12 @@ import logging
 import json
 
 from dotenv import load_dotenv
+
+if os.environ.get("FLASK_ENV") == "development":
+    load_dotenv('.env.local')
+else:
+    load_dotenv()
+
 load_dotenv()
 
 is_loaded = load_dotenv()
@@ -70,7 +76,7 @@ def fetch_tokens_from_db(connection, phone_number):
         
         # SQL query to fetch the access and refresh tokens based on phone number
         query = "SELECT oauth_token, refresh_token FROM conversations WHERE phone_number = %s;"
-        
+        ç
         # Execute the query
         cursor.execute(query, (phone_number,))
         
