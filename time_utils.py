@@ -1,13 +1,11 @@
 
 #time_utils.py
 from datetime import datetime
-import pytz
+import pytz  # Install this package if you haven't
 
-def get_local_time(timezone):
-    try:
-        user_timezone = pytz.timezone(timezone)
-        user_time = datetime.now(user_timezone)
-        formatted_time = user_time.strftime('%Y-%m-%d %H:%M:%S %Z%z')
-        return formatted_time
-    except Exception as e:
-        return str(e)
+def get_local_time(timezone_str):
+    timezone = pytz.timezone(timezone_str)
+    local_dt = datetime.now(timezone)
+    local_time = local_dt.strftime('%H:%M:%S')
+    local_date = local_dt.strftime('%Y-%m-%d')
+    return local_time, local_date

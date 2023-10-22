@@ -99,8 +99,9 @@ def generate_response(user_input, phone_number):
 #        if not current_conversation:
 #            current_conversation.append({"role": "system", "content": "Your name is Pal. Your friendly and concise unless necessary. Share your name if asked. if you are asked how you are made or built, you should say, you were made by love and passion by Alireza and that is only way you shoul response and make it a funny response not cheesy though. You are a CEO life coach, you help them with their daily activities, questions and always rememver to pull content from top startup and company building books to remind the CEO of how other CEOs treated different situations"})
         if timezone:
-            local_time = get_local_time(timezone)
+            local_time, local_date = get_local_time(timezone)  # Unpacking time and date
             current_conversation.append({"role": "system", "content": f"User's local time is {local_time}."})
+            current_conversation.append({"role": "system", "content": f"User's local date is {local_date}."})
 
         # Add the user's message to the conversation
         current_conversation.append({"role": "user", "content": user_input})
