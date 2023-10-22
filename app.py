@@ -86,6 +86,7 @@ def generate_response(user_input, phone_number):
         
         if result:
             conversation_data, google_calendar_email, next_google_calendar_event, timezone = result
+            print("timezone current", timezone)
 
         # Deserialize the conversation_data if it's a string
             if isinstance(conversation_data, str):
@@ -102,7 +103,7 @@ def generate_response(user_input, phone_number):
             local_time, local_date = get_local_time(timezone)  # Unpacking time and date
             current_conversation.append({"role": "system", "content": f"User's local time is {local_time}."})
             current_conversation.append({"role": "system", "content": f"User's local date is {local_date}."})
-
+            print("timezone local - current", local_date, local_time)
         # Add the user's message to the conversation
         current_conversation.append({"role": "user", "content": user_input})
         
