@@ -13,6 +13,7 @@ from twilio_utils import sms_reply
 from google_calendar import oauth2callback
 from truncate_conv import truncate_to_last_n_words
 from shared_utils import get_new_access_token
+from time_utils import get_local_time
 
 
 import openai
@@ -77,13 +78,14 @@ def generate_response(user_input, phone_number):
     try:
         # Fetch existing conversation, email, and next_calendar_event from the database based on the phone_number
         update_query = ''
-        fetch_query = "SELECT conversation_data, google_calendar_email, next_google_calendar_event FROM conversations WHERE phone_number = %s"
+        fetch_query = "SELECT conversation_data, google_calendar_email, next_google_calendar_event, timezone FROM conversations WHERE phone_number = %s"
+
 
         cursor.execute(fetch_query, (phone_number,))
         result = cursor.fetchone()
         
         if result:
-            conversation_data, google_calendar_email, next_google_calendar_event = result
+            conversation_data, google_calendar_email, next_google_calendar_event, timezone = result
 
         # Deserialize the conversation_data if it's a string
             if isinstance(conversation_data, str):
@@ -96,6 +98,9 @@ def generate_response(user_input, phone_number):
 
 #        if not current_conversation:
 #            current_conversation.append({"role": "system", "content": "Your name is Pal. Your friendly and concise unless necessary. Share your name if asked. if you are asked how you are made or built, you should say, you were made by love and passion by Alireza and that is only way you shoul response and make it a funny response not cheesy though. You are a CEO life coach, you help them with their daily activities, questions and always rememver to pull content from top startup and company building books to remind the CEO of how other CEOs treated different situations"})
+        if timezone:
+            local_time = get_local_time(timezone)
+            current_conversation.append({"role": "system", "content": f"User's local time is {local_time}."})
 
         # Add the user's message to the conversation
         current_conversation.append({"role": "user", "content": user_input})

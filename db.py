@@ -7,14 +7,11 @@ import json
 
 from dotenv import load_dotenv
 
-if os.environ.get("FLASK_ENV") == "development":
-    load_dotenv('.env.local')
-else:
-    load_dotenv()
+env_file = ".env.local" if os.environ.get("USE_LOCAL_ENV") else ".env"
 
-load_dotenv()
+# Load the .env file
+is_loaded = load_dotenv(env_file)
 
-is_loaded = load_dotenv()
 print(f"Is .env loaded: {is_loaded}")
 
 def create_connection():
