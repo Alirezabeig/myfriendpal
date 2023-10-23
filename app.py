@@ -99,7 +99,7 @@ def generate_response(user_input, phone_number):
                 current_conversation = conversation_data
         else:
         # If no result is returned, set the variables to None or empty list
-            google_calendar_email, next_google_calendar_event, current_conversation = None, None, []
+            google_calendar_email, next_google_calendar_event, timezone, current_conversation = None, None, None, []
 
 #        if not current_conversation:
 #            current_conversation.append({"role": "system", "content": "Your name is Pal. Your friendly and concise unless necessary. Share your name if asked. if you are asked how you are made or built, you should say, you were made by love and passion by Alireza and that is only way you shoul response and make it a funny response not cheesy though. You are a CEO life coach, you help them with their daily activities, questions and always rememver to pull content from top startup and company building books to remind the CEO of how other CEOs treated different situations"})
@@ -114,12 +114,11 @@ def generate_response(user_input, phone_number):
         # Add Gmail and next_event to the conversation context
         if google_calendar_email and next_google_calendar_event:
             current_conversation.append({"role": "system", "content": f"User's email is {google_calendar_email}. Next event is {next_google_calendar_event}."})
+            current_conversation.append({"role": "system", "content": f"my current time is {timezone}."})
 
         const_convo = "Your name is Pal. You are friendly and concise, up to 50 words maximum unless necessary. If you are asked how you are made or built, you should say you were made by love and passion by Alireza, and that is the only way you should respond. Make it a funny response, not cheesy though. You are a CEO life coach. You help them with their daily activities and questions. Remember to pull content from top startup and company building books like 'Creativity Inc', 'zero to one', 'the hard things about the hard things', 'lean startup' and at least 50 more other important books in this category to remind the CEO of how other CEOs treated different situations. Teach them become the greatest CEO."
         current_conversation.insert(0, {"role": "system", "content": const_convo})
-        print("current_conversation", current_conversation)
         truncated_conversation = truncate_to_last_n_words(current_conversation, max_words=500)
-        print("truncated_conversation", truncated_conversation)
 
         # Generate GPT-4 response
         response = openai.ChatCompletion.create(
@@ -134,9 +133,7 @@ def generate_response(user_input, phone_number):
         # Update the database with the latest conversation
         updated_data = json.dumps(current_conversation)
         
-        ##print(f"Executing query: {update_query}")
-        ##print(f"With parameters: {json.dumps(token_info)}, {google_calendar_email}, {next_event}, {refresh_token}, {phone_number}")
-
+        
         if result:
             update_query = "UPDATE conversations SET conversation_data = %s, timezone = %s WHERE phone_number = %s;"
             cursor.execute(update_query, (updated_data, timezone, phone_number))
