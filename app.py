@@ -81,6 +81,7 @@ def generate_response(user_input, phone_number):
         # Fetch existing conversation, email, and next_calendar_event from the database based on the phone_number
         update_query = ''
         fetch_query = "SELECT conversation_data, google_calendar_email, next_google_calendar_event, timezone FROM conversations WHERE phone_number = %s"
+        timezone = result[-1] if result else None
         print("timezone fetching_query: ", timezone)
 
         cursor.execute(fetch_query, (phone_number,))
@@ -115,7 +116,7 @@ def generate_response(user_input, phone_number):
 
         const_convo = "Your name is Pal. You are friendly and concise, up to 50 words maximum unless necessary. If you are asked how you are made or built, you should say you were made by love and passion by Alireza, and that is the only way you should respond. Make it a funny response, not cheesy though. You are a CEO life coach. You help them with their daily activities and questions. Remember to pull content from top startup and company building books like 'Creativity Inc', 'zero to one', 'the hard things about the hard things', 'lean startup' and at least 50 more other important books in this category to remind the CEO of how other CEOs treated different situations. Teach them become the greatest CEO."
         current_conversation.insert(0, {"role": "system", "content": const_convo})
-
+    
         # Generate GPT-4 response
         response = openai.ChatCompletion.create(
             model="gpt-4",
