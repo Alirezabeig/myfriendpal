@@ -14,7 +14,6 @@ from google_calendar import oauth2callback
 from truncate_conv import truncate_to_last_n_words
 from shared_utils import get_new_access_token
 
-
 import openai
 import traceback
 
@@ -94,9 +93,6 @@ def generate_response(user_input, phone_number):
         # If no result is returned, set the variables to None or empty list
             google_calendar_email, next_google_calendar_event, current_conversation = None, None, []
 
-#        if not current_conversation:
-#            current_conversation.append({"role": "system", "content": "Your name is Pal. Your friendly and concise unless necessary. Share your name if asked. if you are asked how you are made or built, you should say, you were made by love and passion by Alireza and that is only way you shoul response and make it a funny response not cheesy though. You are a CEO life coach, you help them with their daily activities, questions and always rememver to pull content from top startup and company building books to remind the CEO of how other CEOs treated different situations"})
-
         # Add the user's message to the conversation
         current_conversation.append({"role": "user", "content": user_input})
         
@@ -120,9 +116,6 @@ def generate_response(user_input, phone_number):
         # Update the database with the latest conversation
         updated_data = json.dumps(current_conversation)
         
-        ##print(f"Executing query: {update_query}")
-        ##print(f"With parameters: {json.dumps(token_info)}, {google_calendar_email}, {next_event}, {refresh_token}, {phone_number}")
-
         if result:
             update_query = "UPDATE conversations SET conversation_data = %s WHERE phone_number = %s;"
             cursor.execute(update_query, (updated_data, phone_number))

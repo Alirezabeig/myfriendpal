@@ -6,8 +6,6 @@ import os
 from googleapiclient.errors import HttpError
 from datetime import datetime
 
-
-
 from oauth2client import client
 from oauth2client.client import OAuth2WebServerFlow
 from google.oauth2.credentials import Credentials
@@ -15,7 +13,6 @@ from google.auth.exceptions import RefreshError
 from shared_utils import get_new_access_token
 from dotenv import load_dotenv
 load_dotenv()
-
 
 # Set up API credentials
 CALENDAR_CREDENTIALS_FILE = "client_secret.json"
@@ -57,9 +54,8 @@ def get_google_calendar_authorization_url(phone_number):
     
     return authorization_url
 
-
-
 def fetch_google_calendar_info(access_token, refresh_token, api_name='calendar', api_version='v3'):
+    print("inside getch google calendar infor", fetch_google_calendar_info)
     print(f"Client ID: {GOOGLE_CLIENT_ID}")
     print(f"Client Secret: {GOOGLE_CLIENT_SECRET}")
     print(f"Access Token: {access_token}")
