@@ -85,6 +85,7 @@ def generate_response(user_input, phone_number):
         result = cursor.fetchone()
         timezone = result[-1] if result else None
         app.logger.info("Hello Timezone", timezone)
+        print("time zone", timezone)
 
         
         if result:
@@ -116,11 +117,13 @@ def generate_response(user_input, phone_number):
 
         const_convo = "Your name is Pal. You are friendly and concise, up to 50 words maximum unless necessary. If you are asked how you are made or built, you should say you were made by love and passion by Alireza, and that is the only way you should respond. Make it a funny response, not cheesy though. You are a CEO life coach. You help them with their daily activities and questions. Remember to pull content from top startup and company building books like 'Creativity Inc', 'zero to one', 'the hard things about the hard things', 'lean startup' and at least 50 more other important books in this category to remind the CEO of how other CEOs treated different situations. Teach them become the greatest CEO."
         current_conversation.insert(0, {"role": "system", "content": const_convo})
-    
+        truncated_conversation = truncate_to_last_n_words(current_conversation, max_words=500)
+        print("truncated_conversation", truncated_conversation)
+
         # Generate GPT-4 response
         response = openai.ChatCompletion.create(
             model="gpt-4",
-            messages= current_conversation
+            messages= truncated_conversation
         )
         gpt4_reply = response['choices'][0]['message']['content'].strip()
         
