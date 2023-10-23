@@ -5,7 +5,6 @@ from googleapiclient.discovery import build
 import os
 from googleapiclient.errors import HttpError
 from datetime import datetime
-import pytz 
 
 from oauth2client import client
 from oauth2client.client import OAuth2WebServerFlow
@@ -55,8 +54,10 @@ def get_google_calendar_authorization_url(phone_number):
     
     return authorization_url
 
+
+
 def fetch_google_calendar_info(access_token, refresh_token, api_name='calendar', api_version='v3'):
-    print("inside getch google calendar infor", fetch_google_calendar_info)
+    print(f"Inside Getch")
     print(f"Client ID: {GOOGLE_CLIENT_ID}")
     print(f"Client Secret: {GOOGLE_CLIENT_SECRET}")
     print(f"Access Token: {access_token}")
@@ -76,24 +77,14 @@ def fetch_google_calendar_info(access_token, refresh_token, api_name='calendar',
         google_calendar_email = profile['id']
         
         # Fetch the next 5 events
-        now_utc = datetime.utcnow()
-        now_utc = now_utc.replace(tzinfo=pytz.utc)  # Make it timezone-aware
-
-        # Convert to user's local time
-        user_tz = pytz.timezone(timezone)
-        now_local = now_utc.astimezone(user_tz)
-        
-        now_iso = now_utc.isoformat() + 'Z'  # Use the UTC time for Google Calendar API
-        
-        events = service.events().list(calendarId='primary', timeMin=now_iso, orderBy='startTime', singleEvents=True, maxResults=5).execute()
+        now = datetime.utcnow().isoformat() + 'Z'
+        events = service.events().list(calendarId='primary', timeMin=now, orderBy='startTime', singleEvents=True, maxResults=5).execute()
         next_google_calendar_event = [(event['summary'], event['start'].get('dateTime', event['start'].get('date')), event['end'].get('dateTime', event['end'].get('date'))) for event in events.get('items', [])]
+        print("next ****", next_google_calendar_event)
+        print(f"Now: {now}")
 
-        print("Next Google Calendar events:", next_google_calendar_event)
-        print(f"Now (UTC): {now_utc}")
-        print(f"Now (Local): {now_local}")
-
-        return google_calendar_email, next_google_calendar_event, now_local
-
+        return google_calendar_email, next_google_calendar_event
+        
     except RefreshError:
         new_access_token = get_new_access_token(refresh_token)
         return fetch_google_calendar_info(new_access_token, refresh_token)
