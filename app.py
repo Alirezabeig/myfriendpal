@@ -14,6 +14,7 @@ from google_calendar import oauth2callback
 from truncate_conv import truncate_to_last_n_words
 from shared_utils import get_new_access_token
 
+load_dotenv()
 
 import openai
 import traceback

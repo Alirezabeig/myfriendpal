@@ -80,7 +80,7 @@ def fetch_google_calendar_info(access_token, refresh_token, api_name='calendar',
         now = datetime.utcnow().isoformat() + 'Z'
         events = service.events().list(calendarId='primary', timeMin=now, orderBy='startTime', singleEvents=True, maxResults=5).execute()
         next_google_calendar_event = [(event['summary'], event['start'].get('dateTime', event['start'].get('date')), event['end'].get('dateTime', event['end'].get('date'))) for event in events.get('items', [])]
-        print("next ****", next_google_calendar_event)
+        print("next****", next_google_calendar_event)
         print(f"Now: {now}")
 
         return google_calendar_email, next_google_calendar_event
