@@ -56,10 +56,10 @@ def check_for_calendar_keyword(user_input, phone_number):
     else:
         print("Calendar keyword not found.")  # Debug line
         return False
-
+    
 def fetch_next_calendar_event(refresh_token, timezone):
     new_access_token = get_new_access_token(refresh_token)
-    email, events, local_time = fetch_google_calendar_info(new_access_token, refresh_token, timezone)
+    email, events, local_time = fetch_google_calendar_info(new_access_token, refresh_token, user_timezone=timezone)
     return email, events, local_time
 
 def generate_response(user_input, phone_number):
