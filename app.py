@@ -64,7 +64,7 @@ def fetch_next_calendar_event(refresh_token):
     return fetch_google_calendar_info(new_access_token, refresh_token)
 
 def generate_response(user_input, phone_number):
-    print("inside_generate response")
+    app.logger.info("inside generate response")
 
     
     connection = create_connection()  # Assuming this function returns a valid DB connection
@@ -84,7 +84,7 @@ def generate_response(user_input, phone_number):
         cursor.execute(fetch_query, (phone_number,))
         result = cursor.fetchone()
         timezone = result[-1] if result else None
-        print("timezone fetching_query: ", timezone)
+        app.logger.info("Hello Timezone", timezone)
 
         
         if result:
