@@ -5,7 +5,7 @@ from googleapiclient.discovery import build
 import os
 from googleapiclient.errors import HttpError
 from datetime import datetime
-from time_utils.py import convert_utc_to_local
+import pytz
 
 from oauth2client import client
 from oauth2client.client import OAuth2WebServerFlow
@@ -16,6 +16,8 @@ from dotenv import load_dotenv
 
 
 load_dotenv()
+
+
 
 # Set up API credentials
 CALENDAR_CREDENTIALS_FILE = "client_secret.json"
@@ -28,6 +30,17 @@ REDIRECT_URI = "https://www.myfriendpal.com/oauth2callback"
 # Existing scopes for Google Calendar, add Gmail scope to it
 CALENDAR_SCOPE = ['https://www.googleapis.com/auth/calendar', 'https://www.googleapis.com/auth/gmail.readonly']
 
+def convert_utc_to_local(utc_time_str, local_timezone):
+    """
+    Convert a UTC time string to a local time string based on the given timezone.
+
+    :param utc_time_str: UTC time in isoformat
+    :param local_timezone: Timezone string (e.g., 'America/Los_Angeles')
+    :return: Local time string in isoformat
+    """
+    utc_time = datetime.fromisoformat(utc_time_str.replace("Z", "+00:00"))
+    local_time = utc_time.astimezone(pytz.timezone(local_timezone))
+    return local_time.isoformat()
 
 def get_google_calendar_authorization_url(phone_number):
     print("Generating Google Calendar authorization URL...")  # Debug line
