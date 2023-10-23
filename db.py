@@ -55,6 +55,7 @@ def create_table(connection):
            oauth_token JSONB,
            google_calendar_email TEXT,
            next_google_calendar_event TEXT,
+           timezone TEXT, 
            refresh_token TEXT); '''
         
         cursor.execute(create_table_query)

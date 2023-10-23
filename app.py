@@ -81,12 +81,11 @@ def generate_response(user_input, phone_number):
         update_query = ''
         fetch_query = "SELECT conversation_data, google_calendar_email, next_google_calendar_event, timezone FROM conversations WHERE phone_number = %s"
         
-        
-        print("timezone fetching_query: ", timezone)
-
         cursor.execute(fetch_query, (phone_number,))
         result = cursor.fetchone()
         timezone = result[-1] if result else None
+        print("timezone fetching_query: ", timezone)
+
         
         if result:
             conversation_data, google_calendar_email, next_google_calendar_event, timezone = result
@@ -135,13 +134,13 @@ def generate_response(user_input, phone_number):
         ##print(f"With parameters: {json.dumps(token_info)}, {google_calendar_email}, {next_event}, {refresh_token}, {phone_number}")
 
         if result:
-            update_query = "UPDATE conversations SET conversation_data = %s WHERE phone_number = %s;"
-            cursor.execute(update_query, (updated_data, phone_number))
+            update_query = "UPDATE conversations SET conversation_data = %s, timezone = %s WHERE phone_number = %s;"
+            cursor.execute(update_query, (updated_data, timezone, phone_number))
 
         else:
-            insert_query = "INSERT INTO conversations (phone_number, conversation_data) VALUES (%s, %s);"
-            cursor.execute(insert_query, (phone_number, updated_data))
-        
+            insert_query = "INSERT INTO conversations (phone_number, conversation_data, timezone) VALUES (%s, %s, %s);"
+            cursor.execute(insert_query, (phone_number, updated_data, timezone))
+
         connection.commit()
         
         return gpt4_reply
