@@ -6,12 +6,9 @@ import logging
 import json
 
 from dotenv import load_dotenv
+load_dotenv()
 
-env_file = ".env.local" if os.environ.get("USE_LOCAL_ENV") else ".env"
-
-# Load the .env file
-is_loaded = load_dotenv(env_file)
-
+is_loaded = load_dotenv()
 print(f"Is .env loaded: {is_loaded}")
 
 def create_connection():
@@ -55,7 +52,6 @@ def create_table(connection):
            oauth_token JSONB,
            google_calendar_email TEXT,
            next_google_calendar_event TEXT,
-           timezone TEXT, 
            refresh_token TEXT); '''
         
         cursor.execute(create_table_query)
@@ -74,7 +70,7 @@ def fetch_tokens_from_db(connection, phone_number):
         
         # SQL query to fetch the access and refresh tokens based on phone number
         query = "SELECT oauth_token, refresh_token FROM conversations WHERE phone_number = %s;"
-        ç
+        
         # Execute the query
         cursor.execute(query, (phone_number,))
         

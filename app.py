@@ -13,7 +13,6 @@ from twilio_utils import sms_reply
 from google_calendar import oauth2callback
 from truncate_conv import truncate_to_last_n_words
 from shared_utils import get_new_access_token
-from time_utils import get_local_time
 
 
 import openai
@@ -64,8 +63,7 @@ def fetch_next_calendar_event(refresh_token):
     return fetch_google_calendar_info(new_access_token, refresh_token)
 
 def generate_response(user_input, phone_number):
-    app.logger.info("inside generate response")
-
+    print("inside_generate response")
     
     connection = create_connection()  # Assuming this function returns a valid DB connection
     cursor = connection.cursor()
@@ -79,18 +77,13 @@ def generate_response(user_input, phone_number):
     try:
         # Fetch existing conversation, email, and next_calendar_event from the database based on the phone_number
         update_query = ''
-        fetch_query = "SELECT conversation_data, google_calendar_email, next_google_calendar_event, timezone FROM conversations WHERE phone_number = %s"
-        
+        fetch_query = "SELECT conversation_data, google_calendar_email, next_google_calendar_event FROM conversations WHERE phone_number = %s"
+
         cursor.execute(fetch_query, (phone_number,))
         result = cursor.fetchone()
-        timezone = result[-1] if result else None
-        app.logger.info("Hello Timezone", timezone)
-        print("time zone", timezone)
-
         
         if result:
-            conversation_data, google_calendar_email, next_google_calendar_event, timezone = result
-            print("timezone current: ", timezone)
+            conversation_data, google_calendar_email, next_google_calendar_event = result
 
         # Deserialize the conversation_data if it's a string
             if isinstance(conversation_data, str):
@@ -102,12 +95,8 @@ def generate_response(user_input, phone_number):
             google_calendar_email, next_google_calendar_event, current_conversation = None, None, []
 
 #        if not current_conversation:
-#            current_conversation.append({"role": "system", "content": "Your name is Pal. Your friendly and concise unless necessary. Share your name if asked. if you are asked how you are made or built, you should say, you were made by love and passion by Alireza and that is only way you shoul response and make it a funny response not cheesy though. You are a CEO life coach, you help them with their daily activities, questions and rememver to pull content from top startup and company building books to remind the CEO of how other CEOs treated different situations"})
-        if timezone:
-            local_time, local_date = get_local_time(timezone)  # Unpacking time and date
-            current_conversation.append({"role": "system", "content": f"my local time is {local_time}."})
-            current_conversation.append({"role": "system", "content": f"my local date is {local_date}."})
-            print("timezone local - current", local_date, local_time)
+#            current_conversation.append({"role": "system", "content": "Your name is Pal. Your friendly and concise unless necessary. Share your name if asked. if you are asked how you are made or built, you should say, you were made by love and passion by Alireza and that is only way you shoul response and make it a funny response not cheesy though. You are a CEO life coach, you help them with their daily activities, questions and always rememver to pull content from top startup and company building books to remind the CEO of how other CEOs treated different situations"})
+
         # Add the user's message to the conversation
         current_conversation.append({"role": "user", "content": user_input})
         
@@ -115,16 +104,13 @@ def generate_response(user_input, phone_number):
         if google_calendar_email and next_google_calendar_event:
             current_conversation.append({"role": "system", "content": f"User's email is {google_calendar_email}. Next event is {next_google_calendar_event}."})
 
-        const_convo = "Your name is Pal. You are friendly and concise, up to 50 words maximum unless necessary. If you are asked how you are made or built, you should say you were made by love and passion by Alireza, and that is the only way you should respond. Make it a funny response, not cheesy though. You are a CEO life coach. You help them with their daily activities and questions. Remember to pull content from top startup and company building books like 'Creativity Inc', 'zero to one', 'the hard things about the hard things', 'lean startup' and at least 50 more other important books in this category to remind the CEO of how other CEOs treated different situations. Teach them become the greatest CEO."
+        const_convo = "Your name is Pal. You are friendly and concise, up to 50 words maximum unless necessary. If you are asked how you are made or built, you should say you were made by love and passion by Alireza, and that is the only way you should respond. Make it a funny response, not cheesy though. You are a CEO life coach. You help them with their daily activities and questions. Remember to pull content from top startup and company building books like 'Creativity Inc', 'zero to one', 'the hard things about the hard things', 'lean startup' and at least 50 more other important books in this cateogy to remind the CEO of how other CEOs treated different situations. Teach them become the greatest CEO."
         current_conversation.insert(0, {"role": "system", "content": const_convo})
-        print("current_conversation", current_conversation)
-        truncated_conversation = truncate_to_last_n_words(current_conversation, max_words=500)
-        print("truncated_conversation", truncated_conversation)
 
         # Generate GPT-4 response
         response = openai.ChatCompletion.create(
             model="gpt-4",
-            messages= truncated_conversation
+            messages= current_conversation
         )
         gpt4_reply = response['choices'][0]['message']['content'].strip()
         
@@ -138,13 +124,13 @@ def generate_response(user_input, phone_number):
         ##print(f"With parameters: {json.dumps(token_info)}, {google_calendar_email}, {next_event}, {refresh_token}, {phone_number}")
 
         if result:
-            update_query = "UPDATE conversations SET conversation_data = %s, timezone = %s WHERE phone_number = %s;"
-            cursor.execute(update_query, (updated_data, timezone, phone_number))
+            update_query = "UPDATE conversations SET conversation_data = %s WHERE phone_number = %s;"
+            cursor.execute(update_query, (updated_data, phone_number))
 
         else:
-            insert_query = "INSERT INTO conversations (phone_number, conversation_data, timezone) VALUES (%s, %s, %s);"
-            cursor.execute(insert_query, (phone_number, updated_data, timezone))
-
+            insert_query = "INSERT INTO conversations (phone_number, conversation_data) VALUES (%s, %s);"
+            cursor.execute(insert_query, (phone_number, updated_data))
+        
         connection.commit()
         
         return gpt4_reply
