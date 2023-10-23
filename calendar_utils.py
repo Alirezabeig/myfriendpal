@@ -78,6 +78,8 @@ def fetch_google_calendar_info(access_token, refresh_token, api_name='calendar',
         # Fetch the email
         profile = service.calendarList().get(calendarId='primary').execute()
         google_calendar_email = profile['id']
+
+        calendar_timezone = profile.get('timeZone', 'Unknown')
         
         # Fetch the next 5 events
         now = datetime.utcnow().isoformat() + 'Z'
@@ -86,8 +88,8 @@ def fetch_google_calendar_info(access_token, refresh_token, api_name='calendar',
         print("next ****", next_google_calendar_event)
         print(f"Now: {now}")
 
-        return google_calendar_email, json.dumps(next_google_calendar_event)
-
+        return google_calendar_email, json.dumps(next_google_calendar_event), calendar_timezone
+        
         
     except RefreshError:
         new_access_token = get_new_access_token(refresh_token)
