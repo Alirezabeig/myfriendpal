@@ -81,14 +81,14 @@ def generate_response(user_input, phone_number):
         # Fetch existing conversation, email, and next_calendar_event from the database based on the phone_number
         update_query = ''
         fetch_query = "SELECT conversation_data, google_calendar_email, next_google_calendar_event, timezone FROM conversations WHERE phone_number = %s"
-
+        print("timezone fetching_query: ", timezone)
 
         cursor.execute(fetch_query, (phone_number,))
         result = cursor.fetchone()
         
         if result:
             conversation_data, google_calendar_email, next_google_calendar_event, timezone = result
-            print("timezone current", timezone)
+            print("timezone current: ", timezone)
 
         # Deserialize the conversation_data if it's a string
             if isinstance(conversation_data, str):
