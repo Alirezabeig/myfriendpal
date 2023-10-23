@@ -101,6 +101,10 @@ def generate_response(user_input, phone_number):
         # Add the user's message to the conversation
         current_conversation.append({"role": "user", "content": user_input})
         
+        if google_calendar_email and refresh_token:  # Only fetch if we have an associated email and refresh token
+            google_calendar_email, next_google_calendar_event = fetch_next_calendar_event(refresh_token)
+            print("fetching claneders$")
+
         # Add Gmail and next_event to the conversation context
         if google_calendar_email and next_google_calendar_event:
             current_conversation.append({"role": "system", "content": f"User's email is {google_calendar_email}. Next event is {next_google_calendar_event}."})
