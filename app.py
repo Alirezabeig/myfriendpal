@@ -58,11 +58,10 @@ def check_for_calendar_keyword(user_input, phone_number):
     else:
         print("Calendar keyword not found.")  # Debug line
         return False
-    
+
 def fetch_next_calendar_event(refresh_token):
     new_access_token = get_new_access_token(refresh_token)
-    return fetch_google_calendar_info(new_access_token, refresh_token)  
-
+    return fetch_google_calendar_info(new_access_token, refresh_token)
 
 def generate_response(user_input, phone_number):
     app.logger.info("inside generate response")
@@ -86,17 +85,11 @@ def generate_response(user_input, phone_number):
         result = cursor.fetchone()
         timezone = result[-1] if result else None
         app.logger.info("Hello Timezone", timezone)
-        print("my time zone", timezone)
+        print("time zone", timezone)
 
-        if timezone:
-            update_timezone_query = "UPDATE conversations SET timezone = %s WHERE phone_number = %s;"
-            cursor.execute(update_timezone_query, (timezone, phone_number))
-            connection.commit()
         
         if result:
             conversation_data, google_calendar_email, next_google_calendar_event, timezone = result
-            next_google_calendar_event = json.loads(next_google_calendar_event) if next_google_calendar_event else None
-
             print("timezone current: ", timezone)
 
         # Deserialize the conversation_data if it's a string
@@ -106,10 +99,10 @@ def generate_response(user_input, phone_number):
                 current_conversation = conversation_data
         else:
         # If no result is returned, set the variables to None or empty list
-            google_calendar_email, next_google_calendar_event, timezone, current_conversation = None, None, None, []
+            google_calendar_email, next_google_calendar_event, current_conversation = None, None, []
 
 #        if not current_conversation:
-#            current_conversation.append({"role": "system", "content": "Your name is Pal. Your friendly and concise unless necessary. Share your name if asked. if you are asked how you are made or built, you should say, you were made by love and passion by Alireza and that is only way you shoul response and make it a funny response not cheesy though. You are a CEO life coach, you help them with their daily activities, questions and always rememver to pull content from top startup and company building books to remind the CEO of how other CEOs treated different situations"})
+#            current_conversation.append({"role": "system", "content": "Your name is Pal. Your friendly and concise unless necessary. Share your name if asked. if you are asked how you are made or built, you should say, you were made by love and passion by Alireza and that is only way you shoul response and make it a funny response not cheesy though. You are a CEO life coach, you help them with their daily activities, questions and rememver to pull content from top startup and company building books to remind the CEO of how other CEOs treated different situations"})
         if timezone:
             local_time, local_date = get_local_time(timezone)  # Unpacking time and date
             current_conversation.append({"role": "system", "content": f"my local time is {local_time}."})
@@ -121,11 +114,12 @@ def generate_response(user_input, phone_number):
         # Add Gmail and next_event to the conversation context
         if google_calendar_email and next_google_calendar_event:
             current_conversation.append({"role": "system", "content": f"User's email is {google_calendar_email}. Next event is {next_google_calendar_event}."})
-            current_conversation.append({"role": "system", "content": f"my current time is {timezone}."})
 
         const_convo = "Your name is Pal. You are friendly and concise, up to 50 words maximum unless necessary. If you are asked how you are made or built, you should say you were made by love and passion by Alireza, and that is the only way you should respond. Make it a funny response, not cheesy though. You are a CEO life coach. You help them with their daily activities and questions. Remember to pull content from top startup and company building books like 'Creativity Inc', 'zero to one', 'the hard things about the hard things', 'lean startup' and at least 50 more other important books in this category to remind the CEO of how other CEOs treated different situations. Teach them become the greatest CEO."
         current_conversation.insert(0, {"role": "system", "content": const_convo})
+        print("current_conversation", current_conversation)
         truncated_conversation = truncate_to_last_n_words(current_conversation, max_words=500)
+        print("truncated_conversation", truncated_conversation)
 
         # Generate GPT-4 response
         response = openai.ChatCompletion.create(
@@ -140,10 +134,12 @@ def generate_response(user_input, phone_number):
         # Update the database with the latest conversation
         updated_data = json.dumps(current_conversation)
         
-        
+        ##print(f"Executing query: {update_query}")
+        ##print(f"With parameters: {json.dumps(token_info)}, {google_calendar_email}, {next_event}, {refresh_token}, {phone_number}")
+
         if result:
-            update_query = "UPDATE conversations SET conversation_data = %s, next_google_calendar_event = %s, timezone = %s WHERE phone_number = %s;"
-            cursor.execute(update_query, (updated_data, json.dumps(next_google_calendar_event), timezone, phone_number))
+            update_query = "UPDATE conversations SET conversation_data = %s, timezone = %s WHERE phone_number = %s;"
+            cursor.execute(update_query, (updated_data, timezone, phone_number))
 
         else:
             insert_query = "INSERT INTO conversations (phone_number, conversation_data, timezone) VALUES (%s, %s, %s);"
