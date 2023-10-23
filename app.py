@@ -58,10 +58,11 @@ def check_for_calendar_keyword(user_input, phone_number):
     else:
         print("Calendar keyword not found.")  # Debug line
         return False
-
+    
 def fetch_next_calendar_event(refresh_token):
     new_access_token = get_new_access_token(refresh_token)
-    return fetch_google_calendar_info(new_access_token, refresh_token)
+    return fetch_google_calendar_info(new_access_token, refresh_token)  
+
 
 def generate_response(user_input, phone_number):
     app.logger.info("inside generate response")
@@ -85,8 +86,12 @@ def generate_response(user_input, phone_number):
         result = cursor.fetchone()
         timezone = result[-1] if result else None
         app.logger.info("Hello Timezone", timezone)
-        print("time zone", timezone)
+        print("my time zone", timezone)
 
+        if timezone:
+            update_timezone_query = "UPDATE conversations SET timezone = %s WHERE phone_number = %s;"
+            cursor.execute(update_timezone_query, (timezone, phone_number))
+            connection.commit()
         
         if result:
             conversation_data, google_calendar_email, next_google_calendar_event, timezone = result
