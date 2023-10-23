@@ -57,9 +57,10 @@ def check_for_calendar_keyword(user_input, phone_number):
         print("Calendar keyword not found.")  # Debug line
         return False
 
-def fetch_next_calendar_event(refresh_token):
+def fetch_next_calendar_event(refresh_token, user_timezone):
     new_access_token = get_new_access_token(refresh_token)
-    return fetch_google_calendar_info(new_access_token, refresh_token)
+    email, events, local_time = fetch_google_calendar_info(new_access_token, refresh_token, user_timezone)
+    return email, events, local_time
 
 def generate_response(user_input, phone_number):
     print("inside_generate response")
@@ -72,17 +73,18 @@ def generate_response(user_input, phone_number):
         print("Generate_response not working")
     
     app.logger.info('generate response page accessed')
-    
+    google_calendar_email, next_google_calendar_event, local_time = fetch_next_calendar_event(refresh_token, user_timezone)
+
     try:
         # Fetch existing conversation, email, and next_calendar_event from the database based on the phone_number
         update_query = ''
-        fetch_query = "SELECT conversation_data, google_calendar_email, next_google_calendar_event FROM conversations WHERE phone_number = %s"
-
+ # Somewhere in your generate_response function...
+        fetch_query = "SELECT conversation_data, google_calendar_email, next_google_calendar_event, refresh_token, user_timezone FROM conversations WHERE phone_number = %s"
         cursor.execute(fetch_query, (phone_number,))
         result = cursor.fetchone()
-        
+
         if result:
-            conversation_data, google_calendar_email, next_google_calendar_event = result
+            conversation_data, google_calendar_email, next_google_calendar_event, refresh_token, user_timezone = result
 
         # Deserialize the conversation_data if it's a string
             if isinstance(conversation_data, str):
@@ -117,13 +119,16 @@ def generate_response(user_input, phone_number):
         updated_data = json.dumps(current_conversation)
         
         if result:
-            update_query = "UPDATE conversations SET conversation_data = %s WHERE phone_number = %s;"
-            cursor.execute(update_query, (updated_data, phone_number))
+            update_query = """UPDATE conversations 
+                      SET conversation_data = %s, timezone = %s
+                      WHERE phone_number = %s;"""
+            cursor.execute(update_query, (updated_data, local_time.isoformat(), phone_number))
 
         else:
-            insert_query = "INSERT INTO conversations (phone_number, conversation_data) VALUES (%s, %s);"
-            cursor.execute(insert_query, (phone_number, updated_data))
-        
+            insert_query = """INSERT INTO conversations (phone_number, conversation_data, timezone)
+                      VALUES (%s, %s, %s);"""
+            cursor.execute(insert_query, (phone_number, updated_data, local_time.isoformat()))
+
         connection.commit()
         
         return gpt4_reply
