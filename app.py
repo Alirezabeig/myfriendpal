@@ -65,20 +65,24 @@ def fetch_next_calendar_event(refresh_token, user_timezone):
 def generate_response(user_input, phone_number):
     print("inside_generate response")
     
-    connection = create_connection()  # Assuming this function returns a valid DB connection
+    # Create a database connection
+    connection = create_connection()  
     cursor = connection.cursor()
     
+    # Check for valid database connection
     if not connection:
         app.logger.info("**** *** Generate response - database not connected.")
         print("Generate_response not working")
     
     app.logger.info('generate response page accessed')
-    google_calendar_email, next_google_calendar_event, local_time = fetch_next_calendar_event(refresh_token, user_timezone)
 
+    # Initialize variables
+    current_conversation = []
+    refresh_token = None
+    user_timezone = None
+    
     try:
-        # Fetch existing conversation, email, and next_calendar_event from the database based on the phone_number
-        update_query = ''
- # Somewhere in your generate_response function...
+        # Fetch existing data from the database
         fetch_query = "SELECT conversation_data, google_calendar_email, next_google_calendar_event, refresh_token, user_timezone FROM conversations WHERE phone_number = %s"
         cursor.execute(fetch_query, (phone_number,))
         result = cursor.fetchone()
@@ -86,52 +90,57 @@ def generate_response(user_input, phone_number):
         if result:
             conversation_data, google_calendar_email, next_google_calendar_event, refresh_token, user_timezone = result
 
-        # Deserialize the conversation_data if it's a string
+            # Fetch next Google Calendar event using the refresh token and user_timezone from the database
+            google_calendar_email, next_google_calendar_event, local_time = fetch_next_calendar_event(refresh_token, user_timezone)
+
             if isinstance(conversation_data, str):
                 current_conversation = json.loads(conversation_data)
             else:
                 current_conversation = conversation_data
         else:
-        # If no result is returned, set the variables to None or empty list
-            google_calendar_email, next_google_calendar_event, current_conversation = None, None, []
-
-        # Add the user's message to the conversation
+            google_calendar_email, next_google_calendar_event = None, None
+            
+        # Add user's input to the conversation
         current_conversation.append({"role": "user", "content": user_input})
         
-        # Add Gmail and next_event to the conversation context
+        # Add system content about Gmail and next_event if they exist
         if google_calendar_email and next_google_calendar_event:
             current_conversation.append({"role": "system", "content": f"User's email is {google_calendar_email}. Next event is {next_google_calendar_event}."})
-
-        const_convo = "Your name is Pal. You are friendly and concise, up to 50 words maximum unless necessary. If you are asked how you are made or built, you should say you were made by love and passion by Alireza, and that is the only way you should respond. Make it a funny response, not cheesy though. You are a CEO life coach. You help them with their daily activities and questions. Remember to pull content from top startup and company building books like 'Creativity Inc', 'zero to one', 'the hard things about the hard things', 'lean startup' and at least 50 more other important books in this cateogy to remind the CEO of how other CEOs treated different situations. Teach them become the greatest CEO."
+        
+        # Add constant conversation details
+        const_convo = "Your name is Pal. You are friendly and concise, up to 50 words maximum unless necessary..."
         current_conversation.insert(0, {"role": "system", "content": const_convo})
-
+        
         # Generate GPT-4 response
         response = openai.ChatCompletion.create(
             model="gpt-4",
-            messages= current_conversation
+            messages=current_conversation
         )
         gpt4_reply = response['choices'][0]['message']['content'].strip()
         
-        # Append the generated response to the conversation
+        # Append GPT-4 reply to the conversation
         current_conversation.append({"role": "assistant", "content": gpt4_reply})
         
-        # Update the database with the latest conversation
+        # Update the database
         updated_data = json.dumps(current_conversation)
         
         if result:
             update_query = """UPDATE conversations 
-                      SET conversation_data = %s, timezone = %s
-                      WHERE phone_number = %s;"""
+                              SET conversation_data = %s, timezone = %s 
+                              WHERE phone_number = %s;"""
             cursor.execute(update_query, (updated_data, local_time.isoformat(), phone_number))
-
         else:
-            insert_query = """INSERT INTO conversations (phone_number, conversation_data, timezone)
-                      VALUES (%s, %s, %s);"""
+            insert_query = """INSERT INTO conversations (phone_number, conversation_data, timezone) 
+                              VALUES (%s, %s, %s);"""
             cursor.execute(insert_query, (phone_number, updated_data, local_time.isoformat()))
-
+        
+        # Commit changes and return GPT-4 reply
         connection.commit()
         
         return gpt4_reply
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        return "An error occurred."
 
     except Exception as e:
         logging.error(f"An error occurred: {e}")
