@@ -90,6 +90,8 @@ def generate_response(user_input, phone_number):
         
         if result:
             conversation_data, google_calendar_email, next_google_calendar_event, timezone = result
+            next_google_calendar_event = json.loads(next_google_calendar_event) if next_google_calendar_event else None
+
             print("timezone current: ", timezone)
 
         # Deserialize the conversation_data if it's a string
@@ -135,8 +137,8 @@ def generate_response(user_input, phone_number):
         
         
         if result:
-            update_query = "UPDATE conversations SET conversation_data = %s, timezone = %s WHERE phone_number = %s;"
-            cursor.execute(update_query, (updated_data, timezone, phone_number))
+            update_query = "UPDATE conversations SET conversation_data = %s, next_google_calendar_event = %s, timezone = %s WHERE phone_number = %s;"
+            cursor.execute(update_query, (updated_data, json.dumps(next_google_calendar_event), timezone, phone_number))
 
         else:
             insert_query = "INSERT INTO conversations (phone_number, conversation_data, timezone) VALUES (%s, %s, %s);"

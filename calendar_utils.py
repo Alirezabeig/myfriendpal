@@ -5,6 +5,7 @@ from googleapiclient.discovery import build
 import os
 from googleapiclient.errors import HttpError
 from datetime import datetime
+import jason
 
 
 
@@ -85,7 +86,8 @@ def fetch_google_calendar_info(access_token, refresh_token, api_name='calendar',
         print("next ****", next_google_calendar_event)
         print(f"Now: {now}")
 
-        return google_calendar_email, next_google_calendar_event
+        return google_calendar_email, json.dumps(next_google_calendar_event)
+
         
     except RefreshError:
         new_access_token = get_new_access_token(refresh_token)

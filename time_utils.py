@@ -1,11 +1,18 @@
 
 #time_utils.py
 from datetime import datetime
-import pytz  # Install this package if you haven't
+import requests
+import pytz
+from datetime import datetime
 
-def get_local_time(timezone_str):
-    timezone = pytz.timezone(timezone_str)
-    local_dt = datetime.now(timezone)
-    local_time = local_dt.strftime('%H:%M:%S')
-    local_date = local_dt.strftime('%Y-%m-%d')
-    return local_time, local_date
+current_time = datetime.now()
+
+def get_current_time_by_ip(ip_address):
+    response = requests.get(f'http://ip-api.com/json/{ip_address}')
+    data = response.json()
+    timezone = data.get('timezone')
+    if timezone:
+        tz = pytz.timezone(timezone)
+        current_time = datetime.now(tz)
+        return current_time
+    return None
