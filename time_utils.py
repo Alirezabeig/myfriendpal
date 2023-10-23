@@ -1,11 +1,16 @@
 
 #time_utils.py
 from datetime import datetime
-import pytz  # Install this package if you haven't
+import pytz
 
-def get_local_time(timezone_str):
-    timezone = pytz.timezone(timezone_str)
-    local_dt = datetime.now(timezone)
-    local_time = local_dt.strftime('%H:%M:%S')
-    local_date = local_dt.strftime('%Y-%m-%d')
-    return local_time, local_date
+def convert_utc_to_local(utc_time_str, local_timezone):
+    """
+    Convert a UTC time string to a local time string based on the given timezone.
+
+    :param utc_time_str: UTC time in isoformat
+    :param local_timezone: Timezone string (e.g., 'America/Los_Angeles')
+    :return: Local time string in isoformat
+    """
+    utc_time = datetime.fromisoformat(utc_time_str.replace("Z", "+00:00"))
+    local_time = utc_time.astimezone(pytz.timezone(local_timezone))
+    return local_time.isoformat()

@@ -5,6 +5,7 @@ from googleapiclient.discovery import build
 import os
 from googleapiclient.errors import HttpError
 from datetime import datetime
+from time_utils.py import convert_utc_to_local
 
 from oauth2client import client
 from oauth2client.client import OAuth2WebServerFlow
@@ -12,6 +13,8 @@ from google.oauth2.credentials import Credentials
 from google.auth.exceptions import RefreshError
 from shared_utils import get_new_access_token
 from dotenv import load_dotenv
+
+
 load_dotenv()
 
 # Set up API credentials
@@ -75,12 +78,20 @@ def fetch_google_calendar_info(access_token, refresh_token, api_name='calendar',
         # Fetch the email
         profile = service.calendarList().get(calendarId='primary').execute()
         google_calendar_email = profile['id']
-        
+        google_calendar_timezone = profile['timeZone']
+
         # Fetch the next 5 events
         now = datetime.utcnow().isoformat() + 'Z'
         events = service.events().list(calendarId='primary', timeMin=now, orderBy='startTime', singleEvents=True, maxResults=5).execute()
-        next_google_calendar_event = [(event['summary'], event['start'].get('dateTime', event['start'].get('date')), event['end'].get('dateTime', event['end'].get('date'))) for event in events.get('items', [])]
+        next_google_calendar_event = [(event['summary'], 
+                               convert_utc_to_local(event['start'].get('dateTime', event['start'].get('date')), google_calendar_timezone), 
+                               convert_utc_to_local(event['end'].get('dateTime', event['end'].get('date')), google_calendar_timezone)) 
+                              for event in events.get('items', [])]
+
         print("next****", next_google_calendar_event)
+        local_now = convert_utc_to_local(now, google_calendar_timezone)
+        print(f"Local Current Time: {local_now}")
+
         print(f"Now: {now}")
 
         return google_calendar_email, next_google_calendar_event
