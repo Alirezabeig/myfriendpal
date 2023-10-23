@@ -65,6 +65,8 @@ def fetch_next_calendar_event(refresh_token):
 
 def generate_response(user_input, phone_number):
     print("inside_generate response")
+    timezone = None
+
     
     connection = create_connection()  # Assuming this function returns a valid DB connection
     cursor = connection.cursor()
@@ -79,14 +81,17 @@ def generate_response(user_input, phone_number):
         # Fetch existing conversation, email, and next_calendar_event from the database based on the phone_number
         update_query = ''
         fetch_query = "SELECT conversation_data, google_calendar_email, next_google_calendar_event, timezone FROM conversations WHERE phone_number = %s"
-
+        
+        
+        print("timezone fetching_query: ", timezone)
 
         cursor.execute(fetch_query, (phone_number,))
         result = cursor.fetchone()
+        timezone = result[-1] if result else None
         
         if result:
             conversation_data, google_calendar_email, next_google_calendar_event, timezone = result
-            print("timezone current", timezone)
+            print("timezone current: ", timezone)
 
         # Deserialize the conversation_data if it's a string
             if isinstance(conversation_data, str):
@@ -101,8 +106,8 @@ def generate_response(user_input, phone_number):
 #            current_conversation.append({"role": "system", "content": "Your name is Pal. Your friendly and concise unless necessary. Share your name if asked. if you are asked how you are made or built, you should say, you were made by love and passion by Alireza and that is only way you shoul response and make it a funny response not cheesy though. You are a CEO life coach, you help them with their daily activities, questions and always rememver to pull content from top startup and company building books to remind the CEO of how other CEOs treated different situations"})
         if timezone:
             local_time, local_date = get_local_time(timezone)  # Unpacking time and date
-            current_conversation.append({"role": "system", "content": f"User's local time is {local_time}."})
-            current_conversation.append({"role": "system", "content": f"User's local date is {local_date}."})
+            current_conversation.append({"role": "system", "content": f"my local time is {local_time}."})
+            current_conversation.append({"role": "system", "content": f"my local date is {local_date}."})
             print("timezone local - current", local_date, local_time)
         # Add the user's message to the conversation
         current_conversation.append({"role": "user", "content": user_input})
@@ -113,7 +118,7 @@ def generate_response(user_input, phone_number):
 
         const_convo = "Your name is Pal. You are friendly and concise, up to 50 words maximum unless necessary. If you are asked how you are made or built, you should say you were made by love and passion by Alireza, and that is the only way you should respond. Make it a funny response, not cheesy though. You are a CEO life coach. You help them with their daily activities and questions. Remember to pull content from top startup and company building books like 'Creativity Inc', 'zero to one', 'the hard things about the hard things', 'lean startup' and at least 50 more other important books in this category to remind the CEO of how other CEOs treated different situations. Teach them become the greatest CEO."
         current_conversation.insert(0, {"role": "system", "content": const_convo})
-
+    
         # Generate GPT-4 response
         response = openai.ChatCompletion.create(
             model="gpt-4",
