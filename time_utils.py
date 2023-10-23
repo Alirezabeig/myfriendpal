@@ -7,7 +7,7 @@ from datetime import datetime
 
 current_time = datetime.now()
 
-def get_current_time_by_ip(ip_address):
+def get_local_time(ip_address):
     response = requests.get(f'http://ip-api.com/json/{ip_address}')
     data = response.json()
     timezone = data.get('timezone')
