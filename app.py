@@ -65,7 +65,6 @@ def fetch_next_calendar_event(refresh_token):
 
 def generate_response(user_input, phone_number):
     print("inside_generate response")
-    timezone = None
 
     
     connection = create_connection()  # Assuming this function returns a valid DB connection
