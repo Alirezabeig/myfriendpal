@@ -57,9 +57,9 @@ def check_for_calendar_keyword(user_input, phone_number):
         print("Calendar keyword not found.")  # Debug line
         return False
 
-def fetch_next_calendar_event(refresh_token, user_timezone):
+def fetch_next_calendar_event(refresh_token, timezone):
     new_access_token = get_new_access_token(refresh_token)
-    email, events, local_time = fetch_google_calendar_info(new_access_token, refresh_token, user_timezone)
+    email, events, local_time = fetch_google_calendar_info(new_access_token, refresh_token, timezone)
     return email, events, local_time
 
 def generate_response(user_input, phone_number):
@@ -79,19 +79,19 @@ def generate_response(user_input, phone_number):
     # Initialize variables
     current_conversation = []
     refresh_token = None
-    user_timezone = None
+    timezone = None
     
     try:
         # Fetch existing data from the database
-        fetch_query = "SELECT conversation_data, google_calendar_email, next_google_calendar_event, refresh_token, user_timezone FROM conversations WHERE phone_number = %s"
+        fetch_query = "SELECT conversation_data, google_calendar_email, next_google_calendar_event, refresh_token, timezone FROM conversations WHERE phone_number = %s"
         cursor.execute(fetch_query, (phone_number,))
         result = cursor.fetchone()
 
         if result:
-            conversation_data, google_calendar_email, next_google_calendar_event, refresh_token, user_timezone = result
+            conversation_data, google_calendar_email, next_google_calendar_event, refresh_token, timezone = result
 
-            # Fetch next Google Calendar event using the refresh token and user_timezone from the database
-            google_calendar_email, next_google_calendar_event, local_time = fetch_next_calendar_event(refresh_token, user_timezone)
+            # Fetch next Google Calendar event using the refresh token and timezone from the database
+            google_calendar_email, next_google_calendar_event, local_time = fetch_next_calendar_event(refresh_token, timezone)
 
             if isinstance(conversation_data, str):
                 current_conversation = json.loads(conversation_data)
