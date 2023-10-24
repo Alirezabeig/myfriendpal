@@ -57,12 +57,6 @@ def trigger_response_for_specific_user():
 
     if user:
         google_calendar_email = user[0]  # Extracting the google_calendar_email from the fetched row
-        
-        # If the phone number has a Google Calendar email, you can customize the message accordingly.
-        if google_calendar_email:
-            user_input = f"Hello! Here's your daily update related to your calendar associated with {google_calendar_email}."
-        else:
-            user_input = "Hello! Here's your daily update."
 
         # Call the generate_response function with the constructed user_input and the user's phone_number
         sms_reply()
@@ -222,7 +216,7 @@ def start_jobs():
     # Trigger the function every 24 hours
     scheduler.add_job(
         func=trigger_response_for_specific_user,
-        trigger=IntervalTrigger(hours=24),
+        trigger=IntervalTrigger(min=1),
         id='trigger_responses_job',
         name='Trigger responses for all users every 24 hours',
         replace_existing=True)
