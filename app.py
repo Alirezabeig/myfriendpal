@@ -44,6 +44,7 @@ conversations = {}
 logging.basicConfig(level=logging.ERROR)
 
 def trigger_response_for_specific_user():
+    print("inside trigger")
     phone_number = "5035284019"  # The specific phone number you want to target
 
     connection = create_connection()
@@ -215,6 +216,7 @@ def pal_page():
     return render_template('pal.html')
 
 def start_jobs():
+    print("inside Start jobs")
     scheduler = BackgroundScheduler()
     scheduler.start()
     # Trigger the function every 24 hours
