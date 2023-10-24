@@ -43,9 +43,9 @@ def sms_reply(user_input=None, phone_number=None):
                 from_=TWILIO_PHONE_NUMBER,
                 body=response_text
             )
-            return jsonify({'message': 'Reply sent!'})
+            return {'status': 'success', 'message': 'Reply sent!'}
         except Exception as e:
             print(f"Error sending SMS: {e}")
-            return jsonify({'message': 'Failed to send reply!'}), 500
-
-    return jsonify({'message': 'Calendar keyword detected, no reply sent!'})
+            return {'status': 'error', 'message': 'Failed to send reply!'}
+    
+    return {'status': 'info', 'message': 'Calendar keyword detected, no reply sent!'}
