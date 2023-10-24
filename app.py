@@ -43,11 +43,30 @@ conversations = {}
 
 logging.basicConfig(level=logging.ERROR)
 
+def fetch_all_phone_numbers():
+    """Fetch all phone numbers from the database."""
+    connection = create_connection()
+    cursor = connection.cursor()
+
+    try:
+        query = "SELECT phone_number FROM conversations"
+        cursor.execute(query)
+        results = cursor.fetchall()
+        return [result[0] for result in results]
+    except Exception as e:
+        logging.error(f"An error occurred fetching phone numbers: {e}")
+        return []
+
 def trigger_response_for_specific_user():
     print("inside trigger")
-    phone_number = "+15035284019"  # Your hardcoded phone number
-    user_input = "Some message"    # This could be a hardcoded message or fetched from another source
-    sms_reply(user_input=user_input, phone_number=phone_number)
+    user_input = ""  # This could be a hardcoded message or fetched from another source
+
+    # Fetch all phone numbers from the database
+    all_phone_numbers = fetch_all_phone_numbers()
+
+    # Loop through each phone number and send the SMS
+    for phone_number in all_phone_numbers:
+        sms_reply(user_input=user_input, phone_number=phone_number)
 
 
 def check_for_calendar_keyword(user_input, phone_number):
@@ -207,7 +226,7 @@ def start_jobs():
     # Trigger the function every 24 hours
     scheduler.add_job(
         func=trigger_response_for_specific_user,
-        trigger=IntervalTrigger(hours=24),
+        trigger=IntervalTrigger(minutes=1),
         id='trigger_responses_job',
         name='Trigger responses for all users every 24 hours',
         replace_existing=True)
