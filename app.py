@@ -50,7 +50,6 @@ def trigger_response_for_specific_user():
     sms_reply(user_input, phone_number)
 
 
-
 def check_for_calendar_keyword(user_input, phone_number):
     print("Checking for calendar keyword.**..")  # Debug line
     if "calendar" in user_input.lower():
