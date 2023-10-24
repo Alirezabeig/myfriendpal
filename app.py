@@ -111,11 +111,11 @@ def generate_response(user_input, phone_number):
         current_conversation.insert(0, {"role": "system", "content": const_convo})
         current_conversation.append({"role": "system", "content": f"my local Current Time: {local_now}"})
         print("locato time:", local_now)
-
+        truncated_convo = truncate_to_last_n_words(current_conversation, max_words=500)
         # Generate GPT-4 response
         response = openai.ChatCompletion.create(
             model="gpt-4",
-            messages= current_conversation
+            messages= truncated_convo
         )
         gpt4_reply = response['choices'][0]['message']['content'].strip()
         
