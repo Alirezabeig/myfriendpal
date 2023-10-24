@@ -71,11 +71,7 @@ def get_google_calendar_authorization_url(phone_number):
 
 def fetch_google_calendar_info(access_token, refresh_token, api_name='calendar', api_version='v3'):
     print(f"Inside Getch")
-    print(f"Client ID: {GOOGLE_CLIENT_ID}")
-    print(f"Client Secret: {GOOGLE_CLIENT_SECRET}")
-    print(f"Access Token: {access_token}")
-    print(f"Refresh Token: {refresh_token}")
-
+    
     try:
         creds = Credentials.from_authorized_user_info({
             'client_id': GOOGLE_CLIENT_ID,
@@ -98,7 +94,6 @@ def fetch_google_calendar_info(access_token, refresh_token, api_name='calendar',
                                convert_utc_to_local(event['end'].get('dateTime', event['end'].get('date')), google_calendar_timezone)) 
                               for event in events.get('items', [])]
 
-        print("next****", next_google_calendar_event)
         local_now = convert_utc_to_local(now, google_calendar_timezone)
         print(f"Local Current Time: {local_now}")
 
