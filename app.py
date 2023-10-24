@@ -16,6 +16,8 @@ from shared_utils import get_new_access_token
 from constants import const_convo
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.interval import IntervalTrigger
+import atexit
+
 
 
 load_dotenv()
