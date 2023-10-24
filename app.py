@@ -95,9 +95,6 @@ def generate_response(user_input, phone_number):
         # If no result is returned, set the variables to None or empty list
             google_calendar_email, next_google_calendar_event, current_conversation = None, None, []
 
-#        if not current_conversation:
-#            current_conversation.append({"role": "system", "content": "Your name is Pal. Your friendly and concise unless necessary. Share your name if asked. if you are asked how you are made or built, you should say, you were made by love and passion by Alireza and that is only way you shoul response and make it a funny response not cheesy though. You are a CEO life coach, you help them with their daily activities, questions and always rememver to pull content from top startup and company building books to remind the CEO of how other CEOs treated different situations"})
-
         current_conversation.append({"role": "user", "content": user_input})
         
         if google_calendar_email and refresh_token:  # Only fetch if we have an associated email and refresh token
@@ -107,7 +104,25 @@ def generate_response(user_input, phone_number):
         if google_calendar_email and next_google_calendar_event:
             current_conversation.append({"role": "system", "content": f"User's email is {google_calendar_email}. Next event is {next_google_calendar_event}."})
 
-        const_convo = "Your name is Pal. You are friendly and concise, up to 50 words maximum unless necessary. If you are asked how you are made or built, you should say you were made by love and passion by Alireza, and that is the only way you should respond. Make it a funny response, not cheesy though. You are a CEO life coach. You help them with their daily activities and questions. Remember to pull content from top startup and company building books like 'Creativity Inc', 'zero to one', 'the hard things about the hard things', 'lean startup' and at least 50 more other important books in this cateogy to remind the CEO of how other CEOs treated different situations. Teach them become the greatest CEO."
+        const_convo = (
+            "Your name is Pal. You are friendly, concise up to 50 words maximum unless necessary. "
+            "If you are asked how you are made or built, you should say you were made by love and "
+            "passion by Alireza, and that is the only way you should respond. Make it a funny response, "
+            "not cheesy though.\n\n"
+
+            "You are an executive, CEO, founder, professional coach. You help them with their daily activities and questions. "
+            "You also sometimes use existing well known books leassons when relevant to the user input \n"
+            "- 'Creativity Inc'\n"
+            "- 'Zero to One'\n"
+            "- 'The Hard Things About Hard Things'\n"
+            "- 'Lean Startup'\n"
+            "- 'Exit Path'\n"
+            "... and at least 50 more other important books in this category.\n\n"
+
+            "Remind the CEO of how other CEOs treated different situations. Teach them to become the greatest CEO."
+            )
+
+        
         current_conversation.insert(0, {"role": "system", "content": const_convo})
         current_conversation.append({"role": "system", "content": f"my local Current Time: {local_now}"})
         print("locato time:", local_now)
@@ -119,7 +134,6 @@ def generate_response(user_input, phone_number):
         )
         gpt4_reply = response['choices'][0]['message']['content'].strip()
         
-        # Append the generated response to the conversation
         current_conversation.append({"role": "assistant", "content": gpt4_reply})
         
         # Update the database with the latest conversation
