@@ -14,10 +14,7 @@ from google.auth.exceptions import RefreshError
 from shared_utils import get_new_access_token
 from dotenv import load_dotenv
 
-
 load_dotenv()
-
-
 
 # Set up API credentials
 CALENDAR_CREDENTIALS_FILE = "client_secret.json"
