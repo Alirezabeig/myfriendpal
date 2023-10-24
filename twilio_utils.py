@@ -20,7 +20,7 @@ print("Debug in twilio_utils.py: Twilio credentials", os.environ.get('TWILIO_ACC
 client = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
 
 
-def sms_reply():
+def sms_reply(user_input=None, phone_number=None):
     from app import client, TWILIO_PHONE_NUMBER, check_for_calendar_keyword, generate_response
 
     print("SMS reply triggered")
