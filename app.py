@@ -45,21 +45,10 @@ logging.basicConfig(level=logging.ERROR)
 
 def trigger_response_for_specific_user():
     print("inside trigger")
-    phone_number = "+15035284019"  # The specific phone number you want to target
+    phone_number = "+15035284019"  # Your hardcoded phone number
+    user_input = "Some message"    # This could be a hardcoded message or fetched from another source
+    sms_reply(user_input, phone_number)
 
-    connection = create_connection()
-    cursor = connection.cursor()
-
-    # Fetching the google_calendar_email associated with the specific phone_number
-    fetch_user_query = "SELECT google_calendar_email FROM conversations WHERE phone_number = %s"
-    cursor.execute(fetch_user_query, (phone_number,))
-    user = cursor.fetchone()
-
-    if user:
-        google_calendar_email = user[0]  # Extracting the google_calendar_email from the fetched row
-
-        # Call the generate_response function with the constructed user_input and the user's phone_number
-        sms_reply()
 
 
 def check_for_calendar_keyword(user_input, phone_number):
@@ -167,7 +156,10 @@ def generate_response(user_input, phone_number):
 
 @app.route("/sms", methods=['POST'])
 def handle_sms():
-    return sms_reply()
+    user_input = request.values.get('Body', None)
+    phone_number = request.values.get('From', None)
+    return sms_reply(user_input, phone_number)
+
     
 @app.route('/')
 def index():
