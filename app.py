@@ -43,6 +43,7 @@ conversations = {}
 
 logging.basicConfig(level=logging.ERROR)
 
+
 def fetch_all_phone_numbers():
     """Fetch all phone numbers from the database."""
     connection = create_connection()
