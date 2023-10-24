@@ -47,7 +47,7 @@ def trigger_response_for_specific_user():
     print("inside trigger")
     phone_number = "+15035284019"  # Your hardcoded phone number
     user_input = "Some message"    # This could be a hardcoded message or fetched from another source
-    sms_reply(user_input, phone_number)
+    sms_reply(user_input=user_input, phone_number=phone_number)
 
 
 def check_for_calendar_keyword(user_input, phone_number):
@@ -207,7 +207,7 @@ def start_jobs():
     # Trigger the function every 24 hours
     scheduler.add_job(
         func=trigger_response_for_specific_user,
-        trigger=IntervalTrigger(minutes=1),
+        trigger=IntervalTrigger(hours=24),
         id='trigger_responses_job',
         name='Trigger responses for all users every 24 hours',
         replace_existing=True)
