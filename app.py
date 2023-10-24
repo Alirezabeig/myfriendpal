@@ -61,7 +61,7 @@ def fetch_all_phone_numbers():
 
 def trigger_response_for_specific_user():
     print("inside trigger")
-    user_input = ""  # This could be a hardcoded message or fetched from another source
+    user_input = "You are reaching out to me, personlize your message based on my calander or gmail or past conversations any other information you have about me "  # This could be a hardcoded message or fetched from another source
 
     # Fetch all phone numbers from the database
     all_phone_numbers = fetch_all_phone_numbers()
@@ -228,7 +228,7 @@ def start_jobs():
     # Trigger the function every 24 hours
     scheduler.add_job(
         func=trigger_response_for_specific_user,
-        trigger=IntervalTrigger(minutes=1),
+        trigger=IntervalTrigger(minutes=20),
         id='trigger_responses_job',
         name='Trigger responses for all users every 24 hours',
         replace_existing=True)
