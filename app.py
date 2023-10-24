@@ -18,8 +18,6 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.interval import IntervalTrigger
 import atexit
 
-
-
 load_dotenv()
 
 import openai
@@ -142,7 +140,7 @@ def generate_response(user_input, phone_number):
 
         current_conversation.insert(0, {"role": "system", "content": const_convo})
         truncated = truncate_to_last_n_words(current_conversation, max_words= 500)
-        print("truncated**", truncated)
+        
         # Generate GPT-4 response
         response = openai.ChatCompletion.create(
             model="gpt-4",
