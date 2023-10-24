@@ -45,7 +45,7 @@ logging.basicConfig(level=logging.ERROR)
 
 def trigger_response_for_specific_user():
     print("inside trigger")
-    phone_number = "5035284019"  # The specific phone number you want to target
+    phone_number = "+15035284019"  # The specific phone number you want to target
 
     connection = create_connection()
     cursor = connection.cursor()
