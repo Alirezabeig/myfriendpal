@@ -44,7 +44,7 @@ conversations = {}
 logging.basicConfig(level=logging.ERROR)
 
 def trigger_response_for_specific_user():
-    phone_number = "+15035284019"  # The specific phone number you want to target
+    phone_number = "5035284019"  # The specific phone number you want to target
 
     connection = create_connection()
     cursor = connection.cursor()
@@ -148,15 +148,10 @@ def generate_response(user_input, phone_number):
         )
         gpt4_reply = response['choices'][0]['message']['content'].strip()
         
-        # Append the generated response to the conversation
         current_conversation.append({"role": "assistant", "content": gpt4_reply})
         
-        # Update the database with the latest conversation
         updated_data = json.dumps(current_conversation)
         
-        ##print(f"Executing query: {update_query}")
-        ##print(f"With parameters: {json.dumps(token_info)}, {google_calendar_email}, {next_event}, {refresh_token}, {phone_number}")
-
         if result:
             update_query = "UPDATE conversations SET conversation_data = %s WHERE phone_number = %s;"
             cursor.execute(update_query, (updated_data, phone_number))
