@@ -94,6 +94,9 @@ def generate_response(user_input, phone_number):
         # If no result is returned, set the variables to None or empty list
             google_calendar_email, next_google_calendar_event, current_conversation = None, None, []
 
+#        if not current_conversation:
+#            current_conversation.append({"role": "system", "content": "Your name is Pal. Your friendly and concise unless necessary. Share your name if asked. if you are asked how you are made or built, you should say, you were made by love and passion by Alireza and that is only way you shoul response and make it a funny response not cheesy though. You are a CEO life coach, you help them with their daily activities, questions and always rememver to pull content from top startup and company building books to remind the CEO of how other CEOs treated different situations"})
+
         current_conversation.append({"role": "user", "content": user_input})
         
         if google_calendar_email and refresh_token:  # Only fetch if we have an associated email and refresh token
@@ -102,39 +105,20 @@ def generate_response(user_input, phone_number):
 
         if google_calendar_email and next_google_calendar_event:
             current_conversation.append({"role": "system", "content": f"User's email is {google_calendar_email}. Next event is {next_google_calendar_event}."})
-        
-        const_convo = (
-                "Your name is Pal. You are friendly, concise up to 50 words maximum unless necessary. "
-                "If you are asked how you are made or built, you should say you were made by love and "
-                "passion by Alireza, and that is the only way you should respond. Make it a funny response, "
-                "not cheesy though.\n\n"
 
-                "You are an executive, CEO, founder, professional coach. You help them with their daily activities and questions. "
-                "You also sometimes use existing well known books leassons when relevant to the user input \n"
-                "- 'Creativity Inc'\n"
-                "- 'The Hard Things About Hard Things'\n"
-                "- 'Exit Path'\n"
-                "... and at least 50 more other important books in this category.\n\n"
-                "pull your knowledge your own training and more specifically and try to include these books when relevant :"
-                "The Lean Startup by Eric Ries,Zero to One by Peter Thiel , The Hard Thing About Hard Things by Ben Horowitz, Good to Great by Jim Collins, The Startup Owner's Manual by Steve Blank and Bob Dorf"
-                "Traction by Gabriel Weinberg and Justin Mares , Crossing the Chasm by Geoffrey A. "
-                "The Innovator's Dilemma by Clayton M. Christensen, Start with Why by Simon Sinek, Hooked: How to Build Habit-Forming Products by Nir Eyal, The Four Steps to the Epiphany by Steve Blank, The Art of Innovation by Tom Kelley and David Kelley, Rework by Jason Fried and David Heinemeier Hansson, The Personal MBA by Josh Kaufman, This is Marketing by Seth Godin, The Mom Test by Rob Fitzpatrick, Built to Sell by John Warrillow, The $100 Startup by Chris Guillebeau, The E-Myth Revisited by Michael E. Gerber," 
-                "The 4-Hour Workweek by Tim Ferriss, Purple Cow by Seth Godin, The Startup Playbook by Bill Draper, The Innovator's Solution by Clayton M. Christensen and Michael E. Raynor, The Innovator's DNA by Jeff Dyer, Hal Gregersen, and Clayton M. Christensen, The Halo Effect by Phil Rosenzweig, The Long Tail by Chris Anderson"
-                "The Tipping Point by Malcolm Gladwell, Blink by Malcolm Gladwell, Outliers by Malcolm Gladwell, Freakonomics by Steven D. Levitt and Stephen J. Dubner, Thinking, Fast and Slow by Daniel Kahneman, The Power of Habit by Charles Duhigg, Made to Stick by Chip Heath and Dan Heath, Start with Why by Simon Sinek, Leaders Eat Last by Simon Sinek, Dare to Lead by Brené Brown, Radical Candor by Kim Scott"
-                "The Culture Code by Daniel Coyle, Give and Take by Adam Grant ,The Art of War by Sun Tzu, The Prince by Niccolò Machiavelli, The Richest Man in Babylon by George S. Clason, Rich Dad Poor Dad by Robert T. Kiyosaki, The Total Money Makeover by Dave Ramsey, The 7 Habits of Highly Effective People by Stephen R. Covey, The 4-Hour Workweek by Tim Ferriss, The E-Myth Revisited by Michael E. Gerber, Essentialism by Greg McKeown, Deep Work by Cal Newport, Atomic Habits by James Clear"                        
-                        )
-
+        const_convo = "Your name is Pal. You are friendly and concise, up to 50 words maximum unless necessary. If you are asked how you are made or built, you should say you were made by love and passion by Alireza, and that is the only way you should respond. Make it a funny response, not cheesy though. You are a CEO life coach. You help them with their daily activities and questions. Remember to pull content from top startup and company building books like 'Creativity Inc', 'zero to one', 'the hard things about the hard things', 'lean startup' and at least 50 more other important books in this cateogy to remind the CEO of how other CEOs treated different situations. Teach them become the greatest CEO."
         current_conversation.insert(0, {"role": "system", "content": const_convo})
         current_conversation.append({"role": "system", "content": f"my local Current Time: {local_now}"})
         print("locato time:", local_now)
-        truncated_convo = truncate_to_last_n_words(current_conversation, max_words=500)
+
         # Generate GPT-4 response
         response = openai.ChatCompletion.create(
             model="gpt-4",
-            messages= truncated_convo
+            messages= current_conversation
         )
         gpt4_reply = response['choices'][0]['message']['content'].strip()
         
+        # Append the generated response to the conversation
         current_conversation.append({"role": "assistant", "content": gpt4_reply})
         
         # Update the database with the latest conversation
@@ -160,6 +144,7 @@ def generate_response(user_input, phone_number):
         logging.error(traceback.format_exc())
         return "Sorry, I couldn't understand that."
  
+
 
 @app.route("/sms", methods=['POST'])
 def handle_sms():
