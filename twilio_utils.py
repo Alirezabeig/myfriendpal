@@ -24,7 +24,10 @@ def sms_reply(user_input=None, phone_number=None):
     from app import client, TWILIO_PHONE_NUMBER, check_for_calendar_keyword, generate_response
 
     print("SMS reply triggered")
-
+    if user_input is None and phone_number is None:
+        user_input = request.values.get('Body', None)
+        phone_number = request.values.get('From', None)
+        
     # Use values from request if parameters aren't provided
     if not user_input:
         user_input = request.values.get('Body', None)

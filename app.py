@@ -49,10 +49,11 @@ def fetch_all_phone_numbers():
     cursor = connection.cursor()
 
     try:
-        query = "SELECT phone_number FROM conversations"
-        cursor.execute(query)
-        results = cursor.fetchall()
-        return [result[0] for result in results]
+        fetch_users_query = "SELECT DISTINCT phone_number FROM conversations"  # Assuming this is the right query to fetch all unique users' phone numbers
+        cursor.execute(fetch_users_query)
+        all_users = cursor.fetchall()
+    
+        return all_users
     except Exception as e:
         logging.error(f"An error occurred fetching phone numbers: {e}")
         return []
