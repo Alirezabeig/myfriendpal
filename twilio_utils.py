@@ -20,32 +20,26 @@ client = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
 
 
 def sms_reply(user_input=None, phone_number=None):
-    # Import relevant modules and variables from 'app' module
     from app import client, TWILIO_PHONE_NUMBER, check_for_calendar_keyword, generate_response
 
     print("SMS reply triggered")
 
-    # If 'user_input' and 'phone_number' are not provided, get them from the request
-    if user_input is None and phone_number is None:
-        user_input = request.values.get('Body', None)
-        phone_number = request.values.get('From', None)
+    # If 'user_input' or 'phone_number' are not provided, log it or set them to default values
+    if user_input is None:
+        print("user_input is not provided")
+        user_input = "default_user_input"  # or any suitable default
 
-    # Use values from the request if parameters aren't provided
-    if not user_input:
-        user_input = request.values.get('Body', None)
-    if not phone_number:
-        phone_number = request.values.get('From', None)
+    if phone_number is None:
+        print("phone_number is not provided")
+        phone_number = "default_phone_number"  # or any suitable default
 
     print(f"User input: {user_input}, Phone number: {phone_number}")  # Debug line
 
-    # Check for calendar keyword in 'user_input'
     calendar_keyword_found = check_for_calendar_keyword(user_input, phone_number)
 
-    # If calendar keyword is not found, proceed to send a response
     if not calendar_keyword_found:
         response_text = generate_response(user_input, phone_number)
         try:
-            # Attempt to send the SMS using Twilio client
             message = client.messages.create(
                 to=phone_number,
                 from_=TWILIO_PHONE_NUMBER,
