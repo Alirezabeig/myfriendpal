@@ -14,6 +14,9 @@ from google_calendar import oauth2callback
 from truncate_conv import truncate_to_last_n_words
 from shared_utils import get_new_access_token
 from constants import const_convo
+from apscheduler.schedulers.background import BackgroundScheduler
+from apscheduler.triggers.interval import IntervalTrigger
+
 
 load_dotenv()
 
@@ -39,6 +42,30 @@ openai.api_key = gpt4_api_key
 conversations = {}
 
 logging.basicConfig(level=logging.ERROR)
+
+def trigger_response_for_specific_user():
+    phone_number = "+15035284019"  # The specific phone number you want to target
+
+    connection = create_connection()
+    cursor = connection.cursor()
+
+    # Fetching the google_calendar_email associated with the specific phone_number
+    fetch_user_query = "SELECT google_calendar_email FROM conversations WHERE phone_number = %s"
+    cursor.execute(fetch_user_query, (phone_number,))
+    user = cursor.fetchone()
+
+    if user:
+        google_calendar_email = user[0]  # Extracting the google_calendar_email from the fetched row
+        
+        # If the phone number has a Google Calendar email, you can customize the message accordingly.
+        if google_calendar_email:
+            user_input = f"Hello! Here's your daily update related to your calendar associated with {google_calendar_email}."
+        else:
+            user_input = "Hello! Here's your daily update."
+
+        # Call the generate_response function with the constructed user_input and the user's phone_number
+        generate_response(user_input, phone_number)
+
 
 def check_for_calendar_keyword(user_input, phone_number):
     print("Checking for calendar keyword.**..")  # Debug line
@@ -192,8 +219,24 @@ def handle_oauth2callback():
 def pal_page():
     return render_template('pal.html')
 
+def start_jobs():
+    scheduler = BackgroundScheduler()
+    scheduler.start()
+    # Trigger the function every 24 hours
+    scheduler.add_job(
+        func=trigger_response_for_specific_user,
+        trigger=IntervalTrigger(minutes=1),
+        id='trigger_responses_job',
+        name='Trigger responses for all users every 24 hours',
+        replace_existing=True)
+    
+    # Shut down the scheduler when exiting the app
+    atexit.register(lambda: scheduler.shutdown())
+
 if __name__ == '__main__':
     print("Script is starting")
+    start_jobs()  # Start the background job
+
     app.debug = True
     port = int(os.environ.get("PORT", 5002))
     app.run(host="0.0.0.0", port=port)
