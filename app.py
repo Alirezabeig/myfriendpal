@@ -40,7 +40,7 @@ conversations = {}
 logging.basicConfig(level=logging.ERROR)
 
 def check_for_calendar_keyword(user_input, phone_number):
-    print("Checking for calendar keyword...")  # Debug line
+    print("Checking for calendar keyword.**..")  # Debug line
     if "calendar" in user_input.lower():
         print("Calendar keyword found. Generating authorization URL...")  # Debug line
         authorization_url = get_google_calendar_authorization_url(phone_number)
