@@ -65,7 +65,7 @@ def trigger_response_for_specific_user():
             user_input = "Hello! Here's your daily update."
 
         # Call the generate_response function with the constructed user_input and the user's phone_number
-        generate_response(user_input, phone_number)
+        sms_reply()
 
 
 def check_for_calendar_keyword(user_input, phone_number):
