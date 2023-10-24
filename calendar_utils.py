@@ -99,7 +99,7 @@ def fetch_google_calendar_info(access_token, refresh_token, api_name='calendar',
 
         print(f"Now: {now}")
 
-        return google_calendar_email, next_google_calendar_event
+        return google_calendar_email, next_google_calendar_event, local_now
         
     except RefreshError:
         new_access_token = get_new_access_token(refresh_token)
