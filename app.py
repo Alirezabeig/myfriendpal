@@ -13,6 +13,7 @@ from twilio_utils import sms_reply
 from google_calendar import oauth2callback
 from truncate_conv import truncate_to_last_n_words
 from shared_utils import get_new_access_token
+
 load_dotenv()
 
 import openai
@@ -94,8 +95,7 @@ def generate_response(user_input, phone_number):
         # If no result is returned, set the variables to None or empty list
             google_calendar_email, next_google_calendar_event, current_conversation = None, None, []
 
-#        if not current_conversation:
-#            current_conversation.append({"role": "system", "content": "Your name is Pal. Your friendly and concise unless necessary. Share your name if asked. if you are asked how you are made or built, you should say, you were made by love and passion by Alireza and that is only way you shoul response and make it a funny response not cheesy though. You are a CEO life coach, you help them with their daily activities, questions and always rememver to pull content from top startup and company building books to remind the CEO of how other CEOs treated different situations"})
+
 
         current_conversation.append({"role": "user", "content": user_input})
         
@@ -144,7 +144,6 @@ def generate_response(user_input, phone_number):
         logging.error(traceback.format_exc())
         return "Sorry, I couldn't understand that."
  
-
 
 @app.route("/sms", methods=['POST'])
 def handle_sms():
