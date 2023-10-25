@@ -14,6 +14,8 @@ from google.auth.exceptions import RefreshError
 from shared_utils import get_new_access_token
 from dotenv import load_dotenv
 
+MAX_RETRIES = 3
+
 load_dotenv()
 
 # Set up API credentials
@@ -67,9 +69,6 @@ def get_google_calendar_authorization_url(phone_number):
     
     return authorization_url
 
-
-
-MAX_RETRIES = 3
 
 def fetch_google_calendar_info(access_token, refresh_token, api_name='calendar', api_version='v3'):
     print("Inside fetch_google_calendar_info")
@@ -126,46 +125,50 @@ def fetch_google_calendar_info(access_token, refresh_token, api_name='calendar',
     return None, None, None
 
     
-def fetch_google_gmail_info(new_access_token , refresh_token):
+def fetch_google_gmail_info(new_access_token, refresh_token):
     email_list = []  # To store the last 5 emails' content and subject
+    retry_count = 0  # Initialize retry counter
     
-    try:
-        # Generate new access token using refresh token
-        new_access_token = get_new_access_token(refresh_token)
-        
-        creds = Credentials.from_authorized_user_info({
-            'client_id': GOOGLE_CLIENT_ID,
-            'client_secret': GOOGLE_CLIENT_SECRET,
-            'refresh_token': refresh_token,
-            'access_token': new_access_token
-        })
-        
-        service = build('gmail', 'v1', credentials=creds)
-
-        # Fetch the user's email profile to get the email address
-        profile_info = service.users().getProfile(userId='me').execute()
-        google_calendar_email = profile_info['emailAddress']
-
-        # Fetch the most recent 5 email IDs
-        results = service.users().messages().list(userId='me', maxResults=5).execute()
-        message_ids = results['messages']
-
-        for message_data in message_ids:
-            message_id = message_data['id']
-            message = service.users().messages().get(userId='me', id=message_id).execute()
-
-            # Decode the Base64 encoded Email subject and snippet (a preview of the email content)
-            subject = next(header['value'] for header in message['payload']['headers'] if header['name'] == 'Subject')
-            snippet = message['snippet']
-
-            email_list.append({
-                'subject': subject,
-                'snippet': snippet
+    while retry_count < MAX_RETRIES:
+        try:
+            # Generate new access token using refresh token
+            new_access_token = get_new_access_token(refresh_token)
+            
+            creds = Credentials.from_authorized_user_info({
+                'client_id': GOOGLE_CLIENT_ID,
+                'client_secret': GOOGLE_CLIENT_SECRET,
+                'refresh_token': refresh_token,
+                'access_token': new_access_token
             })
+            
+            service = build('gmail', 'v1', credentials=creds)
 
-        return google_calendar_email, email_list
-    
-    except RefreshError:
-        # Refresh the access token and recursively call this function
-        new_access_token = get_new_access_token(refresh_token)
-        return fetch_google_gmail_info(new_access_token, refresh_token)
+            # Fetch the user's email profile to get the email address
+            profile_info = service.users().getProfile(userId='me').execute()
+            google_calendar_email = profile_info['emailAddress']
+
+            # Fetch the most recent 5 email IDs
+            results = service.users().messages().list(userId='me', maxResults=5).execute()
+            message_ids = results['messages']
+
+            for message_data in message_ids:
+                message_id = message_data['id']
+                message = service.users().messages().get(userId='me', id=message_id).execute()
+
+                # Decode the Base64 encoded Email subject and snippet (a preview of the email content)
+                subject = next(header['value'] for header in message['payload']['headers'] if header['name'] == 'Subject')
+                snippet = message['snippet']
+
+                email_list.append({
+                    'subject': subject,
+                    'snippet': snippet
+                })
+
+            return google_calendar_email, email_list
+        
+        except RefreshError:
+            print("RefreshError occurred. Retrying...")
+            retry_count += 1  # Increment retry counter
+
+    print("Maximum retries reached. Exiting function.")
+    return None, None
