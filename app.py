@@ -9,7 +9,7 @@ import json
 
 from config import load_configurations
 from db import create_connection
-#from twilio_utils import sms_reply
+from twilio_utils import sms_reply
 from google_calendar import oauth2callback
 from truncate_conv import truncate_to_last_n_words
 from shared_utils import get_new_access_token
@@ -42,39 +42,6 @@ openai.api_key = gpt4_api_key
 conversations = {}
 
 logging.basicConfig(level=logging.ERROR)
-
-def sms_reply(user_input=None, phone_number=None):
-    from app import client, TWILIO_PHONE_NUMBER, check_for_calendar_keyword, generate_response
-
-    print("SMS reply triggered")
-
-    # If 'user_input' or 'phone_number' are not provided, log it or set them to default values
-    if user_input is None:
-        print("user_input is not provided")
-        user_input = "default_user_input"  # or any suitable default
-
-    if phone_number is None:
-        print("phone_number is not provided")
-        phone_number = "default_phone_number"  # or any suitable default
-
-    print(f"User input: {user_input}, Phone number: {phone_number}")  # Debug line
-
-    calendar_keyword_found = check_for_calendar_keyword(user_input, phone_number)
-
-    if not calendar_keyword_found:
-        response_text = generate_response(user_input, phone_number)
-        try:
-            message = client.messages.create(
-                to=phone_number,
-                from_=TWILIO_PHONE_NUMBER,
-                body=response_text
-            )
-            return {'status': 'success', 'message': 'Reply sent!'}
-        except Exception as e:
-            print(f"Error sending SMS: {e}")
-            return {'status': 'error', 'message': 'Failed to send reply!'}
-
-    return {'status': 'info', 'message': 'Calendar keyword detected, no reply sent!'}
 
 
 def fetch_all_phone_numbers():
@@ -261,7 +228,7 @@ def start_jobs():
     # Trigger the function every 24 hours
     scheduler.add_job(
         func=trigger_response_for_specific_user,
-        trigger=IntervalTrigger(minutes=2),
+        trigger=IntervalTrigger(minutes=50),
         id='trigger_responses_job',
         name='Trigger responses for all users every 24 hours',
         replace_existing=True)
