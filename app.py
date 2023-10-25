@@ -215,12 +215,12 @@ def message_all_users():
             print(f"Failed to send message to {phone_number}: {e}")
 
 def start_jobs():
-    print("inside Start jobs")
+    print("inside Startss jobs")
     scheduler = BackgroundScheduler()
     scheduler.start()
     scheduler.add_job(
         func=message_all_users,
-        trigger=IntervalTrigger(minutes=50),
+        trigger=IntervalTrigger(minutes=5),
         id='trigger_responses_job',
         name='Trigger responses for all users every 24 hours',
         replace_existing=True,
@@ -238,4 +238,4 @@ if __name__ == '__main__':
     start_jobs() 
     app.debug = True
     port = int(os.environ.get("PORT", 5002))
-    app.run(host="0.0.0.0", port=port)
+    app.run(host="0.0.0.0", port=port, debug=True, use_reloader=False)
