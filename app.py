@@ -201,7 +201,7 @@ def message_all_users():
 
     for phone_number_tuple in all_phone_numbers:
         phone_number = phone_number_tuple[0]
-        print(f"Attempting to send message to {phone_number}")
+        print(f"Attemptinggs to send message to {phone_number}")
         try:
             generated_response = generate_response(user_input=daily_user_input, phone_number=phone_number)
             
@@ -220,7 +220,7 @@ def start_jobs():
     scheduler.start()
     scheduler.add_job(
         func=message_all_users,
-        trigger=IntervalTrigger(minutes=50),
+        trigger=IntervalTrigger(minutes=1),
         id='trigger_responses_job',
         name='Trigger responses for all users every 24 hours',
         replace_existing=True,
