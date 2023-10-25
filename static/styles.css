@@ -54,3 +54,10 @@ body {font-family: 'Roboto', sans-serif; background-color:#fff;}
 .hero-sec .input-group { display:block; }
 .hero-sec .input-group .form-control, .hero-sec .input-group .btn{ width:100%; margin:0 !important; }
 }
+
+/* Modify the size of pal-icon */
+.navbar .navbar-brand img {
+    max-width: 20px; /* You can adjust the size as needed */
+    max-height: 20px; /* You can adjust the size as needed */
+    margin-right: 10px; /* Optional: Add some margin to separate it from text */
+}
