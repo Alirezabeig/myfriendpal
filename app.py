@@ -43,12 +43,22 @@ conversations = {}
 
 logging.basicConfig(level=logging.ERROR)
 
-def sms_reply():
+def sms_reply(user_input=None, phone_number=None):
     from app import client, TWILIO_PHONE_NUMBER, check_for_calendar_keyword, generate_response
 
-    print("**SMS reply triggered")
-    user_input = request.values.get('Body', None)
-    phone_number = request.values.get('From', None)
+    print("SMS reply triggered")
+
+    # If 'user_input' or 'phone_number' are not provided, log it or set them to default values
+    if user_input is None:
+        print("user_input is not provided")
+        user_input = "default_user_input"  # or any suitable default
+
+    if phone_number is None:
+        print("phone_number is not provided")
+        phone_number = "default_phone_number"  # or any suitable default
+
+    print(f"User input: {user_input}, Phone number: {phone_number}")  # Debug line
+
     calendar_keyword_found = check_for_calendar_keyword(user_input, phone_number)
 
     if not calendar_keyword_found:
@@ -59,7 +69,7 @@ def sms_reply():
                 from_=TWILIO_PHONE_NUMBER,
                 body=response_text
             )
-            return {'message': 'Reply sent!'}
+            return {'status': 'success', 'message': 'Reply sent!'}
         except Exception as e:
             print(f"Error sending SMS: {e}")
             return {'status': 'error', 'message': 'Failed to send reply!'}
@@ -83,8 +93,15 @@ def fetch_all_phone_numbers():
         return []
 
 def trigger_response_for_specific_user():
-    print("inside triggerss")
-    sms_reply()
+    print("inside trigger")
+    user_input = "You are reaching out to me, be concise up to 50 words, personlize your message based on my calander or gmail or past conversations any other information you have about me "  # This could be a hardcoded message or fetched from another source
+
+    # Fetch all phone numbers from the database
+    all_phone_numbers = fetch_all_phone_numbers()
+
+    # Loop through each phone number and send the SMS
+    for phone_number in all_phone_numbers:
+        sms_reply(user_input=user_input, phone_number=phone_number)
 
 
 def check_for_calendar_keyword(user_input, phone_number):
@@ -160,7 +177,7 @@ def generate_response(user_input, phone_number):
 
         current_conversation.insert(0, {"role": "system", "content": const_convo})
         truncated = truncate_to_last_n_words(current_conversation, max_words= 500)
-        print("GEN$")
+        
         # Generate GPT-4 response
         response = openai.ChatCompletion.create(
             model="gpt-4",
