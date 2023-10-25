@@ -187,20 +187,20 @@ def handle_oauth2callback():
     print("Entered handle_oauth2callback in app.py")
     return oauth2callback()
 
-def start_jobs():
-    print("inside Start jobs")
-    scheduler = BackgroundScheduler()
-    scheduler.start()
-    # Trigger the function every 24 hours
-    scheduler.add_job(
-        func=trigger_response_for_specific_user,
-        trigger=IntervalTrigger(minutes=1),
-        id='trigger_responses_job',
-        name='Trigger responses for all users every 24 hours',
-        replace_existing=True)
+# def start_jobs():
+#     print("inside Start jobs")
+#     scheduler = BackgroundScheduler()
+#     scheduler.start()
+#     # Trigger the function every 24 hours
+#     scheduler.add_job(
+#         func=trigger_response_for_specific_user,
+#         trigger=IntervalTrigger(minutes=1),
+#         id='trigger_responses_job',
+#         name='Trigger responses for all users every 24 hours',
+#         replace_existing=True)
     
-    # Shut down the scheduler when exiting the app
-    atexit.register(lambda: scheduler.shutdown())
+#     # Shut down the scheduler when exiting the app
+#     atexit.register(lambda: scheduler.shutdown())
 
 @app.route('/pal', methods=['GET'])
 def pal_page():
