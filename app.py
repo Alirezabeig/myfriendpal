@@ -224,7 +224,6 @@ def message_all_users():
 
     daily_user_input = "please"
 
-    # Loop through the phone numbers and trigger generate_response
     for phone_number_tuple in all_phone_numbers:
         phone_number = phone_number_tuple[0]
         try:
@@ -239,14 +238,13 @@ def message_all_users():
         except Exception as e:
             print(f"Failed to send message to {phone_number}: {e}")
 
-
 def start_jobs():
     print("inside Start jobs")
     scheduler = BackgroundScheduler()
     scheduler.start()
     scheduler.add_job(
         func=message_all_users,
-        trigger=IntervalTrigger(hours=24),  # Changed from minutes=1 to hours=24
+        trigger=IntervalTrigger(minutes=1),  # Changed from minutes=1 to hours=24
         id='trigger_responses_job',
         name='Trigger responses for all users every 24 hours',
         replace_existing=True)
