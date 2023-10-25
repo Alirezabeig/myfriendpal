@@ -1,15 +1,5 @@
 document.addEventListener('DOMContentLoaded', function () {
-  console.log("DOM Content Loaded");  // Debug line
-
-  // Initialize hover messages
-  const hoverMessages = {
-      "phrase1": "I'm like a 24/7 diner, open for texts anytime.",
-      "phrase2": "I'm a blend of Einstein and a stand-up comedian.",
-      "phrase3": "Busier than a lazy cat, which means never.",
-      "phrase4": "Solving your puzzles is my daily Sudoku game.",
-      "phrase5": "Impress you? You'll think I'm a magician!",
-      "phrase6": "We'll click so well, you'd think I'm a mind reader."
-  };
+  console.log("DOM Content Loaded");
 
   // Add tooltip text for all phrases
   for (let i = 1; i <= 6; i++) {
@@ -17,23 +7,23 @@ document.addEventListener('DOMContentLoaded', function () {
     if (phrase) {
       const tooltip = phrase.querySelector('.tooltip');
       tooltip.innerText = hoverMessages[`phrase${i}`];
-      phrase.addEventListener("mouseover", function() {
+      phrase.addEventListener("mouseover", function () {
         tooltip.style.visibility = "visible";
         tooltip.style.opacity = "1";
       });
-      phrase.addEventListener("mouseout", function() {
+      phrase.addEventListener("mouseout", function () {
         tooltip.style.visibility = "hidden";
         tooltip.style.opacity = "0";
       });
     }
   }
 
-  const activatePalDiv = document.getElementById('activatePal');
+  const activatePalButton = document.getElementById('activatePal');
 
-  if (activatePalDiv) {
-    console.log("Found Activate Pal div");  // Debug line
-    activatePalDiv.addEventListener('click', function (e) {
-      console.log("Clicked Activate Pal");  // Debug line
+  if (activatePalButton) {
+    console.log("Found Activate Pal button");
+    activatePalButton.addEventListener('click', function (e) {
+      console.log("Clicked Activate Pal");
       e.preventDefault();
 
       const phoneNumber = document.getElementById('phoneInput').value;
@@ -49,11 +39,11 @@ document.addEventListener('DOMContentLoaded', function () {
         modalText.innerText = "Please enter your phone number";
         modal.style.display = "block";
 
-        span.onclick = function() {
+        span.onclick = function () {
           modal.style.display = "none";
         };
 
-        window.onclick = function(event) {
+        window.onclick = function (event) {
           if (event.target === modal) {
             modal.style.display = "none";
           }
@@ -70,32 +60,39 @@ document.addEventListener('DOMContentLoaded', function () {
         },
         body: JSON.stringify({ phone_number: phoneNumber })
       })
-      .then(response => response.json())
-      .then(data => {
-        modalText.innerText = "Great! Pal is now going to message you on your phone to pick up the conversation.";  // Update modal text
-        modalBulletPoints.innerHTML = `
-          <li>Your first random point</li>
-          <li>Your second random point</li>
-          <li>Your third random point</li>
-        `;
-
-        modal.style.display = "block";  // Show modal
-
-        span.onclick = function() {
-          modal.style.display = "none";
-        };
-
-        window.onclick = function(event) {
-          if (event.target === modal) {
-            modal.style.display = "none";
+        .then(response => {
+          if (response.ok) {
+            return response.json();
+          } else {
+            throw new Error('Failed to send SMS. Please try again.');
           }
-        };
-      })
-      .catch(error => {
-        alert('Failed to send SMS. Please try again.');
-      });
+        })
+        .then(data => {
+          modalText.innerText = "Great! Pal is now going to message you on your phone to pick up the conversation.";
+          modalBulletPoints.innerHTML = `
+            <li>Your first random point</li>
+            <li>Your second random point</li>
+            <li>Your third random point</li>
+          `;
+
+          modal.style.display = "block";
+
+          span.onclick = function () {
+            modal.style.display = "none";
+          };
+
+          window.onclick = function (event) {
+            if (event.target === modal) {
+              modal.style.display = "none";
+            }
+          };
+        })
+        .catch(error => {
+          modalText.innerText = error.message; // Display the error message
+          modal.style.display = "block";
+        });
     });
   } else {
-    console.log("Could not find Activate Pal div");  // Debug line
+    console.log("Could not find Activate Pal button");
   }
 });
