@@ -64,4 +64,5 @@ body {font-family: 'Roboto', sans-serif; background-color:#fff;}
 /* Add a CSS rule to change the text color of the paragraph to gray */
 .section-wrap p {
     color: #808080; /* You can adjust the color as needed */
+    font-size: 24px;
 }
