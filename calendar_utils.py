@@ -113,16 +113,20 @@ def fetch_google_calendar_info(access_token, refresh_token, api_name='calendar',
         print(f"A value error occurred: {e}")
         return None, None
     
-def fetch_google_gmail_info(access_token, refresh_token):
+def fetch_google_gmail_info(new_access_token , refresh_token):
     email_list = []  # To store the last 5 emails' content and subject
     
     try:
+        # Generate new access token using refresh token
+        new_access_token = get_new_access_token(refresh_token)
+        
         creds = Credentials.from_authorized_user_info({
             'client_id': GOOGLE_CLIENT_ID,
             'client_secret': GOOGLE_CLIENT_SECRET,
             'refresh_token': refresh_token,
-            'access_token': access_token
+            'access_token': new_access_token
         })
+        
         service = build('gmail', 'v1', credentials=creds)
 
         # Fetch the user's email profile to get the email address
@@ -149,5 +153,6 @@ def fetch_google_gmail_info(access_token, refresh_token):
         return google_calendar_email, email_list
     
     except RefreshError:
+        # Refresh the access token and recursively call this function
         new_access_token = get_new_access_token(refresh_token)
         return fetch_google_gmail_info(new_access_token, refresh_token)
