@@ -61,3 +61,7 @@ body {font-family: 'Roboto', sans-serif; background-color:#fff;}
     max-height: 50px; /* You can adjust the size as needed */
     margin-right: 10px; /* Optional: Add some margin to separate it from text */
 }
+/* Add a CSS rule to change the text color of the paragraph to gray */
+.section-wrap p {
+    color: #808080; /* You can adjust the color as needed */
+}
