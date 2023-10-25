@@ -219,7 +219,7 @@ def start_jobs():
     scheduler = BackgroundScheduler()
     scheduler.start()
     scheduler.add_job(
-        func=handle_sms,
+        func=message_all_users,
         trigger=IntervalTrigger(minutes=2),
         id='trigger_responses_job',
         name='Trigger responses for all users every 24 hours',
