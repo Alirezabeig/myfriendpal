@@ -57,7 +57,7 @@ body {font-family: 'Roboto', sans-serif; background-color:#fff;}
 
 /* Modify the size of pal-icon */
 .navbar .navbar-brand img {
-    max-width: 20px; /* You can adjust the size as needed */
-    max-height: 20px; /* You can adjust the size as needed */
+    max-width: 50px; /* You can adjust the size as needed */
+    max-height: 50px; /* You can adjust the size as needed */
     margin-right: 10px; /* Optional: Add some margin to separate it from text */
 }
