@@ -43,19 +43,14 @@ conversations = {}
 
 logging.basicConfig(level=logging.ERROR)
 
-def sms_reply(user_input=None, phone_number=None):
+def sms_reply():
     from app import client, TWILIO_PHONE_NUMBER, check_for_calendar_keyword, generate_response
 
     print("**SMS reply triggered")
 
-    # If 'user_input' or 'phone_number' are not provided, log it or set them to default values
-    if user_input is None:
-        print("user_input is not provided")
-        user_input = "default_user_input"  # or any suitable default
-
-    if phone_number is None:
-        print("phone_number is not provided")
-        phone_number = "default_phone_number"  # or any suitable default
+    # Fetch user_input and phone_number from another source, database, or set default values
+    user_input = "some_input_from_another_source"  # Replace with actual source
+    phone_number = "some_phone_number_from_another_source"  # Replace with actual source
 
     print(f"User input: {user_input}, Phone number: {phone_number}")  # Debug line
 
@@ -93,15 +88,8 @@ def fetch_all_phone_numbers():
         return []
 
 def trigger_response_for_specific_user():
-    print("inside trigger")
-    user_input = "You are reaching out to me, be concise up to 50 words, personlize your message based on my calander or gmail or past conversations any other information you have about me "  # This could be a hardcoded message or fetched from another source
-
-    # Fetch all phone numbers from the database
-    all_phone_numbers = fetch_all_phone_numbers()
-
-    # Loop through each phone number and send the SMS
-    for phone_number in all_phone_numbers:
-        sms_reply(user_input=user_input, phone_number=phone_number)
+    print("inside triggerss")
+    sms_reply()
 
 
 def check_for_calendar_keyword(user_input, phone_number):
