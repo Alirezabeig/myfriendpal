@@ -117,24 +117,19 @@ def generate_response(user_input=None, phone_number=None):
             print("userf email ", google_calendar_email)
 
         current_conversation.insert(0, {"role": "system", "content": const_convo})
-        truncated = truncate_to_last_n_words(current_conversation, max_words= 500)
+        truncated = truncate_to_last_n_words(current_conversation, max_words= 75)
         print("truncated**", truncated)
-        # Generate GPT-4 response
         response = openai.ChatCompletion.create(
             model="gpt-4",
             messages= truncated
         )
         gpt4_reply = response['choices'][0]['message']['content'].strip()
         
-        # Append the generated response to the conversation
         current_conversation.append({"role": "assistant", "content": gpt4_reply})
         
-        # Update the database with the latest conversation
         updated_data = json.dumps(current_conversation)
         
-        ##print(f"Executing query: {update_query}")
-        ##print(f"With parameters: {json.dumps(token_info)}, {google_calendar_email}, {next_event}, {refresh_token}, {phone_number}")
-
+        
         if result:
             update_query = "UPDATE conversations SET conversation_data = %s WHERE phone_number = %s;"
             cursor.execute(update_query, (updated_data, phone_number))
@@ -206,6 +201,7 @@ def message_all_users():
 
     for phone_number_tuple in all_phone_numbers:
         phone_number = phone_number_tuple[0]
+        print(f"Attempting to send message to {phone_number}")
         try:
             generated_response = generate_response(user_input=daily_user_input, phone_number=phone_number)
             
@@ -224,12 +220,13 @@ def start_jobs():
     scheduler.start()
     scheduler.add_job(
         func=message_all_users,
-        trigger=IntervalTrigger(minutes=3),  # Changed from minutes=1 to hours=24
+        trigger=IntervalTrigger(minutes=1),
         id='trigger_responses_job',
         name='Trigger responses for all users every 24 hours',
-        replace_existing=True)
+        replace_existing=True,
+        max_instances=1
+        )
     
-    # Shut down the scheduler when exiting the app
     atexit.register(lambda: scheduler.shutdown())
 
 @app.route('/pal', methods=['GET'])
@@ -238,8 +235,7 @@ def pal_page():
 
 if __name__ == '__main__':
     print("Script is starting")
-    start_jobs()  # Start the background job
-
+    start_jobs() 
     app.debug = True
     port = int(os.environ.get("PORT", 5002))
     app.run(host="0.0.0.0", port=port)
