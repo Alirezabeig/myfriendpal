@@ -44,26 +44,6 @@ conversations = {}
 
 logging.basicConfig(level=logging.ERROR)
 
-def sms_reply():
-    from app import client, TWILIO_PHONE_NUMBER, check_for_calendar_keyword, generate_response
-
-    print("SMS reply triggered")
-    user_input = request.values.get('Body', None)
-    phone_number = request.values.get('From', None)
-    
-    print(f"User input: {user_input}, Phone number: {phone_number}")  # Debug line
-    
-    calendar_keyword_found = check_for_calendar_keyword(user_input, phone_number)
-    
-    if not calendar_keyword_found:
-        response_text = generate_response(user_input, phone_number)
-        message = client.messages.create(
-            to=phone_number,
-            from_=TWILIO_PHONE_NUMBER,
-            body=response_text
-        )
-
-    return jsonify({'message': 'Reply sent!'})
 
 def check_for_calendar_keyword(user_input, phone_number):
     print("Checking for calendar keyword.**..")  # Debug line
@@ -201,8 +181,8 @@ def send_message():
             from_=TWILIO_PHONE_NUMBER,
             body=greeting_message
         )
-        logging.info(f"Message sent with ID: {message.sid}")
-        return jsonify({'message': 'Message sent!'})
+        logging.info(f"Message delivered with ID: {message.sid}")
+        return jsonify({'message': 'Message delivered!'})
     except Exception as e:
         logging.error(f"Failed to send message: {e}")
         return jsonify({'message': 'Failed to send message', 'error': str(e)})
@@ -244,7 +224,7 @@ def start_jobs():
     scheduler.start()
     scheduler.add_job(
         func=message_all_users,
-        trigger=IntervalTrigger(minutes=1),  # Changed from minutes=1 to hours=24
+        trigger=IntervalTrigger(minutes=3),  # Changed from minutes=1 to hours=24
         id='trigger_responses_job',
         name='Trigger responses for all users every 24 hours',
         replace_existing=True)
@@ -252,21 +232,14 @@ def start_jobs():
     # Shut down the scheduler when exiting the app
     atexit.register(lambda: scheduler.shutdown())
 
-if __name__ == '__main__':
-    print("Script is starting")
-    start_jobs()  # Start the background job
-
-    app.debug = True
-    port = int(os.environ.get("PORT", 5002))
-    app.run(host="0.0.0.0", port=port)
-
 @app.route('/pal', methods=['GET'])
 def pal_page():
     return render_template('pal.html')
 
 if __name__ == '__main__':
     print("Script is starting")
-    start_jobs()
+    start_jobs()  # Start the background job
+
     app.debug = True
     port = int(os.environ.get("PORT", 5002))
     app.run(host="0.0.0.0", port=port)
