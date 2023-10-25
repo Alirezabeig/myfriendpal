@@ -26,6 +26,7 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.interval import IntervalTrigger
 import atexit
 
+app = Flask(__name__, static_url_path='/static')
 
 app, conn = load_configurations()
 conn = create_connection()
