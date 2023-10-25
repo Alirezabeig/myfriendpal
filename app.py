@@ -46,7 +46,7 @@ logging.basicConfig(level=logging.ERROR)
 def sms_reply(user_input=None, phone_number=None):
     from app import client, TWILIO_PHONE_NUMBER, check_for_calendar_keyword, generate_response
 
-    print("SMS reply triggered")
+    print("**SMS reply triggered")
 
     # If 'user_input' or 'phone_number' are not provided, log it or set them to default values
     if user_input is None:
@@ -177,7 +177,7 @@ def generate_response(user_input, phone_number):
 
         current_conversation.insert(0, {"role": "system", "content": const_convo})
         truncated = truncate_to_last_n_words(current_conversation, max_words= 500)
-        
+        print("GEN$")
         # Generate GPT-4 response
         response = openai.ChatCompletion.create(
             model="gpt-4",
