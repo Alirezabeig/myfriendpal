@@ -93,7 +93,7 @@ def generate_response(user_input=None, phone_number=None):
         
         if result:
             conversation_data, google_calendar_email, next_google_calendar_event, refresh_token = result
-            google_calendar_email, last_five_emails = fetch_google_gmail_info(new_access_token, refresh_token)
+            google_calendar_email, last_five_emails = fetch_google_gmail_info(refresh_token)
 
         # Deserialize the conversation_data if it's a string
             if isinstance(conversation_data, str):
