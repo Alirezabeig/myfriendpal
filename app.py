@@ -22,6 +22,10 @@ import traceback
 
 from calendar_utils import get_google_calendar_authorization_url
 from calendar_utils import fetch_google_calendar_info
+from apscheduler.schedulers.background import BackgroundScheduler
+from apscheduler.triggers.interval import IntervalTrigger
+import atexit
+
 
 app, conn = load_configurations()
 conn = create_connection()
@@ -39,6 +43,27 @@ openai.api_key = gpt4_api_key
 conversations = {}
 
 logging.basicConfig(level=logging.ERROR)
+
+def sms_reply():
+    from app import client, TWILIO_PHONE_NUMBER, check_for_calendar_keyword, generate_response
+
+    print("SMS reply triggered")
+    user_input = request.values.get('Body', None)
+    phone_number = request.values.get('From', None)
+    
+    print(f"User input: {user_input}, Phone number: {phone_number}")  # Debug line
+    
+    calendar_keyword_found = check_for_calendar_keyword(user_input, phone_number)
+    
+    if not calendar_keyword_found:
+        response_text = generate_response(user_input, phone_number)
+        message = client.messages.create(
+            to=phone_number,
+            from_=TWILIO_PHONE_NUMBER,
+            body=response_text
+        )
+
+    return jsonify({'message': 'Reply sent!'})
 
 def check_for_calendar_keyword(user_input, phone_number):
     print("Checking for calendar keyword.**..")  # Debug line
@@ -64,7 +89,7 @@ def fetch_next_calendar_event(refresh_token):
     new_access_token = get_new_access_token(refresh_token)
     return fetch_google_calendar_info(new_access_token, refresh_token)
 
-def generate_response(user_input, phone_number):
+def generate_response(user_input=None, phone_number=None):
     print("inside_generate response")
     
     connection = create_connection()  # Assuming this function returns a valid DB connection
@@ -187,20 +212,55 @@ def handle_oauth2callback():
     print("Entered handle_oauth2callback in app.py")
     return oauth2callback()
 
-# def start_jobs():
-#     print("inside Start jobs")
-#     scheduler = BackgroundScheduler()
-#     scheduler.start()
-#     # Trigger the function every 24 hours
-#     scheduler.add_job(
-#         func=trigger_response_for_specific_user,
-#         trigger=IntervalTrigger(minutes=1),
-#         id='trigger_responses_job',
-#         name='Trigger responses for all users every 24 hours',
-#         replace_existing=True)
+def message_all_users():
+    print("Inside message_all_users")
+
+    connection = create_connection()
+    cursor = connection.cursor()
+
+    fetch_query = "SELECT phone_number FROM conversations"
+    cursor.execute(fetch_query)
+    all_phone_numbers = cursor.fetchall()
+
+    daily_user_input = "please"
+
+    # Loop through the phone numbers and trigger generate_response
+    for phone_number_tuple in all_phone_numbers:
+        phone_number = phone_number_tuple[0]
+        try:
+            generated_response = generate_response(user_input=daily_user_input, phone_number=phone_number)
+            
+            message = client.messages.create(
+                to=phone_number,
+                from_=TWILIO_PHONE_NUMBER,
+                body=generated_response
+            )
+            print(f"Message sent to {phone_number} with ID: {message.sid}")
+        except Exception as e:
+            print(f"Failed to send message to {phone_number}: {e}")
+
+
+def start_jobs():
+    print("inside Start jobs")
+    scheduler = BackgroundScheduler()
+    scheduler.start()
+    scheduler.add_job(
+        func=message_all_users,
+        trigger=IntervalTrigger(hours=24),  # Changed from minutes=1 to hours=24
+        id='trigger_responses_job',
+        name='Trigger responses for all users every 24 hours',
+        replace_existing=True)
     
-#     # Shut down the scheduler when exiting the app
-#     atexit.register(lambda: scheduler.shutdown())
+    # Shut down the scheduler when exiting the app
+    atexit.register(lambda: scheduler.shutdown())
+
+if __name__ == '__main__':
+    print("Script is starting")
+    start_jobs()  # Start the background job
+
+    app.debug = True
+    port = int(os.environ.get("PORT", 5002))
+    app.run(host="0.0.0.0", port=port)
 
 @app.route('/pal', methods=['GET'])
 def pal_page():
@@ -208,6 +268,7 @@ def pal_page():
 
 if __name__ == '__main__':
     print("Script is starting")
+    start_jobs()
     app.debug = True
     port = int(os.environ.get("PORT", 5002))
     app.run(host="0.0.0.0", port=port)
