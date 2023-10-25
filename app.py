@@ -14,9 +14,6 @@ from google_calendar import oauth2callback
 from truncate_conv import truncate_to_last_n_words
 from shared_utils import get_new_access_token
 from constants import const_convo
-from apscheduler.schedulers.background import BackgroundScheduler
-from apscheduler.triggers.interval import IntervalTrigger
-import atexit
 
 load_dotenv()
 
@@ -42,34 +39,6 @@ openai.api_key = gpt4_api_key
 conversations = {}
 
 logging.basicConfig(level=logging.ERROR)
-
-
-def fetch_all_phone_numbers():
-    """Fetch all phone numbers from the database."""
-    connection = create_connection()
-    cursor = connection.cursor()
-
-    try:
-        fetch_users_query = "SELECT DISTINCT phone_number FROM conversations"  # Assuming this is the right query to fetch all unique users' phone numbers
-        cursor.execute(fetch_users_query)
-        all_users = cursor.fetchall()
-    
-        return all_users
-    except Exception as e:
-        logging.error(f"An error occurred fetching phone numbers: {e}")
-        return []
-
-def trigger_response_for_specific_user():
-    print("inside trigger")
-    user_input = "You are reaching out to me, be concise up to 50 words, personlize your message based on my calander or gmail or past conversations any other information you have about me "  # This could be a hardcoded message or fetched from another source
-
-    # Fetch all phone numbers from the database
-    all_phone_numbers = fetch_all_phone_numbers()
-
-    # Loop through each phone number and send the SMS
-    for phone_number in all_phone_numbers:
-        sms_reply(user_input=user_input, phone_number=phone_number)
-
 
 def check_for_calendar_keyword(user_input, phone_number):
     print("Checking for calendar keyword.**..")  # Debug line
@@ -144,7 +113,7 @@ def generate_response(user_input, phone_number):
 
         current_conversation.insert(0, {"role": "system", "content": const_convo})
         truncated = truncate_to_last_n_words(current_conversation, max_words= 500)
-        
+        print("truncated**", truncated)
         # Generate GPT-4 response
         response = openai.ChatCompletion.create(
             model="gpt-4",
@@ -152,10 +121,15 @@ def generate_response(user_input, phone_number):
         )
         gpt4_reply = response['choices'][0]['message']['content'].strip()
         
+        # Append the generated response to the conversation
         current_conversation.append({"role": "assistant", "content": gpt4_reply})
         
+        # Update the database with the latest conversation
         updated_data = json.dumps(current_conversation)
         
+        ##print(f"Executing query: {update_query}")
+        ##print(f"With parameters: {json.dumps(token_info)}, {google_calendar_email}, {next_event}, {refresh_token}, {phone_number}")
+
         if result:
             update_query = "UPDATE conversations SET conversation_data = %s WHERE phone_number = %s;"
             cursor.execute(update_query, (updated_data, phone_number))
@@ -176,10 +150,7 @@ def generate_response(user_input, phone_number):
 
 @app.route("/sms", methods=['POST'])
 def handle_sms():
-    user_input = request.values.get('Body', None)
-    phone_number = request.values.get('From', None)
-    return sms_reply(user_input, phone_number)
-
+    return sms_reply()
     
 @app.route('/')
 def index():
@@ -216,11 +187,6 @@ def handle_oauth2callback():
     print("Entered handle_oauth2callback in app.py")
     return oauth2callback()
 
-
-@app.route('/pal', methods=['GET'])
-def pal_page():
-    return render_template('pal.html')
-
 def start_jobs():
     print("inside Start jobs")
     scheduler = BackgroundScheduler()
@@ -236,10 +202,12 @@ def start_jobs():
     # Shut down the scheduler when exiting the app
     atexit.register(lambda: scheduler.shutdown())
 
+@app.route('/pal', methods=['GET'])
+def pal_page():
+    return render_template('pal.html')
+
 if __name__ == '__main__':
     print("Script is starting")
-    start_jobs()  # Start the background job
-
     app.debug = True
     port = int(os.environ.get("PORT", 5002))
     app.run(host="0.0.0.0", port=port)
