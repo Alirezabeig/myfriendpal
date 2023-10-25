@@ -114,27 +114,40 @@ def fetch_google_calendar_info(access_token, refresh_token, api_name='calendar',
         return None, None
     
 def fetch_google_gmail_info(access_token, refresh_token):
+    email_list = []  # To store the last 5 emails' content and subject
     
     try:
-        creds = Credentials.from_authorized_user_info({'access_token': access_token})
+        creds = Credentials.from_authorized_user_info({
+            'client_id': GOOGLE_CLIENT_ID,
+            'client_secret': GOOGLE_CLIENT_SECRET,
+            'refresh_token': refresh_token,
+            'access_token': access_token
+        })
         service = build('gmail', 'v1', credentials=creds)
 
         # Fetch the user's email profile to get the email address
         profile_info = service.users().getProfile(userId='me').execute()
         google_calendar_email = profile_info['emailAddress']
 
-        # Fetch the most recent email subject (just as an example)
+        # Fetch the most recent 5 email IDs
         results = service.users().messages().list(userId='me', maxResults=5).execute()
-        message_id = results['messages'][0]['id']
-        message = service.users().messages().get(userId='me', id=message_id).execute()
+        message_ids = results['messages']
 
-        # Decode the Base64 encoded Email subject
-        subject = next(header['value'] for header in message['payload']['headers'] if header['name'] == 'Subject')
+        for message_data in message_ids:
+            message_id = message_data['id']
+            message = service.users().messages().get(userId='me', id=message_id).execute()
 
-        return google_calendar_email, subject
+            # Decode the Base64 encoded Email subject and snippet (a preview of the email content)
+            subject = next(header['value'] for header in message['payload']['headers'] if header['name'] == 'Subject')
+            snippet = message['snippet']
+
+            email_list.append({
+                'subject': subject,
+                'snippet': snippet
+            })
+
+        return google_calendar_email, email_list
     
     except RefreshError:
         new_access_token = get_new_access_token(refresh_token)
         return fetch_google_gmail_info(new_access_token, refresh_token)
-    
-

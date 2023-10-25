@@ -14,14 +14,14 @@ from google_calendar import oauth2callback
 from truncate_conv import truncate_to_last_n_words
 from shared_utils import get_new_access_token
 from constants import const_convo
+from json import dumbs
 
 load_dotenv()
 
 import openai
 import traceback
 
-from calendar_utils import get_google_calendar_authorization_url
-from calendar_utils import fetch_google_calendar_info
+from calendar_utils import fetch_google_calendar_info , get_google_calendar_authorization_url , fetch_google_gmail_info
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.interval import IntervalTrigger
 import atexit
@@ -92,6 +92,7 @@ def generate_response(user_input=None, phone_number=None):
         
         if result:
             conversation_data, google_calendar_email, next_google_calendar_event, refresh_token = result
+            google_calendar_email, last_five_emails = fetch_google_gmail_info(new_access_token, refresh_token)
 
         # Deserialize the conversation_data if it's a string
             if isinstance(conversation_data, str):
@@ -102,13 +103,15 @@ def generate_response(user_input=None, phone_number=None):
         # If no result is returned, set the variables to None or empty list
             google_calendar_email, next_google_calendar_event, current_conversation = None, None, []
 
-
-
         current_conversation.append({"role": "user", "content": user_input})
         
         if google_calendar_email and refresh_token:  # Only fetch if we have an associated email and refresh token
             google_calendar_email, next_google_calendar_event , local_now = fetch_next_calendar_event(refresh_token)
             current_conversation.append({"role": "system", "content": f"my local Current Time: {local_now}"})
+            
+            if last_five_emails:
+                current_conversation.append({"role": "system", "content": f"Last 5 Emails: {dumps(last_five_emails)}"})
+                print("adding last 5gmails")    
             print("fetching claneders$")
             print("locato time:", local_now)
 
