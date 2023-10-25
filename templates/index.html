@@ -11,7 +11,7 @@
 <body>
     <nav class="navbar navbar-expand-lg sticky-top">
         <div class="container">
-            <a class="navbar-brand fw-bolder fs40 " href="#"><img src="../img/pal-icon.png" alt=""  class="d-inline-block  align-text-top"> PAL</a>
+            <a class="navbar-brand fw-bolder fs40 " href="#"><img src="..img/pal-icon.png" alt=""  class="d-inline-block  align-text-top"> PAL</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
             </button>
@@ -165,126 +165,6 @@
 						<div class="text-muted"><img src="img/google.png" alt="" /> 2 weeks ago</div>
 					</div>
 				</div>
-			</div>
-		</div>
-	</div>
-	<div class="pt-4 pb-4 footer">
-		<div class="container">
-			<div class="row justify-content-between">
-				<div class="col-sm-auto">All rights reserved Momento AI Inc <br/> 2023</div>
-				<div class="col-sm-auto">My contact email: <a href="mailto:almo7383@colorado.edu">almo7383@colorado.edu</a></div>
-			</div>
-		</div>
-	</div>
-    <script src="{{ url_for('static', filename='script.js') }}"></script>
-
-</body>
-</html>
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>PAL</title>
-    <link rel="icon" href="{{ url_for('static', filename='img/favicon.ico') }}">
-    <link href="{{ url_for('static', filename='static/bootstrap.min.css') }}" rel="stylesheet">
-    <link href="{{ url_for('static', filename='static/styles.css') }}" rel="stylesheet">
-</head>
-<body>
-    <nav class="navbar navbar-expand-lg sticky-top">
-        <div class="container">
-            <a class="navbar-brand fw-bolder fs40" href="#"><img src="{{ url_for('static', filename='img/pal-icon.png') }}" alt="" class="d-inline-block align-text-top"> PAL</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse justify-content-end" id="navbarNavAltMarkup">
-                <div class="navbar-nav"> 
-                    <a class="nav-link" href="#">Privacy</a>
-                    <a class="nav-link" href="#">About</a> 
-                </div>
-            </div>
-        </div>
-    </nav>
-    <div class="hero-sec  section-wrap">
-        <div class="container">
-            <div class="row align-items-center">
-                <div class="col-md-7"> 
-                    <h1 class="fs56 mb-3 mb-md-5">Your <span class="highlight">AI-powered</span> executive and founder's coach in your daily messages.</h1>
-                    <form id="activateForm">
-                        <div class="input-group mb-3">
-                            <input type="text" id="phoneInput" class="form-control" placeholder="Enter phone number" aria-label="Recipient's username" aria-describedby="button-addon2">
-                            <button class="btn btn-primary" type="button" id="activatePal">Activate Pal Today! <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#FFF" ><path d="m11.293 17.293 1.414 1.414L19.414 12l-6.707-6.707-1.414 1.414L15.586 11H6v2h9.586z"></path></svg> </button>
-                        </div>
-                    </form>
-                    <p class="fs22 pb-md-5"><span class="text-nowrap">Free 7-day trial</span> &bull; <span class="text-nowrap">10 seconds setup</span> &bull; <span class="text-nowrap">Cancel any time</span> </p>
-                    <h4 class="mt-md-5 pt-md-5 mb-5 mb-md-0 text-muted text-uppercase fs24">Powered by Homemade AI with Love and Passion</h4>
-                </div>
-                <div class="col-md-5 text-md-end">
-                    <img src="{{ url_for('static', filename='img/hero-mobile.png') }}" alt="" class=" img-fluid" />
-                </div>
-            </div>
-        </div>
-    </div>
-    
-	<div class="section-wrap">
-		<div class="container">
-			<div class="text-center mb-5 pb-lg-4">
-				<h1 class="fs40">Proactive. Integrated. Knowledgeable. Easy </h1>
-				<p class="fs30">Pal seamlessly integrates with your messages, watch, calendar, and email. As it learns from your interactions, it provides personalized assistance directly on your phone.</p>
-			</div>
-			<div class="row justify-content-center">
-				<div class="col-lg-8">
-					<div class="row">
-						<div class="col-md-4"><img src="{{ url_for('static', filename='img/mobile-1.png') }}" alt="" class="img-fluid mb-3 mb-md-0" /></div>
-						<div class="col-md-4"><img src="{{ url_for('static', filename='img/mobile-2.png') }}" alt="" class="img-fluid mb-3 mb-md-0" /></div>
-						<div class="col-md-4"><img src="{{ url_for('static', filename='img/mobile-3.png') }}" alt="" class="img-fluid mb-3 mb-md-0" /></div>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
-	<div class="section-wrap">
-		<div class="container">
-			<h1 class="fs48 text-center mb-5 pb-lg-4">Start Fo<span class="highlight">r Free a</span>nd Swit<span class="highlight">ch to Pro or P</span>lus Later!</h1>
-			<div class="row">
-				<div class="col-md-4">
-					<div class="bg-light p-3 mb-3 mb-md-0">
-						<h2 class="mb-3">Free</h2>
-						<h4 class="fs24"><img src="{{ url_for('static', filename='img/grow-icon.svg') }}" alt="" /> 5 Daily SMS</h4>
-						<p>2 integrations  <br/> 50 SMS replies</p>
-					</div>
-				</div>
-				<div class="col-md-4">
-					<div class="bg-light p-3 mb-3 mb-md-0">
-						<h2 class="mb-3">Pro $10</h2>
-						<h4 class="fs24"><img src="{{ url_for('static', filename='img/clock-icon.svg') }}" alt="" /> 50 Daily SMS</h4>
-						<p>5 integrations  <br/> 500 SMS replies</p>
-					</div>
-				</div>
-				<div class="col-md-4">
-					<div class="bg-light p-3 mb-3 mb-md-0">
-						<h2 class="mb-3">Plus $25</h2>
-						<h4 class="fs24"><img src="{{ url_for('static', filename='img/instagram-icon.svg') }}" alt="" /> 100 Daily SMS</h4>
-						<p>Unlimited integration <br/> 1,000 SMS replies</p>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
-	<div class="section-wrap review-wrap">
-		<div class="container">
-			<h1 class="fs56 text-center text-white mb-5">Our users love Pal!</h1>
-			<div class="row">
-				<div class="col-sm-6 col-md-4 col-lg-3">
-						<div class="review-box">
-							<img class="mb-3" src="{{ url_for('static', filename='img/review/review-1.png') }}" alt="" />
-							<h6 class="mb-3">Terry Dias</h6>
-							<img class="mb-3" src="{{ url_for('static', filename='img/star.png') }}" alt="" />
-							<p>I just signed up for a trial and within a couple of hours had a brand new customer testimonials page built on our website as well as sliders...</p>
-							<div class="text-muted"><img src="{{ url_for('static', filename='img/google.png') }}" alt="" /> 2 weeks ago</div>
-						</div>
-				</div>
-				<!-- Add similar code blocks for other reviews -->
 			</div>
 		</div>
 	</div>
