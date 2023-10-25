@@ -76,7 +76,6 @@ def fetch_g_emails_content(refresh_token):
     new_access_token = get_new_access_token(refresh_token)
     return fetch_google_gmail_info(new_access_token, refresh_token)
 
-from threading import Thread
 
 def generate_response(user_input=None, phone_number=None):
     print("inside_generate response")

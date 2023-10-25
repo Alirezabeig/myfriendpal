@@ -69,49 +69,62 @@ def get_google_calendar_authorization_url(phone_number):
 
 
 
+MAX_RETRIES = 3
+
 def fetch_google_calendar_info(access_token, refresh_token, api_name='calendar', api_version='v3'):
-    print(f"Inside Getch")
+    print("Inside fetch_google_calendar_info")
     
-    try:
-        creds = Credentials.from_authorized_user_info({
-            'client_id': GOOGLE_CLIENT_ID,
-            'client_secret': GOOGLE_CLIENT_SECRET,
-            'refresh_token': refresh_token,
-            'access_token': access_token
-        })
-        service = build(api_name, api_version, credentials=creds)
-        
-        # Fetch the email
-        profile = service.calendarList().get(calendarId='primary').execute()
-        google_calendar_email = profile['id']
-        google_calendar_timezone = profile['timeZone']
+    retry_count = 0  # Initialize retry counter
+    
+    while retry_count < MAX_RETRIES:
+        try:
+            creds = Credentials.from_authorized_user_info({
+                'client_id': GOOGLE_CLIENT_ID,
+                'client_secret': GOOGLE_CLIENT_SECRET,
+                'refresh_token': refresh_token,
+                'access_token': access_token
+            })
+            
+            service = build(api_name, api_version, credentials=creds)
+            
+            # Fetch the email
+            profile = service.calendarList().get(calendarId='primary').execute()
+            google_calendar_email = profile['id']
+            google_calendar_timezone = profile['timeZone']
 
-        # Fetch the next 5 events
-        now = datetime.utcnow().isoformat() + 'Z'
-        events = service.events().list(calendarId='primary', timeMin=now, orderBy='startTime', singleEvents=True, maxResults=5).execute()
-        next_google_calendar_event = [(event['summary'], 
-                               convert_utc_to_local(event['start'].get('dateTime', event['start'].get('date')), google_calendar_timezone), 
-                               convert_utc_to_local(event['end'].get('dateTime', event['end'].get('date')), google_calendar_timezone)) 
-                              for event in events.get('items', [])]
+            # Fetch the next 5 events
+            now = datetime.utcnow().isoformat() + 'Z'
+            events = service.events().list(calendarId='primary', timeMin=now, 
+                                           orderBy='startTime', singleEvents=True, 
+                                           maxResults=5).execute()
+                                           
+            next_google_calendar_event = [(event['summary'], 
+                                           convert_utc_to_local(event['start'].get('dateTime', event['start'].get('date')), google_calendar_timezone), 
+                                           convert_utc_to_local(event['end'].get('dateTime', event['end'].get('date')), google_calendar_timezone)) 
+                                          for event in events.get('items', [])]
 
-        local_now = convert_utc_to_local(now, google_calendar_timezone)
-        print(f"Local Current Time: {local_now}")
+            local_now = convert_utc_to_local(now, google_calendar_timezone)
+            print(f"Local Current Time: {local_now}")
+            print(f"Now: {now}")
 
-        print(f"Now: {now}")
+            return google_calendar_email, next_google_calendar_event, local_now
 
-        return google_calendar_email, next_google_calendar_event, local_now
+        except RefreshError:
+            print("RefreshError occurred. Retrying...")
+            retry_count += 1  # Increment retry counter
+            access_token = get_new_access_token(refresh_token)  # Update the access token
         
-    except RefreshError:
-        new_access_token = get_new_access_token(refresh_token)
-        return fetch_google_calendar_info(new_access_token, refresh_token)
-        
-    except HttpError as e:
-        print(f"An HTTP error occurred: {e}")
-        return None, None
-        
-    except ValueError as e:
-        print(f"A value error occurred: {e}")
-        return None, None
+        except HttpError as e:
+            print(f"An HTTP error occurred: {e}")
+            return None, None, None
+            
+        except ValueError as e:
+            print(f"A value error occurred: {e}")
+            return None, None, None
+    
+    print("Maximum retries reached. Exiting function.")
+    return None, None, None
+
     
 def fetch_google_gmail_info(new_access_token , refresh_token):
     email_list = []  # To store the last 5 emails' content and subject
