@@ -47,13 +47,8 @@ def sms_reply():
     from app import client, TWILIO_PHONE_NUMBER, check_for_calendar_keyword, generate_response
 
     print("**SMS reply triggered")
-
-    # Fetch user_input and phone_number from another source, database, or set default values
-    user_input = "some_input_from_another_source"  # Replace with actual source
-    phone_number = "some_phone_number_from_another_source"  # Replace with actual source
-
-    print(f"User input: {user_input}, Phone number: {phone_number}")  # Debug line
-
+    user_input = request.values.get('Body', None)
+    phone_number = request.values.get('From', None)
     calendar_keyword_found = check_for_calendar_keyword(user_input, phone_number)
 
     if not calendar_keyword_found:
@@ -64,7 +59,7 @@ def sms_reply():
                 from_=TWILIO_PHONE_NUMBER,
                 body=response_text
             )
-            return {'status': 'success', 'message': 'Reply sent!'}
+            return {'message': 'Reply sent!'}
         except Exception as e:
             print(f"Error sending SMS: {e}")
             return {'status': 'error', 'message': 'Failed to send reply!'}
