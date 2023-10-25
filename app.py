@@ -15,6 +15,7 @@ from truncate_conv import truncate_to_last_n_words
 from shared_utils import get_new_access_token
 from constants import const_convo
 from json import dumps
+from threading import Thread
 
 
 load_dotenv()
@@ -75,88 +76,88 @@ def fetch_g_emails_content(refresh_token):
     new_access_token = get_new_access_token(refresh_token)
     return fetch_google_gmail_info(new_access_token, refresh_token)
 
+from threading import Thread
+
 def generate_response(user_input=None, phone_number=None):
     print("inside_generate response")
-    
+
     connection = create_connection()  # Assuming this function returns a valid DB connection
     cursor = connection.cursor()
-    
+
     if not connection:
         app.logger.info("**** *** Generate response - database not connected.")
         print("Generate_response not working")
-    
-    app.logger.info('ggenerate response page accessed')
-    
-    try:
-        # Fetch existing conversation, email, and next_calendar_event from the database based on the phone_number
-        update_query = ''
-        fetch_query = "SELECT conversation_data, google_calendar_email, next_google_calendar_event, refresh_token FROM conversations WHERE phone_number = %s"
+        return "Error: Database not connected"
 
+    app.logger.info('generate response page accessed')
+
+    # Asynchronously fetch Google information
+    def fetch_google_info(refresh_token):
+        nonlocal google_calendar_email, next_google_calendar_event, last_five_emails, local_now
+
+        google_calendar_email, next_google_calendar_event, local_now = fetch_next_calendar_event(refresh_token)
+        google_calendar_email, last_five_emails = fetch_g_emails_content(refresh_token)
+
+    try:
+        fetch_query = "SELECT conversation_data, google_calendar_email, next_google_calendar_event, refresh_token FROM conversations WHERE phone_number = %s"
         cursor.execute(fetch_query, (phone_number,))
         result = cursor.fetchone()
-        
+
+        google_calendar_email, next_google_calendar_event, last_five_emails, local_now = None, None, None, None
+
         if result:
             conversation_data, google_calendar_email, next_google_calendar_event, refresh_token = result
-            google_calendar_email, last_five_emails = fetch_g_emails_content(refresh_token)
-
-        # Deserialize the conversation_data if it's a string
+            thread = Thread(target=fetch_google_info, args=(refresh_token,))
+            thread.start()
+            thread.join()
+            # Deserialize the conversation_data if it's a string
             if isinstance(conversation_data, str):
                 current_conversation = json.loads(conversation_data)
             else:
                 current_conversation = conversation_data
         else:
-        # If no result is returned, set the variables to None or empty list
             google_calendar_email, next_google_calendar_event, current_conversation = None, None, []
 
         current_conversation.append({"role": "user", "content": user_input})
-        
+
         if google_calendar_email and refresh_token:  # Only fetch if we have an associated email and refresh token
-            google_calendar_email, next_google_calendar_event , local_now = fetch_next_calendar_event(refresh_token)
             current_conversation.append({"role": "system", "content": f"my local Current Time: {local_now}"})
-            
+
             if last_five_emails:
                 current_conversation.append({"role": "system", "content": f"Last 5 Emails: {dumps(last_five_emails)}"})
-                print("adding last 5gmails")    
-            print("fetching claneders$")
-            print("locato time:", local_now)
-
+                print("adding last 5gmails")
 
         if google_calendar_email and next_google_calendar_event:
             current_conversation.append({"role": "system", "content": f"User's email is {google_calendar_email}. Next event is {next_google_calendar_event}."})
-            print("userf email ", google_calendar_email)
 
         current_conversation.insert(0, {"role": "system", "content": const_convo})
-        print("Curr_conv", current_conversation)
-        truncated = truncate_to_last_n_words(current_conversation, max_words= 1000)
-        print("truncated**", truncated)
+
+        truncated = truncate_to_last_n_words(current_conversation, max_words=1000)
+
         response = openai.ChatCompletion.create(
             model="gpt-4",
-            messages= truncated
+            messages=truncated
         )
+
         gpt4_reply = response['choices'][0]['message']['content'].strip()
-        
         current_conversation.append({"role": "assistant", "content": gpt4_reply})
-        
         updated_data = json.dumps(current_conversation)
-        
-        
+
         if result:
             update_query = "UPDATE conversations SET conversation_data = %s WHERE phone_number = %s;"
             cursor.execute(update_query, (updated_data, phone_number))
-
         else:
             insert_query = "INSERT INTO conversations (phone_number, conversation_data) VALUES (%s, %s);"
             cursor.execute(insert_query, (phone_number, updated_data))
-        
+
         connection.commit()
-        
+
         return gpt4_reply
 
     except Exception as e:
-        logging.error(f"An error occurred: {e}")
-        logging.error(traceback.format_exc())
-        return "Sorry, I couldn't understand that."
- 
+        app.logger.info(f"Exception: {e}")
+        return "Error occurred"
+
 
 @app.route("/sms", methods=['POST'])
 def handle_sms():
