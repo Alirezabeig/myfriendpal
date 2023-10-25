@@ -117,7 +117,7 @@ def generate_response(user_input=None, phone_number=None):
             print("userf email ", google_calendar_email)
 
         current_conversation.insert(0, {"role": "system", "content": const_convo})
-        truncated = truncate_to_last_n_words(current_conversation, max_words= 600)
+        truncated = truncate_to_last_n_words(current_conversation, max_words= 1000)
         print("truncated**", truncated)
         response = openai.ChatCompletion.create(
             model="gpt-4",
