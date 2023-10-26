@@ -186,7 +186,7 @@ def send_message():
         phone_number = data.get('phone_number')
   
         greeting_message = f"👋🏼 Hi there, I am so excited to connect with you. What is your name? Also read more about me here: https://www.myfriendpal.com/pal . I am getting insanely good to help CEOs build the next big thing!"
-
+        print("greeting_message")
         # Send the first message
         message = client.messages.create(
             to=phone_number,
