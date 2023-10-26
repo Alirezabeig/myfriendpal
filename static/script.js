@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
       // Validate phone number
       if (!phoneNumber) {
-        modalText.innerText = "Please enter your phone number";
+        modalText.innerText = "Please enter your phone number and make sure you entered the correct phone number in this format 6664442222";
         modal.style.display = "block";
 
         span.onclick = function () {
@@ -51,7 +51,7 @@ document.addEventListener('DOMContentLoaded', function () {
           }
         })
         .then(data => {
-          modalText.innerText = "Great! Pal is now going to message you on your phone to pick up the conversation.";
+          modalText.innerText = "Great! Pal is now going to message you on your phone to pick up the conversation. Please make sure you entered the correct phone number in this format 6664442222";
           modalBulletPoints.innerHTML = `
           
           `;
