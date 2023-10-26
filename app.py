@@ -251,11 +251,11 @@ def pal_page():
     return render_template('pal.html')
 
 @app.route('/policy', methods=['GET'])
-def pal_page():
+def policy_page():
     return render_template('policy.html')
 
 @app.route('/about', methods=['GET'])
-def pal_page():
+def about_page():
     return render_template('about.html')
 
 
