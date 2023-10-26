@@ -1,23 +1,6 @@
 document.addEventListener('DOMContentLoaded', function () {
   console.log("DOM Content Loaded");
 
-  // Add tooltip text for all phrases
-  for (let i = 1; i <= 6; i++) {
-    const phrase = document.getElementById(`phrase${i}`);
-    if (phrase) {
-      const tooltip = phrase.querySelector('.tooltip');
-      tooltip.innerText = hoverMessages[`phrase${i}`];
-      phrase.addEventListener("mouseover", function () {
-        tooltip.style.visibility = "visible";
-        tooltip.style.opacity = "1";
-      });
-      phrase.addEventListener("mouseout", function () {
-        tooltip.style.visibility = "hidden";
-        tooltip.style.opacity = "0";
-      });
-    }
-  }
-
   const activatePalButton = document.getElementById('activatePal');
 
   if (activatePalButton) {
