@@ -14,7 +14,7 @@ from google.auth.exceptions import RefreshError
 from shared_utils import get_new_access_token
 from dotenv import load_dotenv
 
-MAX_RETRIES = 3
+MAX_RETRIES = 1
 
 load_dotenv()
 
