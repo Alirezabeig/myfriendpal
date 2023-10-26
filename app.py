@@ -130,17 +130,21 @@ def generate_response(user_input=None, phone_number=None):
             current_conversation.append({"role": "system", "content": f"User's email is {google_calendar_email}. Next event is {next_google_calendar_event}."})
 
         current_conversation.insert(0, {"role": "system", "content": const_convo})
-
+        
         truncated = truncate_to_last_n_words(current_conversation, max_words=1000)
-
+        print("curr_conv1", current_conversation)
+        
         response = openai.ChatCompletion.create(
             model="gpt-4",
             messages=truncated
         )
 
         gpt4_reply = response['choices'][0]['message']['content'].strip()
-        current_conversation.pop(0)
+
         
+        current_conversation.pop(0)
+        print("curre_conv2", current_conversation)
+
         current_conversation.append({"role": "assistant", "content": gpt4_reply})
         updated_data = json.dumps(current_conversation)
 
