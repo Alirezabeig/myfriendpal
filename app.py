@@ -139,6 +139,8 @@ def generate_response(user_input=None, phone_number=None):
         )
 
         gpt4_reply = response['choices'][0]['message']['content'].strip()
+        current_conversation.pop(0)
+        
         current_conversation.append({"role": "assistant", "content": gpt4_reply})
         updated_data = json.dumps(current_conversation)
 
