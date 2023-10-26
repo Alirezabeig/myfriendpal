@@ -51,7 +51,7 @@ document.addEventListener('DOMContentLoaded', function () {
           }
         })
         .then(data => {
-          modalText.innerText = "Great! Pal is now going to message you on your phone to pick up the conversation. Please make sure you entered the correct phone number in this format 6664442222";
+          modalText.innerText = "Great! Pal is now going to message you on your phone to pick up the conversation. Please make sure you entered the correct phone number in this format 0123456789";
           modalBulletPoints.innerHTML = `
           
           `;
