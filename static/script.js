@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
       // Validate phone number
       if (!phoneNumber) {
-        modalText.innerText = "Please enter your phone number and make sure you entered the correct phone number in this format 6664442222";
+        modalText.innerText = "Please enter your phone number and make sure you entered the correct phone number in this format 1234567890";
         modal.style.display = "block";
 
         span.onclick = function () {
