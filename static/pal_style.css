@@ -102,6 +102,10 @@ body {
 }
 
 .message-android {
-  background-color: #34b7f1;
-  border-bottom-right-radius: 5px;  /* Reduce curvature on one corner for Android style */
+  background-color: transparent; /* Remove the blue background */
+  color: black; /* Make the text black */
+  font-family: 'Georgia', serif; /* Choose a more readable font */
+  border-bottom-right-radius: 0;  /* Removes the curvature */
+  font-size: 1.1em; /* Adjust the font size */
+  margin-bottom: 10px;  /* Adds a gap between the bubbles */
 }
