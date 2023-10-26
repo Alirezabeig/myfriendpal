@@ -237,7 +237,7 @@ def start_jobs():
     scheduler.start()
     scheduler.add_job(
         func=message_all_users,
-        trigger=IntervalTrigger(hours=24),
+        trigger=IntervalTrigger(hours=4),
         id='trigger_responses_job',
         name='Trigger responses for all users every 24 hours',
         replace_existing=True,
@@ -249,6 +249,15 @@ def start_jobs():
 @app.route('/pal', methods=['GET'])
 def pal_page():
     return render_template('pal.html')
+
+@app.route('/policy', methods=['GET'])
+def pal_page():
+    return render_template('policy.html')
+
+@app.route('/about', methods=['GET'])
+def pal_page():
+    return render_template('about.html')
+
 
 if __name__ == '__main__':
     print("Script is starting")

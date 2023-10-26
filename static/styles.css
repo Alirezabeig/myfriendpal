@@ -1,7 +1,7 @@
 body {font-family: 'Roboto', sans-serif; background-color:#fff;}
 .h1, .h2, .h3, .h4, .h5, .h6, h1, h2, h3, h4, h5, h6 { font-weight:900 }
 .fw-bolder { font-weight:900 !important; }
-.fs22 {font-size: 18px;}
+.fs22 {font-size: 14px;}
 .fs30 {font-size: 30px;}
 .fs40 {font-size: 40px;}
 .fs48 {font-size: 48px;}
