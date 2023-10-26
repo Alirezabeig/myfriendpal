@@ -16,6 +16,7 @@ from shared_utils import get_new_access_token
 from constants import const_convo
 from json import dumps
 from threading import Thread
+import time
 
 
 load_dotenv()
@@ -205,6 +206,7 @@ def handle_oauth2callback():
     return oauth2callback()
 
 def message_all_users():
+    start_time = time.time()
     print("Inside message_all_users")
 
     connection = create_connection()
@@ -230,6 +232,9 @@ def message_all_users():
             print(f"Message sent to {phone_number} with ID: {message.sid}")
         except Exception as e:
             print(f"Failed to send message to {phone_number}: {e}")
+    end_time = time.time()  # Capture the end time
+    elapsed_time = end_time - start_time
+    print(f"message_all_users took {elapsed_time} seconds to execute")
 
 def start_jobs():
     print("inside Startss jobs")
@@ -237,7 +242,7 @@ def start_jobs():
     scheduler.start()
     scheduler.add_job(
         func=message_all_users,
-        trigger=IntervalTrigger(hours=4),
+        trigger=IntervalTrigger(minutes=2),
         id='trigger_responses_job',
         name='Trigger responses for all users every 24 hours',
         replace_existing=True,
