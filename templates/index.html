@@ -6,9 +6,7 @@
     <title>PAL</title>
     <link rel="icon" href="static/img/pal-icon.png">
     <link href="static/bootstrap.min.css" rel="stylesheet">
-    <link href="static/styles.css" rel="stylesheet">
-	<link href="static/style.js" rel="stylesheet">
-	
+    <link href="static/styles.css" rel="stylesheet">	
 	<script src="{{ url_for('static', filename='script.js') }}"></script>
 </head>
 <body>
@@ -180,6 +178,17 @@
 		</div>
 	</div>
    
+	<!-- The Modal -->
+	<div id="myModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background-color:rgba(0,0,0,0.5);">
+		<div style="margin:15% auto; padding:20px; width:50%; background-color:#fff;">
+		<span class="close" style="float:right; cursor:pointer;">&times;</span>
+		<p id="modalText">Modal Text here</p>
+		<ul id="modalBulletPoints">
+			<!-- Bullet points here -->
+		</ul>
+		</div>
+	</div>
+  
 
 </body>
 </html>
