@@ -53,9 +53,7 @@ document.addEventListener('DOMContentLoaded', function () {
         .then(data => {
           modalText.innerText = "Great! Pal is now going to message you on your phone to pick up the conversation.";
           modalBulletPoints.innerHTML = `
-            <li>Your first random point</li>
-            <li>Your second random point</li>
-            <li>Your third random point</li>
+          
           `;
 
           modal.style.display = "block";
