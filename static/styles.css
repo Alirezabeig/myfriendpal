@@ -37,7 +37,7 @@ body {font-family: 'Roboto', sans-serif; background-color:#fff;}
 @media (max-width:992px) {
 .section-wrap { padding:60px 0; } 
 .container { max-width:100%; }
-.fs22 {font-size: 16px;}
+.fs22 {font-size: 14px;}
 .fs24 {font-size: 16px;}
 .fs24 img{ max-width: 18px}
 .fs30 {font-size: 22px;}
