@@ -129,7 +129,7 @@ def generate_response(user_input=None, phone_number=None):
         if google_calendar_email and next_google_calendar_event:
             current_conversation.append({"role": "system", "content": f"User's email is {google_calendar_email}. Next event is {next_google_calendar_event}."})
 
-        current_conversation.insert(0, {"role": "system", "content": const_convo})
+        current_conversation.append({"role": "system", "content": const_convo})
         
         truncated = truncate_to_last_n_words(current_conversation, max_words=1000)
         print("curr_conv1", current_conversation)
