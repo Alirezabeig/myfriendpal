@@ -142,7 +142,7 @@ def generate_response(user_input=None, phone_number=None):
         gpt4_reply = response['choices'][0]['message']['content'].strip()
         gpt4_reply = gpt4_reply[:1600] 
 
-        
+        current_conversation.pop(-1) 
         
         print("curre_conv2", current_conversation)
 
