@@ -143,7 +143,7 @@ def generate_response(user_input=None, phone_number=None):
         gpt4_reply = gpt4_reply[:1600] 
 
         
-        current_conversation.pop(0)
+        
         print("curre_conv2", current_conversation)
 
         current_conversation.append({"role": "assistant", "content": gpt4_reply})
