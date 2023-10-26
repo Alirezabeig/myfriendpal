@@ -98,13 +98,18 @@ body {
 }
 
 .message-blue {
-  background-color: #00bfff;
+  background-color: transparent; /* Remove the blue background */
+  color: black; /* Make the text black */
+  font-family: 'Roboto', sans-serif; /* Use Roboto font */
+  border-bottom-right-radius: 0;  /* Removes the curvature */
+  font-size: 1.1em; /* Adjust the font size */
+  margin-bottom: 10px;  /* Adds a gap between the bubbles */
 }
 
 .message-android {
   background-color: transparent; /* Remove the blue background */
   color: black; /* Make the text black */
-  font-family: 'Georgia', serif; /* Choose a more readable font */
+  font-family: 'Roboto', sans-serif; /* Use Roboto font */
   border-bottom-right-radius: 0;  /* Removes the curvature */
   font-size: 1.1em; /* Adjust the font size */
   margin-bottom: 10px;  /* Adds a gap between the bubbles */
