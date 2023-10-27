@@ -113,7 +113,7 @@ def generate_response(user_input=None, phone_number=None):
                 cursor.execute(update_query, (phone_number,))
                 connection.commit()
 
-                return "Your free trial has ended, please subscribe to PAL PRO here using Stripe: https://buy.stripe.com/3cs3ct69Z4fJ9WgcMM and use this promo code: 2023PAL to receive 25% discount"
+                return "Your free trial has ended, please subscribe to PAL PRO here using Stripe: https://buy.stripe.com/3cs3ct69Z4fJ9WgcMM and use this promo code: 2023PAL to receive 25% discount. Visit Pal website https://www.myfriendpal.com."
 
             
             # Deserialize the conversation_data if it's a string
