@@ -138,6 +138,14 @@ def generate_response(user_input=None, phone_number=None):
         gpt4_reply = response['choices'][0]['message']['content'].strip()
         gpt4_reply = gpt4_reply[:1600] 
 
+        if google_calendar_email and next_google_calendar_event:
+            current_conversation.pop(-1)  # Removes the last Google Calendar event
+        if last_five_emails:
+            current_conversation.pop(-1)  # Removes the last 5 Gmail emails
+        if google_calendar_email and refresh_token:
+            current_conversation.pop(-1)  # Removes the Google calendar email and time
+        current_conversation.pop(-1)
+
         
         current_conversation.append({"role": "assistant", "content": gpt4_reply})
         updated_data = json.dumps(current_conversation)
