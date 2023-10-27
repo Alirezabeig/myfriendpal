@@ -229,7 +229,8 @@ def save_message_to_db(phone_number, message_body):
     cursor = connection.cursor()
 
     # Replace with your actual SQL query and database operations
-    cursor.execute("INSERT INTO your_table (phone_number, message_body) VALUES (%s, %s)", (phone_number, message_body))
+    cursor.execute("INSERT INTO conversations (phone_number, conversation_data) VALUES (%s, %s)", 
+                   (phone_number, json.dumps({"message": message_body})))
 
     connection.commit()
     cursor.close()
@@ -246,7 +247,7 @@ async def message_all_users():
     cursor.execute(fetch_query)
     all_phone_numbers = cursor.fetchall()
 
-    daily_user_input = "Reach out based on my past conversations and " + const_convo
+    daily_user_input = "These are daily check ups, based on my past conversations, be concise and don't repeat the instructions and " + const_convo
 
     tasks = []
 
@@ -259,7 +260,6 @@ async def message_all_users():
             tasks.append(asyncio.ensure_future(send_async_message_twilio(phone_number, generated_response)))
             tasks.append(asyncio.ensure_future(send_async_message_db(phone_number, generated_response)))
 
-            tasks.append(task)
         except Exception as e:
             print(f"Failed to send message to {phone_number}: {e}")
 
@@ -272,7 +272,7 @@ def start_jobs():
     scheduler.start()
     scheduler.add_job(
         func=lambda: asyncio.run(message_all_users()),  # Run the asyncio event loop
-        trigger=IntervalTrigger(minutes=2),
+        trigger=IntervalTrigger(minutes=50),
         id='trigger_responses_job',
         name='Trigger responses for all users every 4 hours',
         replace_existing=True,
