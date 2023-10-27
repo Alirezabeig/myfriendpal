@@ -73,113 +73,79 @@ def fetch_g_emails_content(refresh_token):
     new_access_token = get_new_access_token(refresh_token)
     return fetch_google_gmail_info(new_access_token, refresh_token)
 
+def execute_query(query, params, cursor):
+    cursor.execute(query, params)
+    return cursor.fetchone()
+
+def fetch_google_info(refresh_token):
+    google_calendar_email, next_google_calendar_event, local_now = fetch_next_calendar_event(refresh_token)
+    google_calendar_email, last_five_emails = fetch_g_emails_content(refresh_token)
+    return google_calendar_email, next_google_calendar_event, local_now, last_five_emails
+
+def update_conversation_data(conversation, role, content):
+    conversation.append({"role": role, "content": content})
 
 def generate_response(user_input=None, phone_number=None):
     print("inside_generate response")
-
-    connection = create_connection()  # Assuming this function returns a valid DB connection
+    
+    connection = create_connection()  
     cursor = connection.cursor()
 
     if not connection:
-        app.logger.info("**** *** Generate response - database not connected.")
-        print("Generate_response not working")
         return "Error: Database not connected"
 
-    app.logger.info('generate response page accessed')
+    fetch_query = "SELECT conversation_data, request_count, google_calendar_email, next_google_calendar_event, refresh_token FROM conversations WHERE phone_number = %s"
+    result = execute_query(fetch_query, (phone_number,), cursor)
 
-    # Asynchronously fetch Google information
-    def fetch_google_info(refresh_token):
-        nonlocal google_calendar_email, next_google_calendar_event, last_five_emails, local_now
+    google_calendar_email, next_google_calendar_event, local_now, last_five_emails = None, None, None, None
+    current_conversation = []
+    
+    if result:
+        conversation_data, request_count, google_calendar_email, next_google_calendar_event, refresh_token = result
+        google_calendar_email, next_google_calendar_event, local_now, last_five_emails = fetch_google_info(refresh_token)
 
-        google_calendar_email, next_google_calendar_event, local_now = fetch_next_calendar_event(refresh_token)
-        google_calendar_email, last_five_emails = fetch_g_emails_content(refresh_token)
+        if request_count >= 20:
+            return "Your free trial has ended, please subscribe to PAL PRO."
 
-    try:
-        fetch_query = "SELECT conversation_data, request_count, google_calendar_email, next_google_calendar_event, refresh_token FROM conversations WHERE phone_number = %s"
-        cursor.execute(fetch_query, (phone_number,))
-        result = cursor.fetchone()
+        current_conversation = json.loads(conversation_data) if isinstance(conversation_data, str) else conversation_data
 
-        google_calendar_email, next_google_calendar_event, last_five_emails, local_now = None, None, None, None
+    update_conversation_data(current_conversation, "user", user_input)
+    
+    if google_calendar_email and refresh_token:
+        update_conversation_data(current_conversation, "system", f"my local Current Time: {local_now}")
 
-        if result:
-            conversation_data, request_count, google_calendar_email, next_google_calendar_event, refresh_token = result
-            thread = Thread(target=fetch_google_info, args=(refresh_token,))
-            thread.start()
-            thread.join()
+    if last_five_emails:
+        update_conversation_data(current_conversation, "system", f"These are my Last 5 Emails: {dumps(last_five_emails)}")
 
-            if request_count >= 20:
-                # Update the database to indicate another request has been made
-                update_query = "UPDATE conversations SET request_count = request_count + 1 WHERE phone_number = %s;"
-                cursor.execute(update_query, (phone_number,))
-                connection.commit()
+    if google_calendar_email and next_google_calendar_event:
+        update_conversation_data(current_conversation, "system", f"mys email is {google_calendar_email}. my Next events based on my calendar are: {next_google_calendar_event}.")
 
-                return "Your free trial has ended, please subscribe to PAL PRO here using Stripe: https://buy.stripe.com/3cs3ct69Z4fJ9WgcMM and use this promo code: 2023PAL to receive 25% discount. Visit Pal website https://www.myfriendpal.com."
+    truncated = truncate_to_last_n_words(current_conversation, max_words=1000)
+    
+    response = openai.ChatCompletion.create(
+        model="gpt-4",
+        messages=truncated
+    )
+    
+    gpt4_reply = response['choices'][0]['message']['content'].strip()
+    gpt4_reply = gpt4_reply[:1600]
+    
+    update_conversation_data(current_conversation, "assistant", gpt4_reply)
 
-            
-            # Deserialize the conversation_data if it's a string
-            if isinstance(conversation_data, str):
-                current_conversation = json.loads(conversation_data)
-            else:
-                current_conversation = conversation_data
-            
+    updated_data = json.dumps(current_conversation)
 
-        else:
-            google_calendar_email, next_google_calendar_event, current_conversation = None, None, []
+    if result:
+        update_query = "UPDATE conversations SET conversation_data = %s, request_count = request_count + 1 WHERE phone_number = %s;"
+        cursor.execute(update_query, (updated_data, phone_number))
+    else:
+        insert_query = "INSERT INTO conversations (phone_number, conversation_data, request_count) VALUES (%s, %s, 1) ON CONFLICT (phone_number) DO NOTHING;"
+        cursor.execute(insert_query, (phone_number, updated_data))
+    
+    connection.commit()
 
-        current_conversation.append({"role": "user", "content": user_input})
-
-        if google_calendar_email and refresh_token:  # Only fetch if we have an associated email and refresh token
-            current_conversation.append({"role": "system", "content": f"my local Current Time: {local_now}"})
-
-            if last_five_emails:
-                current_conversation.append({"role": "system", "content": f"These are my Last 5 Emails: {dumps(last_five_emails)}"})
-                print("adding last 5gmails")
-
-        if google_calendar_email and next_google_calendar_event:
-            current_conversation.append({"role": "system", "content": f"mys email is {google_calendar_email}. my Next events based on my calendar are: {next_google_calendar_event}."})
-        print("current_convo before const_convo ****", current_conversation)
-        current_conversation.append({"role": "system", "content": const_convo})
-        truncated = truncate_to_last_n_words(current_conversation, max_words=1000)
-
-        response = openai.ChatCompletion.create(
-            model="gpt-4",
-            messages=truncated
-        )
-
-        gpt4_reply = response['choices'][0]['message']['content'].strip()
-        gpt4_reply = gpt4_reply[:1600] 
-
-        if google_calendar_email and next_google_calendar_event:
-            current_conversation.pop(-1)  # Removes the last Google Calendar event
-        if last_five_emails:
-            current_conversation.pop(-1)  # Removes the last 5 Gmail emails
-        if google_calendar_email and refresh_token:
-            current_conversation.pop(-1)  # Removes the Google calendar email and time
-        current_conversation.pop(-1)
-
-        
-        current_conversation.append({"role": "assistant", "content": gpt4_reply})
-        updated_data = json.dumps(current_conversation)
-
-        if result:
-            update_query = "UPDATE conversations SET conversation_data = %s, request_count = request_count + 1 WHERE phone_number = %s;"
-            cursor.execute(update_query, (updated_data, phone_number))
-        else:
-            insert_query = """ 
-            INSERT INTO conversations (phone_number, conversation_data, request_count) 
-            VALUES (%s, %s, 1) 
-            ON CONFLICT (phone_number) DO NOTHING;
-            """
-            cursor.execute(insert_query, (phone_number, updated_data))
-
-        connection.commit()
+    return gpt4_reply
 
 
-        return gpt4_reply
-
-    except Exception as e:
-        app.logger.info(f"Exception: {e}")
-        return "Error occurred"
 
 
 @app.route("/sms", methods=['POST'])
