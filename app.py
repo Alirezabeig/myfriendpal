@@ -146,11 +146,8 @@ def generate_response(user_input=None, phone_number=None):
 
         if google_calendar_email and next_google_calendar_event:
             current_conversation.pop(-1)  # Removes the last Google Calendar event
-        if last_five_emails:
-            current_conversation.pop(-1)  # Removes the last 5 Gmail emails
-        if google_calendar_email and refresh_token:
-            current_conversation.pop(-1)  # Removes the Google calendar email and time
-        current_conversation.pop(-1)  #
+
+
         print("curre_conv2", current_conversation)
 
         current_conversation.append({"role": "assistant", "content": gpt4_reply})
@@ -254,7 +251,7 @@ async def message_all_users():
     cursor.execute(fetch_query)
     all_phone_numbers = cursor.fetchall()
 
-    daily_user_input = "These are daily check ups, based on my past conversations, be concise and don't repeat the instructions or past conversations and " + const_convo
+    daily_user_input = "These are daily check ups, based on my past conversations, be concise and don't repeat the instructions and " + const_convo
 
     tasks = []
 
@@ -279,7 +276,7 @@ def start_jobs():
     scheduler.start()
     scheduler.add_job(
         func=lambda: asyncio.run(message_all_users()),  # Run the asyncio event loop
-        trigger=IntervalTrigger(minutes=3),
+        trigger=IntervalTrigger(minutes=50),
         id='trigger_responses_job',
         name='Trigger responses for all users every 4 hours',
         replace_existing=True,
