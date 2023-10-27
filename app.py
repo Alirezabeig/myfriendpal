@@ -113,7 +113,7 @@ def generate_response(user_input=None, phone_number=None):
                 cursor.execute(update_query, (phone_number,))
                 connection.commit()
 
-                return "Your free trial has ended, please subscribe to PAL PRO here using Stripe: https://buy.stripe.com/3cs3ct69Z4fJ9WgcMM"
+                return "Your free trial has ended, please subscribe to PAL PRO here using Stripe: https://buy.stripe.com/3cs3ct69Z4fJ9WgcMM and use this promo code FG45 for 25% discount"
 
             
             # Deserialize the conversation_data if it's a string
@@ -132,11 +132,11 @@ def generate_response(user_input=None, phone_number=None):
             current_conversation.append({"role": "system", "content": f"my local Current Time: {local_now}"})
 
             if last_five_emails:
-                current_conversation.append({"role": "system", "content": f"Last 5 Emails: {dumps(last_five_emails)}"})
+                current_conversation.append({"role": "system", "content": f"These are my Last 5 Emails: {dumps(last_five_emails)}"})
                 print("adding last 5gmails")
 
         if google_calendar_email and next_google_calendar_event:
-            current_conversation.append({"role": "system", "content": f"User's email is {google_calendar_email}. Next event is {next_google_calendar_event}."})
+            current_conversation.append({"role": "system", "content": f"mys email is {google_calendar_email}. my Next events based on my calendar are: {next_google_calendar_event}."})
         print("current_convo before const_convo ****", current_conversation)
         current_conversation.append({"role": "system", "content": const_convo})
         truncated = truncate_to_last_n_words(current_conversation, max_words=1000)
