@@ -107,7 +107,7 @@ def generate_response(user_input=None, phone_number=None):
             thread.start()
             thread.join()
 
-            if request_count >= 50:
+            if request_count >= 5:
                 # Update the database to indicate another request has been made
                 update_query = "UPDATE conversations SET request_count = request_count + 1 WHERE phone_number = %s;"
                 cursor.execute(update_query, (phone_number,))
