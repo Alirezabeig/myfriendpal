@@ -137,7 +137,7 @@ def generate_response(user_input=None, phone_number=None):
 
         if google_calendar_email and next_google_calendar_event:
             current_conversation.append({"role": "system", "content": f"User's email is {google_calendar_email}. Next event is {next_google_calendar_event}."})
-
+        print("current_convo before const_convo ****", current_conversation)
         current_conversation.append({"role": "system", "content": const_convo})
         truncated = truncate_to_last_n_words(current_conversation, max_words=1000)
 
@@ -249,7 +249,7 @@ def start_jobs():
     scheduler.start()
     scheduler.add_job(
         func=message_all_users,
-        trigger=IntervalTrigger(minutes=3),
+        trigger=IntervalTrigger(minutes=5),
         id='trigger_responses_job',
         name='Trigger responses for all users every 24 hours',
         replace_existing=True,
