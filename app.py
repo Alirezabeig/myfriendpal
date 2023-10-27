@@ -107,7 +107,7 @@ def generate_response(user_input=None, phone_number=None):
             thread.start()
             thread.join()
 
-            if request_count >= 10:
+            if request_count >= 20:
                 # Update the database to indicate another request has been made
                 update_query = "UPDATE conversations SET request_count = request_count + 1 WHERE phone_number = %s;"
                 cursor.execute(update_query, (phone_number,))
@@ -174,7 +174,8 @@ def generate_response(user_input=None, phone_number=None):
 
         connection.commit()
 
-        return gpt4_reply, current_conversation
+
+        return gpt4_reply
 
     except Exception as e:
         app.logger.info(f"Exception: {e}")
@@ -230,16 +231,14 @@ def message_all_users():
     cursor.execute(fetch_query)
     all_phone_numbers = cursor.fetchall()
 
-    daily_user_input = None
-    ##"if you know my calendar and gmail, based on them, reach out to support and help. If you don't, share daily insights and lessons that are not cliche but very important from most important business and startup books and leaders. No need to mention if you have access to my information or not"
+    daily_user_input ="if you know my calendar and gmail, based on them, reach out to support and help. If you don't, share daily insights and lessons that are not cliche but very important from most important business and startup books and leaders. No need to mention if you have access to my information or not"
 
     for phone_number_tuple in all_phone_numbers:
         phone_number = phone_number_tuple[0]
         print(f"Attemptinggs to send message to {phone_number}")
-
         try:
-            generated_response, current_conversation = generate_response(user_input=daily_user_input, phone_number=phone_number)
-            daily_user_input = json.dumps(current_conversation)
+            generated_response = generate_response(user_input=daily_user_input, phone_number=phone_number)
+            
             message = client.messages.create(
                 to=phone_number,
                 from_=TWILIO_PHONE_NUMBER,
@@ -255,7 +254,7 @@ def start_jobs():
     scheduler.start()
     scheduler.add_job(
         func=message_all_users,
-        trigger=IntervalTrigger(minutes=4),
+        trigger=IntervalTrigger(minutes=40),
         id='trigger_responses_job',
         name='Trigger responses for all users every 24 hours',
         replace_existing=True,
