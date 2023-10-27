@@ -19,7 +19,6 @@ from threading import Thread
 load_dotenv()
 
 import openai
-import traceback
 
 from calendar_utils import fetch_google_calendar_info , get_google_calendar_authorization_url , fetch_google_gmail_info
 from apscheduler.schedulers.background import BackgroundScheduler
@@ -96,22 +95,33 @@ def generate_response(user_input=None, phone_number=None):
         google_calendar_email, last_five_emails = fetch_g_emails_content(refresh_token)
 
     try:
-        fetch_query = "SELECT conversation_data, google_calendar_email, next_google_calendar_event, refresh_token FROM conversations WHERE phone_number = %s"
+        fetch_query = "SELECT conversation_data, request_count, google_calendar_email, next_google_calendar_event, refresh_token FROM conversations WHERE phone_number = %s"
         cursor.execute(fetch_query, (phone_number,))
         result = cursor.fetchone()
 
         google_calendar_email, next_google_calendar_event, last_five_emails, local_now = None, None, None, None
 
         if result:
-            conversation_data, google_calendar_email, next_google_calendar_event, refresh_token = result
+            conversation_data, request_count, google_calendar_email, next_google_calendar_event, refresh_token = result
             thread = Thread(target=fetch_google_info, args=(refresh_token,))
             thread.start()
             thread.join()
+
+            if request_count >= 50:
+                # Update the database to indicate another request has been made
+                update_query = "UPDATE conversations SET request_count = request_count + 1 WHERE phone_number = %s;"
+                cursor.execute(update_query, (phone_number,))
+                connection.commit()
+
+                return "Your free trial ended, please subscribe to pro or plus here."
+            
             # Deserialize the conversation_data if it's a string
             if isinstance(conversation_data, str):
                 current_conversation = json.loads(conversation_data)
             else:
                 current_conversation = conversation_data
+            
+
         else:
             google_calendar_email, next_google_calendar_event, current_conversation = None, None, []
 
@@ -151,10 +161,10 @@ def generate_response(user_input=None, phone_number=None):
         updated_data = json.dumps(current_conversation)
 
         if result:
-            update_query = "UPDATE conversations SET conversation_data = %s WHERE phone_number = %s;"
+            update_query = "UPDATE conversations SET conversation_data = %s, request_count = request_count + 1 WHERE phone_number = %s;"
             cursor.execute(update_query, (updated_data, phone_number))
         else:
-            insert_query = "INSERT INTO conversations (phone_number, conversation_data) VALUES (%s, %s);"
+            insert_query = "INSERT INTO conversations (phone_number, conversation_data, request_count) VALUES (%s, %s, 1);"
             cursor.execute(insert_query, (phone_number, updated_data))
 
         connection.commit()

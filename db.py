@@ -46,13 +46,15 @@ def create_table(connection):
         print("Cursor created.")
         
         create_table_query = '''CREATE TABLE IF NOT EXISTS conversations
-          (id SERIAL PRIMARY KEY,
-           phone_number TEXT NOT NULL,
-           conversation_data JSONB NOT NULL,
-           oauth_token JSONB,
-           google_calendar_email TEXT,
-           next_google_calendar_event TEXT,
-           refresh_token TEXT); '''
+        (id SERIAL PRIMARY KEY,
+        phone_number TEXT NOT NULL,
+        conversation_data JSONB NOT NULL,
+        oauth_token JSONB,
+        google_calendar_email TEXT,
+        next_google_calendar_event TEXT,
+        refresh_token TEXT,
+        request_count INT DEFAULT 0); '''
+
         
         cursor.execute(create_table_query)
         print("Table creation query executed.")
