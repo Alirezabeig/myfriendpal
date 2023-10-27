@@ -107,13 +107,14 @@ def generate_response(user_input=None, phone_number=None):
             thread.start()
             thread.join()
 
-            if request_count >= 5:
+            if request_count >= 50:
                 # Update the database to indicate another request has been made
                 update_query = "UPDATE conversations SET request_count = request_count + 1 WHERE phone_number = %s;"
                 cursor.execute(update_query, (phone_number,))
                 connection.commit()
 
-                return "Your free trial ended, please subscribe to pro or plus here."
+                return 'Your free trial has ended, please subscribe to pro or plus <a href="https://buy.stripe.com/3cs3ct69Z4fJ9WgcMM">here</a>.'
+
             
             # Deserialize the conversation_data if it's a string
             if isinstance(conversation_data, str):
