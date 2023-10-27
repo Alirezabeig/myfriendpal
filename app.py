@@ -120,6 +120,7 @@ def generate_response(user_input=None, phone_number=None):
     if google_calendar_email and next_google_calendar_event:
         update_conversation_data(current_conversation, "system", f"mys email is {google_calendar_email}. my Next events based on my calendar are: {next_google_calendar_event}.")
 
+    update_conversation_data(current_conversation, "system", const_convo)
     truncated = truncate_to_last_n_words(current_conversation, max_words=1000)
     
     response = openai.ChatCompletion.create(
