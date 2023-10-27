@@ -258,7 +258,9 @@ async def message_all_users():
 
         try:
             generated_response = generate_response(user_input=daily_user_input, phone_number=phone_number)
-            task = asyncio.ensure_future(send_async_message(phone_number, generated_response))
+            task = asyncio.ensure_future(send_async_message_twilio(phone_number, generated_response))
+
+
             tasks.append(task)
         except Exception as e:
             print(f"Failed to send message to {phone_number}: {e}")
