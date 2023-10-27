@@ -16,10 +16,6 @@ from shared_utils import get_new_access_token
 from constants import const_convo
 from json import dumps
 from threading import Thread
-import time
-import aiohttp
-import asyncio
-
 load_dotenv()
 
 import openai
@@ -132,9 +128,9 @@ def generate_response(user_input=None, phone_number=None):
             current_conversation.append({"role": "system", "content": f"User's email is {google_calendar_email}. Next event is {next_google_calendar_event}."})
 
         current_conversation.append({"role": "system", "content": const_convo})
-        print("curr_conv1", current_conversation)
+        
         truncated = truncate_to_last_n_words(current_conversation, max_words=1000)
-        print("Truncated", truncated)
+        print("curr_conv1", current_conversation)
 
         response = openai.ChatCompletion.create(
             model="gpt-4",
@@ -144,10 +140,8 @@ def generate_response(user_input=None, phone_number=None):
         gpt4_reply = response['choices'][0]['message']['content'].strip()
         gpt4_reply = gpt4_reply[:1600] 
 
-        if google_calendar_email and next_google_calendar_event:
-            current_conversation.pop(-1)  # Removes the last Google Calendar event
-
-
+        
+        
         print("curre_conv2", current_conversation)
 
         current_conversation.append({"role": "assistant", "content": gpt4_reply})
@@ -190,7 +184,7 @@ def send_message():
         phone_number = data.get('phone_number')
   
         greeting_message = f"👋🏼 Hi there, I am so excited to connect with you. What is your name? Also read more about me here: https://www.myfriendpal.com/pal . I am getting insanely good to help CEOs build the next big thing!"
-        print("greeting_message")
+
         # Send the first message
         message = client.messages.create(
             to=phone_number,
@@ -208,40 +202,7 @@ def handle_oauth2callback():
     print("Entered handle_oauth2callback in app.py")
     return oauth2callback()
 
-async def send_async_message_twilio(phone_number, message_body):
-    loop = asyncio.get_event_loop()
-    await loop.run_in_executor(None, send_message_with_twilio, phone_number, message_body)
-
-def send_message_with_twilio(phone_number, message_body):
-    from twilio_utils import client, TWILIO_PHONE_NUMBER  # Assuming twilio_utils has these variables
-
-    message = client.messages.create(
-        to=phone_number,
-        from_=TWILIO_PHONE_NUMBER,
-        body=message_body
-    )
-    print(f"Message sent to {phone_number} with ID: {message.sid}")
-
-async def send_async_message_db(phone_number, message_body):
-    loop = asyncio.get_event_loop()
-    await loop.run_in_executor(None, save_message_to_db, phone_number, message_body)
-
-def save_message_to_db(phone_number, message_body):
-    from db import create_connection  # Assuming db.py has this function
-
-    connection = create_connection()
-    cursor = connection.cursor()
-
-    # Replace with your actual SQL query and database operations
-    cursor.execute("INSERT INTO conversations (phone_number, conversation_data) VALUES (%s, %s)", 
-                   (phone_number, json.dumps({"message": message_body})))
-
-    connection.commit()
-    cursor.close()
-    connection.close()
-    print(f"Message saved to database for {phone_number}")
-
-async def message_all_users():
+def message_all_users():
     print("Inside message_all_users")
 
     connection = create_connection()
@@ -251,40 +212,37 @@ async def message_all_users():
     cursor.execute(fetch_query)
     all_phone_numbers = cursor.fetchall()
 
-    daily_user_input = "These are daily check ups, based on my past conversations, be concise and don't repeat the instructions and " + const_convo
-
-    tasks = []
+    daily_user_input = "if you know my calendar and gmail, based on them, reach out to support and help. If not, share daily insights and lessons that are not cliche but very important from most important business and startup books and leaders."
 
     for phone_number_tuple in all_phone_numbers:
         phone_number = phone_number_tuple[0]
-        print(f"Attempting to send message to {phone_number}")
-
+        print(f"Attemptinggs to send message to {phone_number}")
         try:
             generated_response = generate_response(user_input=daily_user_input, phone_number=phone_number)
-            tasks.append(asyncio.ensure_future(send_async_message_twilio(phone_number, generated_response)))
-            tasks.append(asyncio.ensure_future(send_async_message_db(phone_number, generated_response)))
-
+            
+            message = client.messages.create(
+                to=phone_number,
+                from_=TWILIO_PHONE_NUMBER,
+                body=generated_response
+            )
+            print(f"Message sent to {phone_number} with ID: {message.sid}")
         except Exception as e:
             print(f"Failed to send message to {phone_number}: {e}")
 
-    await asyncio.gather(*tasks)
-
-
 def start_jobs():
-    print("inside Start jobs")
+    print("inside Startss jobs")
     scheduler = BackgroundScheduler()
     scheduler.start()
     scheduler.add_job(
-        func=lambda: asyncio.run(message_all_users()),  # Run the asyncio event loop
-        trigger=IntervalTrigger(minutes=50),
+        func=message_all_users,
+        trigger=IntervalTrigger(hours=4),
         id='trigger_responses_job',
-        name='Trigger responses for all users every 4 hours',
+        name='Trigger responses for all users every 24 hours',
         replace_existing=True,
         max_instances=1
-    )
+        )
     
     atexit.register(lambda: scheduler.shutdown())
-
 
 @app.route('/pal', methods=['GET'])
 def pal_page():
