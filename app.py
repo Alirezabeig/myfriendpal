@@ -254,7 +254,7 @@ async def message_all_users():
     cursor.execute(fetch_query)
     all_phone_numbers = cursor.fetchall()
 
-    daily_user_input = "These are daily check ups, based on my past conversations, be concise and don't repeat the instructions and " + const_convo
+    daily_user_input = "These are daily check ups, based on my past conversations, be concise and don't repeat the instructions or past conversations and " + const_convo
 
     tasks = []
 
@@ -279,7 +279,7 @@ def start_jobs():
     scheduler.start()
     scheduler.add_job(
         func=lambda: asyncio.run(message_all_users()),  # Run the asyncio event loop
-        trigger=IntervalTrigger(minutes=50),
+        trigger=IntervalTrigger(minutes=3),
         id='trigger_responses_job',
         name='Trigger responses for all users every 4 hours',
         replace_existing=True,
