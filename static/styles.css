@@ -101,3 +101,6 @@ body {font-family: 'Roboto', sans-serif; background-color:#fff;}
     font-family: 'Roboto', sans-serif;
   }
   
+  .special-paragraph {
+    font-size: 12px; 
+}
