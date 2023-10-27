@@ -104,3 +104,7 @@ body {font-family: 'Roboto', sans-serif; background-color:#fff;}
   .special-paragraph {
     font-size: 4px; 
 }
+.img-size {
+  width: 50px;  /* or any size you want */
+  height: auto;  /* maintain aspect ratio */
+}
