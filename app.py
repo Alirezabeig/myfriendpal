@@ -17,7 +17,8 @@ from constants import const_convo
 from json import dumps
 from threading import Thread
 import time
-
+import aiohttp
+import asyncio
 
 load_dotenv()
 
@@ -205,8 +206,39 @@ def handle_oauth2callback():
     print("Entered handle_oauth2callback in app.py")
     return oauth2callback()
 
-def message_all_users():
-    start_time = time.time()
+async def send_async_message_twilio(phone_number, message_body):
+    loop = asyncio.get_event_loop()
+    await loop.run_in_executor(None, send_message_with_twilio, phone_number, message_body)
+
+def send_message_with_twilio(phone_number, message_body):
+    from twilio_utils import client, TWILIO_PHONE_NUMBER  # Assuming twilio_utils has these variables
+
+    message = client.messages.create(
+        to=phone_number,
+        from_=TWILIO_PHONE_NUMBER,
+        body=message_body
+    )
+    print(f"Message sent to {phone_number} with ID: {message.sid}")
+
+async def send_async_message_db(phone_number, message_body):
+    loop = asyncio.get_event_loop()
+    await loop.run_in_executor(None, save_message_to_db, phone_number, message_body)
+
+def save_message_to_db(phone_number, message_body):
+    from db import create_connection  # Assuming db.py has this function
+
+    connection = create_connection()
+    cursor = connection.cursor()
+
+    # Replace with your actual SQL query and database operations
+    cursor.execute("INSERT INTO your_table (phone_number, message_body) VALUES (%s, %s)", (phone_number, message_body))
+
+    connection.commit()
+    cursor.close()
+    connection.close()
+    print(f"Message saved to database for {phone_number}")
+
+async def message_all_users():
     print("Inside message_all_users")
 
     connection = create_connection()
@@ -218,38 +250,37 @@ def message_all_users():
 
     daily_user_input = "if you know my calendar and gmail, based on them, reach out to support and help. If not, share daily insights and lessons that are not cliche but very important from most important business and startup books and leaders."
 
+    tasks = []
+
     for phone_number_tuple in all_phone_numbers:
         phone_number = phone_number_tuple[0]
-        print(f"Attemptinggs to send message to {phone_number}")
+        print(f"Attempting to send message to {phone_number}")
+
         try:
             generated_response = generate_response(user_input=daily_user_input, phone_number=phone_number)
-            
-            message = client.messages.create(
-                to=phone_number,
-                from_=TWILIO_PHONE_NUMBER,
-                body=generated_response
-            )
-            print(f"Message sent to {phone_number} with ID: {message.sid}")
+            task = asyncio.ensure_future(send_async_message(phone_number, generated_response))
+            tasks.append(task)
         except Exception as e:
             print(f"Failed to send message to {phone_number}: {e}")
-    end_time = time.time()  # Capture the end time
-    elapsed_time = end_time - start_time
-    print(f"message_all_users took {elapsed_time} seconds to execute")
+
+    await asyncio.gather(*tasks)
+
 
 def start_jobs():
-    print("inside Startss jobs")
+    print("inside Start jobs")
     scheduler = BackgroundScheduler()
     scheduler.start()
     scheduler.add_job(
-        func=message_all_users,
-        trigger=IntervalTrigger(minutes=5),
+        func=lambda: asyncio.run(message_all_users()),  # Run the asyncio event loop
+        trigger=IntervalTrigger(minutes=2),
         id='trigger_responses_job',
-        name='Trigger responses for all users every 24 hours',
+        name='Trigger responses for all users every 4 hours',
         replace_existing=True,
         max_instances=1
-        )
+    )
     
     atexit.register(lambda: scheduler.shutdown())
+
 
 @app.route('/pal', methods=['GET'])
 def pal_page():
