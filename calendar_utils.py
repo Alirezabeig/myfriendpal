@@ -14,7 +14,6 @@ from google.auth.exceptions import RefreshError
 from shared_utils import get_new_access_token
 from dotenv import load_dotenv
 
-MAX_RETRIES = 1
 
 load_dotenv()
 
@@ -69,6 +68,8 @@ def get_google_calendar_authorization_url(phone_number):
     
     return authorization_url
 
+
+MAX_RETRIES = 3
 
 def fetch_google_calendar_info(access_token, refresh_token, api_name='calendar', api_version='v3'):
     print("Inside fetch_google_calendar_info")
