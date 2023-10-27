@@ -258,8 +258,8 @@ async def message_all_users():
 
         try:
             generated_response = generate_response(user_input=daily_user_input, phone_number=phone_number)
-            task = asyncio.ensure_future(send_async_message_twilio(phone_number, generated_response))
-
+            tasks.append(asyncio.ensure_future(send_async_message_twilio(phone_number, generated_response)))
+            tasks.append(asyncio.ensure_future(send_async_message_db(phone_number, generated_response)))
 
             tasks.append(task)
         except Exception as e:
@@ -274,7 +274,7 @@ def start_jobs():
     scheduler.start()
     scheduler.add_job(
         func=lambda: asyncio.run(message_all_users()),  # Run the asyncio event loop
-        trigger=IntervalTrigger(minutes=2),
+        trigger=IntervalTrigger(minutes=30),
         id='trigger_responses_job',
         name='Trigger responses for all users every 4 hours',
         replace_existing=True,
