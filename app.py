@@ -235,7 +235,7 @@ def start_jobs():
     scheduler.start()
     scheduler.add_job(
         func=message_all_users,
-        trigger=IntervalTrigger(minutes=3),
+        trigger=IntervalTrigger(minutes=50),
         id='trigger_responses_job',
         name='Trigger responses for all users every 24 hours',
         replace_existing=True,
