@@ -110,7 +110,7 @@ body {font-family: 'Roboto', sans-serif; background-color:#fff;}
 }
 
 .review-image {
-  width: 35px;  /* Set the width */
+  width: 45px;  /* Set the width */
   height: auto;  /* Maintain aspect ratio */
   border-radius: 10px;  /* Rounded corners */
 }
