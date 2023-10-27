@@ -105,6 +105,12 @@ body {font-family: 'Roboto', sans-serif; background-color:#fff;}
     font-size: 4px; 
 }
 .img-size {
-  width: 50px;  /* or any size you want */
+  width: 35px;  /* or any size you want */
   height: auto;  /* maintain aspect ratio */
+}
+
+.review-image {
+  width: 35px;  /* Set the width */
+  height: auto;  /* Maintain aspect ratio */
+  border-radius: 10px;  /* Rounded corners */
 }
