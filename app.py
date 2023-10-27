@@ -113,7 +113,7 @@ def generate_response(user_input=None, phone_number=None):
                 cursor.execute(update_query, (phone_number,))
                 connection.commit()
 
-                return "Your free trial has ended, please subscribe to PAL PRO here using Stripe: https://buy.stripe.com/3cs3ct69Z4fJ9WgcMM and use this promo code FG45 for 25% discount"
+                return "Your free trial has ended, please subscribe to PAL PRO here using Stripe: https://buy.stripe.com/3cs3ct69Z4fJ9WgcMM and use this promo code: 2023PAL to receive 25% discount"
 
             
             # Deserialize the conversation_data if it's a string
@@ -165,7 +165,11 @@ def generate_response(user_input=None, phone_number=None):
             update_query = "UPDATE conversations SET conversation_data = %s, request_count = request_count + 1 WHERE phone_number = %s;"
             cursor.execute(update_query, (updated_data, phone_number))
         else:
-            insert_query = "INSERT INTO conversations (phone_number, conversation_data, request_count) VALUES (%s, %s, 1);"
+            insert_query = """ 
+            INSERT INTO conversations (phone_number, conversation_data, request_count) 
+            VALUES (%s, %s, 1) 
+            ON CONFLICT (phone_number) DO NOTHING;
+            """
             cursor.execute(insert_query, (phone_number, updated_data))
 
         connection.commit()
@@ -226,7 +230,7 @@ def message_all_users():
     cursor.execute(fetch_query)
     all_phone_numbers = cursor.fetchall()
 
-    daily_user_input = "if you know my calendar and gmail, based on them, reach out to support and help. If not, share daily insights and lessons that are not cliche but very important from most important business and startup books and leaders."
+    daily_user_input = "if you know my calendar and gmail, based on them, reach out to support and help. If you don't, share daily insights and lessons that are not cliche but very important from most important business and startup books and leaders. No need to mention if you have access to my information or not"
 
     for phone_number_tuple in all_phone_numbers:
         phone_number = phone_number_tuple[0]
