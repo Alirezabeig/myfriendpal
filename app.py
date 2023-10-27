@@ -128,9 +128,7 @@ def generate_response(user_input=None, phone_number=None):
             current_conversation.append({"role": "system", "content": f"User's email is {google_calendar_email}. Next event is {next_google_calendar_event}."})
 
         current_conversation.append({"role": "system", "content": const_convo})
-        
         truncated = truncate_to_last_n_words(current_conversation, max_words=1000)
-        print("curr_conv1", current_conversation)
 
         response = openai.ChatCompletion.create(
             model="gpt-4",
@@ -141,9 +139,6 @@ def generate_response(user_input=None, phone_number=None):
         gpt4_reply = gpt4_reply[:1600] 
 
         
-        
-        print("curre_conv2", current_conversation)
-
         current_conversation.append({"role": "assistant", "content": gpt4_reply})
         updated_data = json.dumps(current_conversation)
 
@@ -212,13 +207,11 @@ def message_all_users():
     cursor.execute(fetch_query)
     all_phone_numbers = cursor.fetchall()
 
-    daily_user_input = "if you know my calendar and gmail, based on them, reach out to support and help. If not, share daily insights and lessons that are not cliche but very important from most important business and startup books and leaders."
-
     for phone_number_tuple in all_phone_numbers:
         phone_number = phone_number_tuple[0]
         print(f"Attemptinggs to send message to {phone_number}")
         try:
-            generated_response = generate_response(user_input=daily_user_input, phone_number=phone_number)
+            generated_response = generate_response(user_input=None, phone_number=phone_number)
             
             message = client.messages.create(
                 to=phone_number,
@@ -235,7 +228,7 @@ def start_jobs():
     scheduler.start()
     scheduler.add_job(
         func=message_all_users,
-        trigger=IntervalTrigger(minutes=50),
+        trigger=IntervalTrigger(minutes=1),
         id='trigger_responses_job',
         name='Trigger responses for all users every 24 hours',
         replace_existing=True,
