@@ -122,7 +122,7 @@ def generate_response(user_input=None, phone_number=None):
 
     update_conversation_data(current_conversation, "system", const_convo)
     truncated = truncate_to_last_n_words(current_conversation, max_words=1000)
-    
+    print("Truncated",truncated)
     response = openai.ChatCompletion.create(
         model="gpt-4",
         messages=truncated

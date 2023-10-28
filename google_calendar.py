@@ -59,7 +59,7 @@ def oauth2callback():
             except Exception as e:
                 print(f"Error occurred: {e}")
                 conn.rollback()
-        send_sms_confirmation(phone_number, "Your Google Calendar and Gamil have been successfully authorized.")
+        send_sms_confirmation(phone_number, "Give me 3 minutes to sync with your Google Calendar and Gmail. Your accounts have been successfully authorized. I will be ready in just a bit.")
         
     else:
         print("Failed to get access_token or refresh_token")
