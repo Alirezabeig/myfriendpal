@@ -6,6 +6,7 @@ from db import conn, create_connection
 from calendar_utils import fetch_google_calendar_info
 from flask import render_template
 import json
+from twilio_utils import send_sms_confirmation
 
 from dotenv import load_dotenv
 load_dotenv()
@@ -58,8 +59,11 @@ def oauth2callback():
             except Exception as e:
                 print(f"Error occurred: {e}")
                 conn.rollback()
+        send_sms_confirmation(phone_number, "Your Google Calendar and Gamil have been successfully authorized.")
+        
     else:
         print("Failed to get access_token or refresh_token")
+        send_sms_confirmation(phone_number, "Failed to authorize Google Calendar.")
 
     return render_template('authorization_complete.html')
 

@@ -169,7 +169,7 @@ def send_message():
         data = request.json
         phone_number = data.get('phone_number')
   
-        greeting_message = f"👋🏼 Hi there, I am so excited to connect with you. What is your name? Also read more about me here: https://www.myfriendpal.com/pal . I am getting insanely good to help CEOs build the next big thing!"
+        greeting_message = f"👋🏼 Hi there, I am Pal! I am so excited to connect with you. What is your name? Also read more about me here: https://www.myfriendpal.com/pal . I am getting insanely good to help founders and executives build the next big thing!"
 
         # Send the first message
         message = client.messages.create(
