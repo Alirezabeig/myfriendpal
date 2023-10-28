@@ -40,3 +40,14 @@ def sms_reply():
         )
 
     return jsonify({'message': 'Reply sent!'})
+
+def send_sms_confirmation(phone_number, message):
+    try:
+        client.messages.create(
+            to=phone_number,
+            from_=TWILIO_PHONE_NUMBER,
+            body=message
+        )
+        print(f"Confirmation SMS sent to {phone_number}")
+    except Exception as e:
+        print(f"Failed to send SMS: {e}")
