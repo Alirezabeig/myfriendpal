@@ -112,13 +112,13 @@ def generate_response(user_input=None, phone_number=None):
     update_conversation_data(current_conversation, "user", user_input)
     
     if google_calendar_email and refresh_token:
-        update_conversation_data(current_conversation, "system", f"my local Current Time: {local_now}")
+        update_conversation_data(current_conversation, "system", f"$$my local Current Time: {local_now}")
 
     if last_five_emails:
-        update_conversation_data(current_conversation, "system", f"These are my Last 5 Emails: {dumps(last_five_emails)}")
+        update_conversation_data(current_conversation, "system", f"%%%I gave you access to my gmail, pay attention: These are my Last 5 Emails: {dumps(last_five_emails)}")
 
     if google_calendar_email and next_google_calendar_event:
-        update_conversation_data(current_conversation, "system", f"mys email is {google_calendar_email}. my Next events based on my calendar are: {next_google_calendar_event}.")
+        update_conversation_data(current_conversation, "system", f"@@@my email is {google_calendar_email}. I gave you access to my calendar, pay attention: my Next events based on my calendar are: {next_google_calendar_event}.")
 
     update_conversation_data(current_conversation, "system", const_convo)
     truncated = truncate_to_last_n_words(current_conversation, max_words=1000)
