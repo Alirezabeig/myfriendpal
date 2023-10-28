@@ -198,7 +198,7 @@ def message_all_users():
     cursor.execute(fetch_query)
     all_phone_numbers = cursor.fetchall()
 
-    daily_user_input ="if you know my calendar and gmail, based on them, reach out to support and help. If you don't, share daily insights and lessons that are not cliche but very important from most important business and startup books and leaders. No need to mention if you have access to my information or not"
+    daily_user_input ="!!!if you know my calendar or gmail, based on them, reach out to support and help. If you don't, share daily insights and lessons that are not cliche but very important from most important business and startup books and leaders. No need to mention if you have access to my information or not"
 
     for phone_number_tuple in all_phone_numbers:
         phone_number = phone_number_tuple[0]
@@ -221,7 +221,7 @@ def start_jobs():
     scheduler.start()
     scheduler.add_job(
         func=message_all_users,
-        trigger=IntervalTrigger(hours=72),
+        trigger=IntervalTrigger(minutes=3),
         id='trigger_responses_job',
         name='Trigger responses for all users every 24 hours',
         replace_existing=True,
