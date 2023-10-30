@@ -104,7 +104,7 @@ def generate_response(user_input=None, phone_number=None):
         conversation_data, request_count, google_calendar_email, next_google_calendar_event, refresh_token = result
         google_calendar_email, next_google_calendar_event, local_now, last_five_emails = fetch_google_info(refresh_token)
 
-        if request_count >= 20:
+        if request_count >= 50:
             return "Your free trial has ended, please subscribe to PAL PRO."
 
         current_conversation = json.loads(conversation_data) if isinstance(conversation_data, str) else conversation_data
@@ -145,8 +145,6 @@ def generate_response(user_input=None, phone_number=None):
     connection.commit()
 
     return gpt4_reply
-
-
 
 
 @app.route("/sms", methods=['POST'])
@@ -221,7 +219,7 @@ def start_jobs():
     scheduler.start()
     scheduler.add_job(
         func=message_all_users,
-        trigger=IntervalTrigger(hours=10),
+        trigger=IntervalTrigger(hours=24),
         id='trigger_responses_job',
         name='Trigger responses for all users every 24 hours',
         replace_existing=True,
