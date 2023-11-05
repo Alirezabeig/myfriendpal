@@ -17,8 +17,6 @@ from constants import const_convo
 from json import dumps
 from threading import Thread
 load_dotenv()
-import asyncio
-from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
 import openai
 
@@ -75,120 +73,79 @@ def fetch_g_emails_content(refresh_token):
     new_access_token = get_new_access_token(refresh_token)
     return fetch_google_gmail_info(new_access_token, refresh_token)
 
-async def execute_async_query(query, params, cursor):
-    await cursor.execute(query, params)
-    return await cursor.fetchone()
+def execute_query(query, params, cursor):
+    cursor.execute(query, params)
+    return cursor.fetchone()
 
-async def fetch_google_info(refresh_token):
-    google_calendar_email, next_google_calendar_event, local_now = await fetch_next_calendar_event(refresh_token)
-    google_calendar_email, last_five_emails = await fetch_g_emails_content(refresh_token)
+def fetch_google_info(refresh_token):
+    google_calendar_email, next_google_calendar_event, local_now = fetch_next_calendar_event(refresh_token)
+    google_calendar_email, last_five_emails = fetch_g_emails_content(refresh_token)
     return google_calendar_email, next_google_calendar_event, local_now, last_five_emails
 
 def update_conversation_data(conversation, role, content):
     conversation.append({"role": role, "content": content})
 
-async def generate_response(user_input=None, phone_number=None):
+def generate_response(user_input=None, phone_number=None):
     print("inside_generate response")
     
-    connection = await create_connection()  
-    async with connection.cursor() as cursor:
-        
-        if not connection:
-            return "Error: Database not connected"
+    connection = create_connection()  
+    cursor = connection.cursor()
 
-        fetch_query = "SELECT conversation_data, request_count, google_calendar_email, next_google_calendar_event, refresh_token FROM conversations WHERE phone_number = %s"
-        result = await execute_async_query(fetch_query, (phone_number,), cursor)
+    if not connection:
+        return "Error: Database not connected"
 
-        google_calendar_email, next_google_calendar_event, local_now, last_five_emails = None, None, None, None
-        current_conversation = []
-        
-        if result:
-            conversation_data, request_count, google_calendar_email, next_google_calendar_event, refresh_token = result
-            google_calendar_email, next_google_calendar_event, local_now, last_five_emails = await fetch_google_info(refresh_token)
+    fetch_query = "SELECT conversation_data, request_count, google_calendar_email, next_google_calendar_event, refresh_token FROM conversations WHERE phone_number = %s"
+    result = execute_query(fetch_query, (phone_number,), cursor)
 
-            if request_count >= 50:
-                return "Your free trial has ended, please subscribe to PAL PRO."
-
-            current_conversation = json.loads(conversation_data) if isinstance(conversation_data, str) else conversation_data
-
-        update_conversation_data(current_conversation, "user", user_input)
-        
-        if google_calendar_email and refresh_token:
-            update_conversation_data(current_conversation, "system", f"$$my local Current Time: {local_now}")
-
-        if last_five_emails:
-            update_conversation_data(current_conversation, "system", f"%%%I gave you access to my gmail, pay attention: These are my Last 5 Emails: {dumps(last_five_emails)}")
-
-        if google_calendar_email and next_google_calendar_event:
-            update_conversation_data(current_conversation, "system", f"@@@my email is {google_calendar_email}. I gave you access to my calendar, pay attention: my Next events based on my calendar are: {next_google_calendar_event}.")
-
-        update_conversation_data(current_conversation, "system", const_convo)
-        truncated = truncate_to_last_n_words(current_conversation, max_words=1000)
-        print("Truncated",truncated)
-        response = openai.ChatCompletion.create(
-            model="gpt-4",
-            messages=truncated
-        )
-        
-        gpt4_reply = response['choices'][0]['message']['content'].strip()
-        gpt4_reply = gpt4_reply[:1600]
-        
-        update_conversation_data(current_conversation, "assistant", gpt4_reply)
-
-        updated_data = json.dumps(current_conversation)
-
-        if result:
-            update_query = "UPDATE conversations SET conversation_data = %s, request_count = request_count + 1 WHERE phone_number = %s;"
-            cursor.execute(update_query, (updated_data, phone_number))
-        else:
-            insert_query = "INSERT INTO conversations (phone_number, conversation_data, request_count) VALUES (%s, %s, 1) ON CONFLICT (phone_number) DO NOTHING;"
-            cursor.execute(insert_query, (phone_number, updated_data))
-        
-        connection.commit()
-
-        return gpt4_reply
-
-async def message_all_users():
-    print("Inside message_all_users")
-
-    connection = await create_connection()
-    async with connection.cursor() as cursor:
-
-        fetch_query = "SELECT phone_number FROM conversations"
-        await cursor.execute(fetch_query)
-        all_phone_numbers = await cursor.fetchall()
-
-        daily_user_input ="!!!if you know my calendar or gmail, based on them, reach out to support and help. If you don't, share daily insights and lessons that are not cliche but very important from most important business and startup books and leaders. No need to mention if you have access to my information or not"
-
-        for phone_number_tuple in all_phone_numbers:
-            phone_number = phone_number_tuple[0]
-            print(f"Attemptinggs to send message to {phone_number}")
-            try:
-                generated_response = await generate_response(user_input=daily_user_input, phone_number=phone_number)
-                
-                message = client.messages.create(
-                    to=phone_number,
-                    from_=TWILIO_PHONE_NUMBER,
-                    body=generated_response
-                )
-                print(f"Message sent to {phone_number} with ID: {message.sid}")
-            except Exception as e:
-                print(f"Failed to send message to {phone_number}: {e}")
-
-async def start_jobs():
-    print("inside Startss jobs")
-    scheduler = BackgroundScheduler()
-    scheduler.start()
-    scheduler.add_job(
-        func=asyncio.run(message_all_users),
-        trigger=IntervalTrigger(hours=16),
-        id='trigger_responses_job',
-        name='Trigger responses for all users every 24 hours',
-        replace_existing=True,
-        max_instances=1
-        )
+    google_calendar_email, next_google_calendar_event, local_now, last_five_emails = None, None, None, None
+    current_conversation = []
     
-    atexit.register(lambda: scheduler.shutdown(wait=False))
+    if result:
+        conversation_data, request_count, google_calendar_email, next_google_calendar_event, refresh_token = result
+        google_calendar_email, next_google_calendar_event, local_now, last_five_emails = fetch_google_info(refresh_token)
+
+        if request_count >= 50:
+            return "Your free trial has ended, please subscribe to PAL PRO."
+
+        current_conversation = json.loads(conversation_data) if isinstance(conversation_data, str) else conversation_data
+
+    update_conversation_data(current_conversation, "user", user_input)
+    
+    if google_calendar_email and refresh_token:
+        update_conversation_data(current_conversation, "system", f"$$my local Current Time: {local_now}")
+
+    if last_five_emails:
+        update_conversation_data(current_conversation, "system", f"%%%I gave you access to my gmail, pay attention: These are my Last 5 Emails: {dumps(last_five_emails)}")
+
+    if google_calendar_email and next_google_calendar_event:
+        update_conversation_data(current_conversation, "system", f"@@@my email is {google_calendar_email}. I gave you access to my calendar, pay attention: my Next events based on my calendar are: {next_google_calendar_event}.")
+
+    update_conversation_data(current_conversation, "system", const_convo)
+    truncated = truncate_to_last_n_words(current_conversation, max_words=1000)
+    print("Truncated",truncated)
+    response = openai.ChatCompletion.create(
+        model="gpt-4",
+        messages=truncated
+    )
+    
+    gpt4_reply = response['choices'][0]['message']['content'].strip()
+    gpt4_reply = gpt4_reply[:1600]
+    
+    update_conversation_data(current_conversation, "assistant", gpt4_reply)
+
+    updated_data = json.dumps(current_conversation)
+
+    if result:
+        update_query = "UPDATE conversations SET conversation_data = %s, request_count = request_count + 1 WHERE phone_number = %s;"
+        cursor.execute(update_query, (updated_data, phone_number))
+    else:
+        insert_query = "INSERT INTO conversations (phone_number, conversation_data, request_count) VALUES (%s, %s, 1) ON CONFLICT (phone_number) DO NOTHING;"
+        cursor.execute(insert_query, (phone_number, updated_data))
+    
+    connection.commit()
+
+    return gpt4_reply
+
 
 @app.route("/sms", methods=['POST'])
 def handle_sms():
@@ -203,15 +160,17 @@ def index():
     return render_template('index.html')
 
 @app.route('/send_message', methods=['POST'])
-async def send_message():  # Define the route as an async function
+def send_message():
     app.logger.info('Inside send_message')
     print("inside_send_message")
     try:
         data = request.json
         phone_number = data.get('phone_number')
+  
         greeting_message = f"👋🏼 Hi there, I am Pal! I am so excited to connect with you. What is your name? Also read more about me here: https://www.myfriendpal.com/pal . I am getting insanely good to help founders and executives build the next big thing!"
 
-        message = await client.messages.create(
+        # Send the first message
+        message = client.messages.create(
             to=phone_number,
             from_=TWILIO_PHONE_NUMBER,
             body=greeting_message
@@ -221,12 +180,53 @@ async def send_message():  # Define the route as an async function
     except Exception as e:
         logging.error(f"Failed to send message: {e}")
         return jsonify({'message': 'Failed to send message', 'error': str(e)})
-
-        
+    
 @app.route('/oauth2callback', methods=['GET'])
 def handle_oauth2callback():
     print("Entered handle_oauth2callback in app.py")
     return oauth2callback()
+
+def message_all_users():
+    print("Inside message_all_users")
+
+    connection = create_connection()
+    cursor = connection.cursor()
+
+    fetch_query = "SELECT phone_number FROM conversations"
+    cursor.execute(fetch_query)
+    all_phone_numbers = cursor.fetchall()
+
+    daily_user_input ="!!!if you know my calendar or gmail, based on them, reach out to support and help. If you don't, share daily insights and lessons that are not cliche but very important from most important business and startup books and leaders. No need to mention if you have access to my information or not"
+
+    for phone_number_tuple in all_phone_numbers:
+        phone_number = phone_number_tuple[0]
+        print(f"Attemptinggs to send message to {phone_number}")
+        try:
+            generated_response = generate_response(user_input=daily_user_input, phone_number=phone_number)
+            
+            message = client.messages.create(
+                to=phone_number,
+                from_=TWILIO_PHONE_NUMBER,
+                body=generated_response
+            )
+            print(f"Message sent to {phone_number} with ID: {message.sid}")
+        except Exception as e:
+            print(f"Failed to send message to {phone_number}: {e}")
+
+def start_jobs():
+    print("inside Startss jobs")
+    scheduler = BackgroundScheduler()
+    scheduler.start()
+    scheduler.add_job(
+        func=message_all_users,
+        trigger=IntervalTrigger(hours=48),
+        id='trigger_responses_job',
+        name='Trigger responses for all users every 24 hours',
+        replace_existing=True,
+        max_instances=1
+        )
+    
+    atexit.register(lambda: scheduler.shutdown())
 
 @app.route('/pal', methods=['GET'])
 def pal_page():
@@ -240,17 +240,10 @@ def policy_page():
 def about_page():
     return render_template('about.html')
 
-async def main_async():
-    # Configure your async database connection here
-    # ...
-    # Start the scheduler
-    scheduler = AsyncIOScheduler()
-    scheduler.add_job(message_all_users, 'interval', hours=48)
-    scheduler.start()
-
-    # Now, you would typically start an ASGI server here instead of Flask's server
-    # For example, with hypercorn:
-    # await hypercorn.asyncio.serve(app, hypercorn.Config())
 
 if __name__ == '__main__':
-    asyncio.run(main_async())
+    print("Script is starting")
+    start_jobs() 
+    app.debug = True
+    port = int(os.environ.get("PORT", 5002))
+    app.run(host="0.0.0.0", port=port, debug=True, use_reloader=False)
