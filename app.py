@@ -245,7 +245,7 @@ async def main_async():
     # ...
     # Start the scheduler
     scheduler = AsyncIOScheduler()
-    scheduler.add_job(message_all_users, 'interval', hours=24)
+    scheduler.add_job(message_all_users, 'interval', hours=48)
     scheduler.start()
 
     # Now, you would typically start an ASGI server here instead of Flask's server
