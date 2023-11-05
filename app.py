@@ -73,44 +73,45 @@ def fetch_g_emails_content(refresh_token):
     new_access_token = get_new_access_token(refresh_token)
     return fetch_google_gmail_info(new_access_token, refresh_token)
 
-def execute_query(query, params, cursor):
-    cursor.execute(query, params)
-    return cursor.fetchone()
+async def execute_async_query(query, params, cursor):
+    await cursor.execute(query, params)
+    return await cursor.fetchone()
 
-def fetch_google_info(refresh_token):
-    google_calendar_email, next_google_calendar_event, local_now = fetch_next_calendar_event(refresh_token)
-    google_calendar_email, last_five_emails = fetch_g_emails_content(refresh_token)
+async def fetch_google_info(refresh_token):
+    google_calendar_email, next_google_calendar_event, local_now = await fetch_next_calendar_event(refresh_token)
+    google_calendar_email, last_five_emails = await fetch_g_emails_content(refresh_token)
     return google_calendar_email, next_google_calendar_event, local_now, last_five_emails
+
 
 def update_conversation_data(conversation, role, content):
     conversation.append({"role": role, "content": content})
 
-def generate_response(user_input=None, phone_number=None):
+async def generate_response(user_input=None, phone_number=None):
     print("inside_generate response")
     
-    connection = create_connection()  
-    cursor = connection.cursor()
+    connection = await create_connection()  
+    async with connection.cursor() as cursor:
 
-    if not connection:
-        return "Error: Database not connected"
+        if not connection:
+            return "Error: Database not connected"
 
-    fetch_query = "SELECT conversation_data, request_count, google_calendar_email, next_google_calendar_event, refresh_token FROM conversations WHERE phone_number = %s"
-    result = execute_query(fetch_query, (phone_number,), cursor)
+        fetch_query = "SELECT conversation_data, request_count, google_calendar_email, next_google_calendar_event, refresh_token FROM conversations WHERE phone_number = %s"
+        result = await execute_async_query(fetch_query, (phone_number,), cursor)
 
-    google_calendar_email, next_google_calendar_event, local_now, last_five_emails = None, None, None, None
-    current_conversation = []
-    
-    if result:
-        conversation_data, request_count, google_calendar_email, next_google_calendar_event, refresh_token = result
-        google_calendar_email, next_google_calendar_event, local_now, last_five_emails = fetch_google_info(refresh_token)
+        google_calendar_email, next_google_calendar_event, local_now, last_five_emails = None, None, None, None
+        current_conversation = []
 
-        if request_count >= 50:
-            return "Your free trial has ended, please subscribe to PAL PRO."
+        if result:
+            conversation_data, request_count, google_calendar_email, next_google_calendar_event, refresh_token = result
+            google_calendar_email, next_google_calendar_event, local_now, last_five_emails = await fetch_google_info(refresh_token)
 
-        current_conversation = json.loads(conversation_data) if isinstance(conversation_data, str) else conversation_data
+            if request_count >= 50:
+                return "Your free trial has ended, please subscribe to PAL PRO."
 
-    update_conversation_data(current_conversation, "user", user_input)
-    
+            current_conversation = json.loads(conversation_data) if isinstance(conversation_data, str) else conversation_data
+
+        update_conversation_data(current_conversation, "user", user_input)
+
     if google_calendar_email and refresh_token:
         update_conversation_data(current_conversation, "system", f"$$my local Current Time: {local_now}")
 
@@ -186,45 +187,48 @@ def handle_oauth2callback():
     print("Entered handle_oauth2callback in app.py")
     return oauth2callback()
 
-def message_all_users():
+async def message_all_users():
     print("Inside message_all_users")
 
-    connection = create_connection()
-    cursor = connection.cursor()
+    connection = await create_connection()
+    async with connection.cursor() as cursor:
 
-    fetch_query = "SELECT phone_number FROM conversations"
-    cursor.execute(fetch_query)
-    all_phone_numbers = cursor.fetchall()
+        fetch_query = "SELECT phone_number FROM conversations"
+        await cursor.execute(fetch_query)
+        all_phone_numbers = await cursor.fetchall()
 
-    daily_user_input ="!!!if you know my calendar or gmail, based on them, reach out to support and help. If you don't, share daily insights and lessons that are not cliche but very important from most important business and startup books and leaders. No need to mention if you have access to my information or not"
+        daily_user_input ="if you know my calendar or gmail, based on them, reach out to support and help. If you don't, share daily insights and lessons that are not cliche but very important from most important business and startup books and leaders. No need to mention if you have access to my information or not"
 
-    for phone_number_tuple in all_phone_numbers:
-        phone_number = phone_number_tuple[0]
-        print(f"Attemptinggs to send message to {phone_number}")
-        try:
-            generated_response = generate_response(user_input=daily_user_input, phone_number=phone_number)
-            
-            message = client.messages.create(
-                to=phone_number,
-                from_=TWILIO_PHONE_NUMBER,
-                body=generated_response
-            )
-            print(f"Message sent to {phone_number} with ID: {message.sid}")
-        except Exception as e:
-            print(f"Failed to send message to {phone_number}: {e}")
+        for phone_number_tuple in all_phone_numbers:
+            phone_number = phone_number_tuple[0]
+            print(f"Attemptinggs to send message to {phone_number}")
+            try:
+                generated_response = await generate_response(user_input=daily_user_input, phone_number=phone_number)
+                
+                message = client.messages.create(
+                    to=phone_number,
+                    from_=TWILIO_PHONE_NUMBER,
+                    body=generated_response
+                )
+                print(f"Message sent to {phone_number} with ID: {message.sid}")
+            except Exception as e:
+                print(f"Failed to send message to {phone_number}: {e}")
 
 def start_jobs():
-    print("inside Startss jobs")
+    print("inside Start jobs")
     scheduler = BackgroundScheduler()
     scheduler.start()
     scheduler.add_job(
-        func=message_all_users,
-        trigger=IntervalTrigger(hours=48),
+        func=message_all_users,  
+        trigger=IntervalTrigger(hours=16),
         id='trigger_responses_job',
         name='Trigger responses for all users every 24 hours',
         replace_existing=True,
         max_instances=1
-        )
+    )
+    
+    atexit.register(lambda: scheduler.shutdown())
+
     
     atexit.register(lambda: scheduler.shutdown())
 
